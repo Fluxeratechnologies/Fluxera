@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "name": "fluxera-technologies",
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/sdk/(.*)", "dest": "/sdk/$1" },
+    { "src": "/(.*)", "dest": "/public/$1" }
+  ],
+  "env": {
+    "ANTHROPIC_API_KEY": "@anthropic_api_key",
+    "DATABASE_URL": "@database_url",
+    "RESEND_API_KEY": "@resend_api_key",
+    "FLUXERA_SECRET": "@fluxera_secret"
+  },
+  "crons": [
+    {
+      "path": "/api/processor",
+      "schedule": "0 * * * *"
+    }
+  ]
+}
