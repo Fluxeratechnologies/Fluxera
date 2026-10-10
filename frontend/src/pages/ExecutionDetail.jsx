@@ -41,14 +41,27 @@ export function ExecutionDetail({apiKey,executionId,go}){
         <Card k="What failed?" v={d.what_failed?`${d.what_failed.type}: ${d.what_failed.name}`:"Nothing"} red={!!d.what_failed} />
         <Card k="Why?" v={d.why?.error_type?`${d.why.error_type}${d.why.retries_fired?" · retries fired":""}${d.why.child_tool_timeout?" · tool timeout":""}`:"—"} />
         <Card k="What did it affect?" v={affectLine(d.affected, e)} />
-        <Card k="How much did it cost?" v={`${f$(d.cost?.failed)} failed · ${f$(d.cost?.retry_wasted)} retry waste`} red />
+        <Card k="How much did it cost?" v={costLine(d.cost)} red />
       </div>
       {err&&<p style={{fontSize:12,color:"var(--red)"}}>{err}</p>}
-      <p style={{fontSize:12,color:"var(--gray4)"}}>{e.status} · {fMs(e.duration_ms)} · started {e.started_at?new Date(e.started_at).toLocaleString():"—"}{d.bottleneck?` · bottleneck ${d.bottleneck.name}`:""}</p>
+      <p style={{fontSize:12,color:"var(--gray4)"}}>{contextLine(e)}{e.status} · {fMs(e.duration_ms)} · started {e.started_at?new Date(e.started_at).toLocaleString():"—"}{d.bottleneck?` · bottleneck ${d.bottleneck.name}`:""}</p>
       <Tree steps={pack.steps||[]} leaves={pack.leaves||[]} failedId={d.what_failed?.id} bottleneckId={d.bottleneck?.id} />
       <RecoveryCard diagnosis={d} recovery={pack.recovery} onRecover={recover} recovering={saving} />
     </div>
   );
+}
+
+function costLine(cost){
+  const head=`${f$(cost?.failed)} failed · ${f$(cost?.retry_wasted)} retry waste`;
+  const kinds=["model","tool","api","compute","third_party"]
+    .filter(k=>parseFloat(cost?.by_kind?.[k])>0)
+    .map(k=>`${k} ${f$(cost.by_kind[k])}`);
+  return kinds.length?`${head} · ${kinds.join(" · ")}`:head;
+}
+
+function contextLine(e){
+  if(e.actor&&e.actor!=="workflow")return `${e.actor} · `;
+  return "";
 }
 
 function affectLine(affected, execution){

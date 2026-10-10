@@ -22,10 +22,13 @@ function checkupLine(e){
   return `${step}${err}${rec}`;
 }
 
+const ACTORS=["","workflow","agent","memory"];
+
 export function Executions({apiKey,isDemo,go,workflow="",grouped=false}){
   const[rows,setRows]=useState([]);
   const[err,setErr]=useState("");
   const[status,setStatus]=useState("");
+  const[actor,setActor]=useState("");
   const[loading,setLoading]=useState(!isDemo&&!!apiKey);
   useEffect(()=>{
     if(isDemo||!apiKey){setRows([]);setLoading(false);return;}
@@ -33,13 +36,14 @@ export function Executions({apiKey,isDemo,go,workflow="",grouped=false}){
     const p=new URLSearchParams();
     if(status)p.set("status",status);
     if(workflow)p.set("workflow",workflow);
+    if(actor)p.set("actor",actor);
     const q=p.toString()?`?${p}`:"";
     apiGet("/api/executions"+q,apiKey).then(async r=>{
       if(!r.ok)throw new Error("Couldn't load executions");
       const j=await r.json();
       setRows(j.executions||[]);
     }).catch(e=>setErr(e.message)).finally(()=>setLoading(false));
-  },[apiKey,isDemo,status,workflow]);
+  },[apiKey,isDemo,status,workflow,actor]);
   if(isDemo)return <p style={{color:"var(--gray4)"}}>{grouped?"Sign in with an API key to see checkup history.":"Sign in with an API key to inspect real executions."}</p>;
   if(err)return <p style={{color:"var(--red)"}}>{err}</p>;
   if(loading)return <p style={{color:"var(--gray4)"}}>Loading...</p>;
@@ -50,17 +54,21 @@ export function Executions({apiKey,isDemo,go,workflow="",grouped=false}){
         {["","success","partial","failed","interrupted"].map(s=>(
           <button key={s||"all"} onClick={()=>setStatus(s)} style={{padding:"5px 12px",border:"1px solid var(--gray2)",borderRadius:6,background:status===s?"var(--gray1)":"var(--white)",color:"var(--ink)",fontSize:12,cursor:"pointer"}}>{s||"all"}</button>
         ))}
+        <span style={{width:8}} />
+        {ACTORS.map(a=>(
+          <button key={a||"any"} onClick={()=>setActor(a)} style={{padding:"5px 12px",border:"1px solid var(--gray2)",borderRadius:6,background:actor===a?"var(--gray1)":"var(--white)",color:"var(--ink)",fontSize:12,cursor:"pointer"}}>{a||"any actor"}</button>
+        ))}
         {workflow&&<button onClick={()=>go("history")} style={{padding:"5px 12px",border:"1px solid var(--gray2)",borderRadius:6,background:"var(--white)",color:"var(--ink)",fontSize:12,cursor:"pointer"}}>All workflows</button>}
       </div>
       {!rows.length?<p style={{color:"var(--gray4)"}}>{grouped?"No checkups yet. Run a workflow or node db/seed-intelligence.js":"No executions. Run node db/seed-intelligence.js"}</p>:
       groups.map(([name,list])=>(
         <div key={name||"flat"}>
-          {grouped&&<p style={{fontSize:13,fontWeight:600,fontFamily:"DM Mono,monospace",marginBottom:8}}>{name} <span style={{fontWeight:400,color:"var(--gray4)",fontFamily:"Inter,sans-serif"}}>{list.length} {list.length===1?"checkup":"checkups"}</span></p>}
+          {grouped&&<p style={{fontSize:13,fontWeight:600,fontFamily:"DM Mono,monospace",marginBottom:8}}>{name}{list[0]?.actor&&list[0].actor!=="workflow"&&<span style={{marginLeft:8,fontSize:10,fontWeight:500,color:"var(--gray4)",border:"1px solid var(--gray2)",borderRadius:4,padding:"1px 5px"}}>{list[0].actor}</span>} <span style={{fontWeight:400,color:"var(--gray4)",fontFamily:"Inter,sans-serif"}}>{list.length} {list.length===1?"checkup":"checkups"}</span></p>}
           <div style={{background:"var(--white)",border:"1px solid var(--gray2)",borderRadius:10,overflow:"hidden"}}>
             {list.map(e=>(
               <button key={e.id} onClick={()=>go("execution",e.id)} style={{width:"100%",textAlign:"left",display:"flex",justifyContent:"space-between",alignItems:"center",gap:16,padding:"14px 20px",border:"none",borderBottom:"1px solid var(--gray2)",background:"transparent",cursor:"pointer"}}>
                 <div style={{minWidth:0}}>
-                  {!grouped&&<p style={{fontSize:13,fontWeight:600,fontFamily:"DM Mono,monospace"}}>{e.workflow_name}</p>}
+                  {!grouped&&<p style={{fontSize:13,fontWeight:600,fontFamily:"DM Mono,monospace"}}>{e.workflow_name}{e.actor&&e.actor!=="workflow"&&<span style={{marginLeft:8,fontSize:10,fontWeight:500,color:"var(--gray4)",border:"1px solid var(--gray2)",borderRadius:4,padding:"1px 5px"}}>{e.actor}</span>}</p>}
                   <p style={{fontSize:grouped?13:11,fontWeight:grouped?500:400,color:grouped?"var(--ink)":"var(--gray3)"}}>{new Date(e.started_at).toLocaleString()}</p>
                   {grouped&&<p style={{fontSize:12,color:e.status==="success"?"var(--gray4)":"var(--gray5)",marginTop:2}}>{checkupLine(e)}</p>}
                 </div>

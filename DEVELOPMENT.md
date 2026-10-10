@@ -381,6 +381,18 @@ Later: business-value recovery, Python SDK, estimated recovery cost from the cur
 
 ---
 
+## Early V1 — agent intelligence
+
+**Landed.** An agent run is a workflow execution. Fluxera does not run the agent.
+
+- `fluxera.agent(name, fn)` is `workflow()` with `actor=agent`. Inside it, reuse `step` / `tool` / `track` / `checkpoint`. Model calls stay leaves with `cost_kind=model`. No `fluxera.model()`.
+- `workflows.actor` is `workflow | agent | memory` (default `workflow`). First sight wins, except a one-way upgrade `workflow → agent|memory`. Never demote, never switch agent ↔ memory.
+- Agent state is the last checkpoint cursor. No conversation store.
+- Cost, failures, interrupt, and recover stay the existing rollup, diagnose, and resume/retry/fallback webhook.
+- Workflows and Executions filter with `?actor=`. Execution detail splits cost by `cost_kind` (`diagnosis.cost.by_kind`). No new nav.
+
+---
+
 ## Phase 3 — product completeness
 
 After recovery actually runs and reliability is computed, not before.

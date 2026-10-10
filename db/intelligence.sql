@@ -125,3 +125,9 @@ ALTER TABLE request_logs ADD CONSTRAINT request_logs_cost_kind_check
 CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_institute
   ON customers (lower(company))
   WHERE company IS NOT NULL AND company <> '';
+
+-- Agent intelligence: same catalog, three actors.
+ALTER TABLE workflows ADD COLUMN IF NOT EXISTS actor TEXT NOT NULL DEFAULT 'workflow';
+ALTER TABLE workflows DROP CONSTRAINT IF EXISTS workflows_actor_check;
+ALTER TABLE workflows ADD CONSTRAINT workflows_actor_check
+  CHECK (actor IN ('workflow', 'agent', 'memory'));

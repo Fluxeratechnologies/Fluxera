@@ -4,6 +4,7 @@ export function RecoveryCard({diagnosis, recovery, onRecover, recovering}){
   const rec=diagnosis?.recover;
   const cost=diagnosis?.cost||{};
   const checkpoint=diagnosis?.checkpoint;
+  const kinds=Object.entries(cost.by_kind||{}).filter(([,v])=>v>0);
   const none=!rec||rec.action==="none";
   if(none&&!checkpoint&&cost.recovery==null&&cost.avoided==null){
     return <div style={{background:"var(--green-bg)",border:"1px solid var(--green-border)",borderRadius:10,padding:20}}><p style={{fontSize:13,color:"var(--green)"}}>No recovery needed.</p></div>;
@@ -27,6 +28,9 @@ export function RecoveryCard({diagnosis, recovery, onRecover, recovering}){
         <p>Recovery cost: {cost.recovery==null?"—":f$(cost.recovery)}</p>
         <p style={{fontWeight:600,color:cost.avoided>0?"var(--green)":"var(--gray5)"}}>Cost avoided: {cost.avoided==null?"—":f$(cost.avoided)}</p>
       </div>
+      {kinds.length>1&&(
+        <p style={{fontSize:11,color:"var(--gray4)"}}>{kinds.map(([k,v])=>`${k} ${f$(v)}`).join(" · ")}</p>
+      )}
       {verified&&<p style={{fontSize:12,color:"var(--green)"}}>{resume?"Verified — the resume execution succeeded.":"Verified — a later run of this workflow succeeded."}</p>}
       {!verified&&executed&&<p style={{fontSize:12,color:"var(--amber)"}}>{resume?"Webhook sent. Still failing until the resume execution succeeds.":"Webhook sent. Still failing until a later success."}</p>}
       {onRecover&&!verified&&rec&&rec.action!=="none"&&(

@@ -15,6 +15,7 @@
     "context.js",
     "wrap.js",
     "workflow.js",
+    "agent.js",
     "step.js",
     "tool.js",
     "checkpoint.js",

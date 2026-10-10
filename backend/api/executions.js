@@ -4,6 +4,7 @@ const { requireAuth } = require('./auth')
 const { diagnoseExecution } = require('../intelligence/diagnose')
 const { executeRecover } = require('./recover')
 const { interruptedSql } = require('../intelligence/interrupt')
+const { actorFilter } = require('../intelligence/kinds')
 
 const router = express.Router()
 
@@ -28,10 +29,15 @@ router.get('/', async (req, res) => {
     params.push(workflow)
     where.push(`w.name = $${params.length}`)
   }
+  const actor = actorFilter(req.query.actor)
+  if (actor) {
+    params.push(actor)
+    where.push(`w.actor = $${params.length}`)
+  }
 
   try {
     const result = await query(
-      `SELECT e.*, w.name AS workflow_name,
+      `SELECT e.*, w.name AS workflow_name, w.actor,
          CASE
            WHEN ${quiet} THEN 'interrupted'
            ELSE e.status

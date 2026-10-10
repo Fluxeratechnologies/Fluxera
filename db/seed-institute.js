@@ -220,6 +220,38 @@ async function seedInterruptedResume(customer) {
   console.log('  ingest-docs interrupted + resume (cost avoided)')
 }
 
+async function seedSalesAgent(customer) {
+  const customerId = customer.id
+  const workflowId = await upsertWorkflow(customerId, 'sales-agent', 'agent')
+  const pricing = await upsertTool(customerId, 'pricing-api', 0.02)
+  const executionId = randomUUID()
+  const started = new Date(Date.now() - 12 * 60 * 1000)
+  await upsertExecution(customerId, {
+    id: executionId, workflowId, startedAt: started,
+    endedAt: new Date(started.getTime() + 2400),
+    status: 'success', durationMs: 2400,
+  })
+  const stepId = randomUUID()
+  await upsertStep(customerId, {
+    id: stepId, executionId, name: 'price', status: 'fail',
+    startedAt: started, endedAt: new Date(started.getTime() + 2400), durationMs: 2400,
+  })
+  await insertLeaf(customerId, {
+    executionId, stepId, endpoint: 'gpt-4o', status: 'success',
+    latency: 800, price: 0.04, at: started, costKind: 'model',
+  })
+  await insertLeaf(customerId, {
+    executionId, stepId, toolId: pricing, endpoint: 'pricing-api', status: 'fail',
+    latency: 1400, price: 0.02, error: 'timeout', at: new Date(started.getTime() + 900), costKind: 'tool',
+  })
+  await applyCheckpoint(customerId, {
+    stepId, executionId, name: 'price', cursor: 'after-qualify',
+  })
+  await rollupExecution(executionId)
+  await diagnoseExecution(customer, executionId)
+  console.log('  sales-agent failed on pricing-api')
+}
+
 async function seed() {
   const apiKey = String(process.argv[2] || '').trim()
   if (!apiKey.startsWith('fx_')) {
@@ -243,6 +275,7 @@ async function seed() {
   console.log('  leak logs')
   await seedCheckout(customer)
   await seedInterruptedResume(customer)
+  await seedSalesAgent(customer)
   console.log('Done. Sign in with that institute key and open Workflows / Executions.')
   await pool.end()
 }

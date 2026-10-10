@@ -76,6 +76,7 @@ router.post('/', async (req, res) => {
       started_at: log.started_at ? new Date(log.started_at) : null,
       ended_at: log.ended_at || log.timestamp ? new Date(log.ended_at || log.timestamp) : null,
       recovery_of: log.recovery_of || null,
+      actor: log.actor || null,
       cursor: log.cursor != null ? log.cursor : null,
       progress_done: Number.isInteger(log.progress_done) ? log.progress_done : (Number.isInteger(log.done) ? log.done : null),
       progress_total: Number.isInteger(log.progress_total) ? log.progress_total : (Number.isInteger(log.total) ? log.total : null),
@@ -97,7 +98,7 @@ router.post('/', async (req, res) => {
       let stepId = ev.step_id
 
       if (ev.workflow) {
-        const workflowId = await upsertWorkflow(customer.id, ev.workflow)
+        const workflowId = await upsertWorkflow(customer.id, ev.workflow, ev.actor)
         if (!executionId) executionId = uuid()
         const ended = ev.kind === 'workflow_end' ? (ev.ended_at || new Date()) : null
         await upsertExecution(customer.id, {

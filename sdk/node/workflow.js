@@ -15,15 +15,17 @@ async function workflow(client, name, fn, opts = {}) {
     request_id: randomUUID(),
     endpoint: name,
     recovery_of: opts.recovery_of || null,
+    actor: opts.actor || 'workflow',
   })
   try {
-    return await runWith({ executionId, workflow: name }, () =>
+    return await runWith({ executionId, workflow: name, actor: opts.actor || 'workflow' }, () =>
       wrap(client, fn, {
         kind: 'workflow_end',
         workflow: name,
         execution_id: executionId,
         endpoint: name,
         started_at: startedAt,
+        actor: opts.actor || 'workflow',
       })
     )
   } catch (err) {

@@ -1,13 +1,19 @@
 const { query } = require('../../db/pool')
 const { normalizeDependsOn } = require('./cascade')
+const { normalizeActor } = require('./kinds')
 
-async function upsertWorkflow(customerId, name) {
+async function upsertWorkflow(customerId, name, actor) {
   const result = await query(
-    `INSERT INTO workflows (customer_id, name)
-     VALUES ($1, $2)
-     ON CONFLICT (customer_id, name) DO UPDATE SET name = EXCLUDED.name
+    `INSERT INTO workflows (customer_id, name, actor)
+     VALUES ($1, $2, $3)
+     ON CONFLICT (customer_id, name) DO UPDATE SET
+       actor = CASE
+         WHEN workflows.actor = 'workflow' AND EXCLUDED.actor IN ('agent', 'memory')
+           THEN EXCLUDED.actor
+         ELSE workflows.actor
+       END -- keep in sync with nextActor()
      RETURNING id`,
-    [customerId, String(name).slice(0, 255)]
+    [customerId, String(name).slice(0, 255), normalizeActor(actor)]
   )
   return result.rows[0].id
 }

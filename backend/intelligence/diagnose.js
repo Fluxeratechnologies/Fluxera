@@ -2,6 +2,7 @@ const { query } = require('../../db/pool')
 const { isFail } = require('./status')
 const { costFromLeaves } = require('./rollup')
 const { isInterrupted } = require('./interrupt')
+const { normalizeCostKind } = require('./kinds')
 
 function mostCommon(values) {
   const counts = {}
@@ -65,6 +66,15 @@ function resumeCost({ original, child }) {
     recovery,
     avoided,
   }
+}
+
+function costByKind(leaves) {
+  const by = {}
+  for (const l of leaves || []) {
+    const k = normalizeCostKind(l.cost_kind, !!l.tool_id)
+    by[k] = (by[k] || 0) + (parseFloat(l.price) || 0)
+  }
+  return by
 }
 
 function diagnosePayload({ execution, steps, leaves, customer, workflowName, child, now }) {
@@ -133,6 +143,7 @@ function diagnosePayload({ execution, steps, leaves, customer, workflowName, chi
       potential_reexecution: resume.potential_reexecution,
       recovery: resume.recovery,
       avoided: resume.avoided,
+      by_kind: costByKind(leaves),
     },
     recover: rec,
     checkpoint: resumeTarget || (openStep && stepHasCursor(openStep) ? openStep : null)
@@ -173,7 +184,7 @@ async function persistRecommendation(customerId, executionId, diagnosis) {
 
 async function diagnoseExecution(customer, executionId) {
   const exec = await query(
-    `SELECT e.*, w.name AS workflow_name
+    `SELECT e.*, w.name AS workflow_name, w.actor
      FROM workflow_executions e
      JOIN workflows w ON w.id = e.workflow_id
      WHERE e.id = $1 AND e.customer_id = $2`,
