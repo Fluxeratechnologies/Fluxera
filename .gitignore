@@ -6,3 +6,5 @@ frontend/.env
 dist/
 coverage/
 tests/
+.agents/skills/
+skills-lock.json

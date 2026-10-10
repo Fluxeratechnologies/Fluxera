@@ -224,7 +224,7 @@ Auth on the landing:
 - **Sign up** — [frontend/src/pages/Onboarding.jsx](frontend/src/pages/Onboarding.jsx): email + institute name → mint → show the key (copy) + SDK snippet → same step sets the dashboard session.
 - **Sign in** — key only (`GET /api/customers/me`). No email on the form. Does not create a demo session.
 - **View demo** — leak-lens mock, no key.
-- **Settings** — Apply key still switches institutes. No rotate, no forgot-key.
+- **Settings** — live institute: copy the one key, no rotate, no switcher. Demo: paste an fx_ key to enter that institute. Lost key + lost session → ops looks it up.
 
 Nav (keep leak, add intelligence):
 
@@ -361,6 +361,23 @@ SDK poll (`GET /api/recover/pending`) stays later.
 5. UI badges + tests + this section marked landed
 
 Hourly snapshots in `intelligence.js` remain later.
+
+---
+
+## Early V1 — work + cost recovery
+
+Control plane only. SDK reports checkpoints. Recover webhook tells the customer where to continue. Fluxera does not re-execute work.
+
+**Landed.** Schema, ingest, diagnose, webhook, Settings threshold, RecoveryCard four-line cost, executions `interrupted`, workflow `cost_avoided`.
+
+- Checkpoint hangs on the existing execution (`cursor`, `progress_done`, `progress_total`, `checkpoint_at` on the step). `fluxera.checkpoint({ done, total, cursor })` inside `step()`.
+- `interrupted` is derived on read: no `ended_at` and last event older than `customers.interrupt_after_minutes` (default 15, Settings, 1–10080). Not stored.
+- Webhook verbs: `resume` | `retry` | `fallback`. Payload includes `completed_steps` and `cursor`.
+- Resume is a new execution with `recovery_of`. Cost avoided is measured on that child after it ends `success`. Latest child only.
+- Leaf `cost_kind`: `api | tool | model | compute | third_party`. Default `tool` inside `tool()`, else `api`.
+- `resume` verifies only when the linked child succeeds. Same-workflow later-success verify excludes `action = 'resume'`.
+
+Later: business-value recovery, Python SDK, estimated recovery cost from the cursor percentage, stored `interrupted`, summing every failed resume.
 
 ---
 

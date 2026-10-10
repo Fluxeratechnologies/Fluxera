@@ -10,7 +10,16 @@
     "type": "git",
     "url": "https://github.com/fluxeratechnologies/sdk-node"
   },
-  "files": ["index.js", "README.md"],
+  "files": [
+    "index.js",
+    "context.js",
+    "wrap.js",
+    "workflow.js",
+    "step.js",
+    "tool.js",
+    "checkpoint.js",
+    "README.md"
+  ],
   "engines": { "node": ">=14.0.0" },
   "dependencies": {}
 }

@@ -1,18 +1,35 @@
+import { f$ } from "../format";
+
 export function RecoveryCard({diagnosis, recovery, onRecover, recovering}){
   const rec=diagnosis?.recover;
-  if(!rec||rec.action==="none"){
+  const cost=diagnosis?.cost||{};
+  const checkpoint=diagnosis?.checkpoint;
+  const none=!rec||rec.action==="none";
+  if(none&&!checkpoint&&cost.recovery==null&&cost.avoided==null){
     return <div style={{background:"var(--green-bg)",border:"1px solid var(--green-border)",borderRadius:10,padding:20}}><p style={{fontSize:13,color:"var(--green)"}}>No recovery needed.</p></div>;
   }
   const verified=!!recovery?.verified_at;
   const executed=recovery?.kind==="executed";
+  const resume=rec?.action==="resume"||recovery?.action==="resume";
   return(
     <div style={{background:"var(--white)",border:"1px solid var(--gray2)",borderRadius:10,padding:20,display:"flex",flexDirection:"column",gap:12}}>
       <p style={{fontSize:10,fontFamily:"DM Mono,monospace",color:"var(--gray4)",letterSpacing:".06em"}}>HOW TO RECOVER</p>
-      <p style={{fontSize:16,fontWeight:600,textTransform:"capitalize"}}>{rec.action.replace("_"," ")}</p>
-      <p style={{fontSize:13,color:"var(--gray5)",lineHeight:1.5}}>{rec.reason}</p>
-      {verified&&<p style={{fontSize:12,color:"var(--green)"}}>Verified — a later run of this workflow succeeded.</p>}
-      {!verified&&executed&&<p style={{fontSize:12,color:"var(--amber)"}}>Webhook sent. Still failing until a later success.</p>}
-      {onRecover&&!verified&&(
+      {rec&&rec.action!=="none"&&<p style={{fontSize:16,fontWeight:600,textTransform:"capitalize"}}>{rec.action.replace("_"," ")}</p>}
+      {rec&&rec.action!=="none"&&<p style={{fontSize:13,color:"var(--gray5)",lineHeight:1.5}}>{rec.reason}</p>}
+      {checkpoint&&(
+        <p style={{fontSize:12,color:"var(--gray5)"}}>
+          Checkpoint {checkpoint.step}{checkpoint.done!=null&&checkpoint.total!=null?` · ${checkpoint.done}/${checkpoint.total}`:""}{checkpoint.token?" · cursor held":""}
+        </p>
+      )}
+      <div style={{display:"flex",flexDirection:"column",gap:6,fontSize:12,color:"var(--gray5)"}}>
+        <p>Original execution cost: {f$(cost.original ?? cost.total)}</p>
+        <p>Potential re-execution cost: {f$(cost.potential_reexecution ?? cost.original ?? cost.total)}</p>
+        <p>Recovery cost: {cost.recovery==null?"—":f$(cost.recovery)}</p>
+        <p style={{fontWeight:600,color:cost.avoided>0?"var(--green)":"var(--gray5)"}}>Cost avoided: {cost.avoided==null?"—":f$(cost.avoided)}</p>
+      </div>
+      {verified&&<p style={{fontSize:12,color:"var(--green)"}}>{resume?"Verified — the resume execution succeeded.":"Verified — a later run of this workflow succeeded."}</p>}
+      {!verified&&executed&&<p style={{fontSize:12,color:"var(--amber)"}}>{resume?"Webhook sent. Still failing until the resume execution succeeds.":"Webhook sent. Still failing until a later success."}</p>}
+      {onRecover&&!verified&&rec&&rec.action!=="none"&&(
         <button onClick={onRecover} disabled={recovering} style={{alignSelf:"flex-start",padding:"8px 14px",background:"var(--ink)",color:"#fff",border:"none",borderRadius:7,fontSize:12,cursor:recovering?"not-allowed":"pointer"}}>
           {recovering?"Recovering…":"Recover"}
         </button>

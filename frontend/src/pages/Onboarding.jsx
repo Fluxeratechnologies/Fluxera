@@ -72,6 +72,10 @@ export function Onboarding({onLogin,go}){
           {err&&<p style={{fontSize:12,color:"var(--red)",padding:"8px 12px",background:"var(--red-bg)",border:"1px solid var(--red-border)",borderRadius:6}}>{err}</p>}
           <button type="submit" disabled={loading} style={{padding:"10px",background:"var(--ink)",color:"#fff",border:"none",borderRadius:8,fontSize:13,cursor:"pointer"}}>{loading?"Creating…":"Create institute →"}</button>
         </form>
+        <p style={{fontSize:13,color:"var(--gray4)",marginTop:20}}>
+          Already have a key?{" "}
+          <button type="button" onClick={()=>go("overview")} style={{background:"none",border:"none",color:"var(--ink)",fontWeight:600,cursor:"pointer",padding:0,fontSize:13}}>Sign in</button>
+        </p>
       </div>
     </div>
   );

@@ -18,6 +18,20 @@ function webhookUrlFor(customer, tool) {
   return null
 }
 
+function cursorPayload(steps, diagnosis) {
+  const id = diagnosis?.what_failed?.type === 'step' ? diagnosis.what_failed.id : null
+  const step = (steps || []).find(s => s.id === id)
+    || (steps || []).find(s => s.cursor || s.progress_done != null || s.checkpoint_at)
+  if (!step) return null
+  if (step.cursor == null && step.progress_done == null) return null
+  return {
+    step: step.name,
+    done: step.progress_done ?? null,
+    total: step.progress_total ?? null,
+    token: step.cursor || null,
+  }
+}
+
 async function executeRecover(customer, packed, action) {
   const stepId = packed.diagnosis.what_failed?.type === 'step' ? packed.diagnosis.what_failed.id : null
   let tool = null
@@ -42,6 +56,8 @@ async function executeRecover(customer, packed, action) {
     step: packed.diagnosis.what_failed?.name || null,
     tool: tool?.name || null,
     reason: packed.diagnosis.recover?.reason || null,
+    completed_steps: (packed.steps || []).filter(s => s.status === 'success').map(s => s.name),
+    cursor: cursorPayload(packed.steps, packed.diagnosis),
   }
 
   const ac = new AbortController()
@@ -71,4 +87,4 @@ async function executeRecover(customer, packed, action) {
   return row.rows[0]
 }
 
-module.exports = { recommendRecover, executeRecover, webhookUrlFor }
+module.exports = { recommendRecover, executeRecover, webhookUrlFor, cursorPayload }

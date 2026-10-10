@@ -24,6 +24,7 @@ export function Settings({apiKey,company,isDemo,pricePerReq,setPricePerReq,impac
   const[webhook,setWebhook]=useState("");
   const[hookSaved,setHookSaved]=useState(false);
   const[hookErr,setHookErr]=useState("");
+  const[interruptMin,setInterruptMin]=useState(15);
 
   useEffect(()=>{setKeyDraft(apiKey||"");},[apiKey]);
   useEffect(()=>{
@@ -32,6 +33,7 @@ export function Settings({apiKey,company,isDemo,pricePerReq,setPricePerReq,impac
       if(!r.ok)return;
       const c=await r.json();
       setWebhook(c.webhook_url||"");
+      setInterruptMin(c.interrupt_after_minutes??15);
     }).catch(()=>{});
   },[apiKey,isDemo]);
 
@@ -94,7 +96,10 @@ export function Settings({apiKey,company,isDemo,pricePerReq,setPricePerReq,impac
     if(isDemo)return;
     setSaving(true);
     try{
-      const r=await apiPatch("/api/customers/me",apiKey,{webhook_url:webhook.trim()});
+      const r=await apiPatch("/api/customers/me",apiKey,{
+        webhook_url:webhook.trim(),
+        interrupt_after_minutes:Number(interruptMin),
+      });
       const j=await r.json().catch(()=>({}));
       if(!r.ok)throw new Error(j.error||"Couldn't save webhook");
       setHookSaved(true);setTimeout(()=>setHookSaved(false),2000);
@@ -108,23 +113,34 @@ export function Settings({apiKey,company,isDemo,pricePerReq,setPricePerReq,impac
   return(
     <div style={{maxWidth:560,display:"flex",flexDirection:"column",gap:16,textAlign:"left"}}>
       <section style={{background:"var(--white)",border:"1px solid var(--gray2)",borderRadius:12,padding:"22px 24px"}}>
-        <p style={{fontSize:14,fontWeight:600,marginBottom:6}}>API Key</p>
-        <p style={{fontSize:12,color:"var(--gray4)",marginBottom:12}}>{isDemo?"Paste a seeded fx_ key to load real workflows. Leave blank for demo.":"This key authenticates the dashboard. Replace it to switch accounts."}</p>
-        <input
-          type="text"
-          value={keyDraft}
-          placeholder="fx_…"
-          spellCheck={false}
-          autoComplete="off"
-          autoCorrect="off"
-          onChange={e=>{setKeyDraft(e.target.value);setKeyErr("");}}
-          onKeyDown={e=>{if(e.key==="Enter")applyKey();}}
-          style={mono}
-        />
-        <div style={{display:"flex",gap:8,marginTop:10,flexWrap:"wrap"}}>
-          <button type="button" onClick={applyKey} disabled={saving||!canApply} style={{...primary,opacity:(saving||!canApply)?0.5:1}}>{keySaved?"Applied ✓":saving?"Checking…":"Apply key"}</button>
-          <button type="button" onClick={copy} style={ghost}>{copied?"Copied":"Copy"}</button>
-        </div>
+        <p style={{fontSize:14,fontWeight:600,marginBottom:6}}>Institute key</p>
+        {isDemo?(
+          <>
+            <p style={{fontSize:12,color:"var(--gray4)",marginBottom:12}}>Demo has no key. Paste an institute’s fx_ key to load that workspace. One key per institute — it is login and SDK auth.</p>
+            <input
+              type="text"
+              value={keyDraft}
+              placeholder="fx_…"
+              spellCheck={false}
+              autoComplete="off"
+              autoCorrect="off"
+              onChange={e=>{setKeyDraft(e.target.value);setKeyErr("");}}
+              onKeyDown={e=>{if(e.key==="Enter")applyKey();}}
+              style={mono}
+            />
+            <div style={{display:"flex",gap:8,marginTop:10,flexWrap:"wrap"}}>
+              <button type="button" onClick={applyKey} disabled={saving||!canApply} style={{...primary,opacity:(saving||!canApply)?0.5:1}}>{keySaved?"Applied ✓":saving?"Checking…":"Apply key"}</button>
+            </div>
+          </>
+        ):(
+          <>
+            <p style={{fontSize:12,color:"var(--gray4)",marginBottom:12}}>{company||"This institute"} has one Fluxera key. Copy it for the SDK. Fluxera does not rotate keys. Lost key and lost session → ask ops to look it up.</p>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+              <input readOnly value={apiKey||""} style={{...mono,flex:1,minWidth:200}} />
+              <button type="button" onClick={copy} style={ghost}>{copied?"Copied":"Copy"}</button>
+            </div>
+          </>
+        )}
         {keyErr&&<p style={{fontSize:12,color:"var(--red)",marginTop:10,padding:"8px 12px",background:"var(--red-bg)",border:"1px solid var(--red-border)",borderRadius:6}}>{keyErr}</p>}
       </section>
 
@@ -159,6 +175,10 @@ export function Settings({apiKey,company,isDemo,pricePerReq,setPricePerReq,impac
         <p style={{fontSize:14,fontWeight:600,marginBottom:6}}>Recovery webhook</p>
         <p style={{fontSize:12,color:"var(--gray4)",marginBottom:12}}>Fluxera POSTs failed-execution payloads here. It does not retry your app.</p>
         <input type="url" value={webhook} placeholder="https://…" disabled={isDemo} onChange={e=>{setWebhook(e.target.value);setHookErr("");}} style={{...mono,opacity:isDemo?.55:1}} />
+        <label style={{display:"flex",flexDirection:"column",gap:6,fontSize:11,color:"var(--gray5)",marginTop:12}}>
+          Quiet before interrupted (minutes)
+          <input type="number" min={1} max={10080} value={interruptMin} disabled={isDemo} onChange={e=>{setInterruptMin(e.target.value);setHookErr("");}} style={{...field,opacity:isDemo?.55:1}} />
+        </label>
         <div style={{display:"flex",gap:8,marginTop:10,flexWrap:"wrap"}}>
           {!isDemo&&<button type="button" onClick={saveWebhook} disabled={saving} style={{...primary,background:hookSaved?"var(--green-bg)":"var(--ink)",color:hookSaved?"var(--green)":"#fff"}}>{hookSaved?"Saved":"Save"}</button>}
         </div>

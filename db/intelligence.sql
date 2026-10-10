@@ -105,3 +105,23 @@ ALTER TABLE execution_steps ADD CONSTRAINT execution_steps_status_check
 CREATE INDEX IF NOT EXISTS idx_logs_tool
   ON request_logs(tool_id)
   WHERE tool_id IS NOT NULL;
+
+-- Early V1 — work + cost recovery
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS interrupt_after_minutes INTEGER NOT NULL DEFAULT 15;
+
+ALTER TABLE workflow_executions ADD COLUMN IF NOT EXISTS recovery_of UUID REFERENCES workflow_executions(id) ON DELETE SET NULL;
+
+ALTER TABLE execution_steps ADD COLUMN IF NOT EXISTS cursor TEXT;
+ALTER TABLE execution_steps ADD COLUMN IF NOT EXISTS progress_done INTEGER;
+ALTER TABLE execution_steps ADD COLUMN IF NOT EXISTS progress_total INTEGER;
+ALTER TABLE execution_steps ADD COLUMN IF NOT EXISTS checkpoint_at TIMESTAMPTZ;
+
+ALTER TABLE request_logs ADD COLUMN IF NOT EXISTS cost_kind TEXT NOT NULL DEFAULT 'api';
+ALTER TABLE request_logs DROP CONSTRAINT IF EXISTS request_logs_cost_kind_check;
+ALTER TABLE request_logs ADD CONSTRAINT request_logs_cost_kind_check
+  CHECK (cost_kind IN ('api', 'tool', 'model', 'compute', 'third_party'));
+
+-- One institute name → one fx_ key (email already unique).
+CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_institute
+  ON customers (lower(company))
+  WHERE company IS NOT NULL AND company <> '';

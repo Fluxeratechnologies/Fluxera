@@ -79,7 +79,7 @@ router.get('/me', async (req, res) => {
   try {
     const result = await query(
       `SELECT
-         id, email, company, plan, price_default, abandonment_rate, avg_order_value, webhook_url, created_at,
+         id, email, company, plan, price_default, abandonment_rate, avg_order_value, webhook_url, interrupt_after_minutes, created_at,
          (SELECT COUNT(*) FROM request_logs WHERE customer_id = $1) AS total_events,
          (SELECT logged_at FROM request_logs WHERE customer_id = $1 ORDER BY logged_at DESC LIMIT 1) AS last_event_at
        FROM customers WHERE id = $1`,
@@ -96,6 +96,7 @@ router.get('/me', async (req, res) => {
       abandonment_rate: c.abandonment_rate,
       avg_order_value:  c.avg_order_value,
       webhook_url:      c.webhook_url,
+      interrupt_after_minutes: c.interrupt_after_minutes,
       created_at:       c.created_at,
       stats: {
         total_events: parseInt(c.total_events) || 0,
@@ -113,7 +114,7 @@ router.patch('/me', async (req, res) => {
   const customer = await requireAuth(req, res)
   if (!customer) return
 
-  const { price_default, abandonment_rate, avg_order_value, webhook_url } = req.body
+  const { price_default, abandonment_rate, avg_order_value, webhook_url, interrupt_after_minutes } = req.body
 
   // Validate everything server-side — never trust the frontend's checks alone.
   const updates = {}
@@ -141,6 +142,13 @@ router.patch('/me', async (req, res) => {
       updates.webhook_url = u.slice(0, 2048)
     }
   }
+  if (interrupt_after_minutes !== undefined) {
+    const m = Number(interrupt_after_minutes)
+    if (!Number.isInteger(m) || m < 1 || m > 10080) {
+      return res.status(400).json({ error: 'interrupt_after_minutes must be an integer from 1 to 10080' })
+    }
+    updates.interrupt_after_minutes = m
+  }
 
   if (!Object.keys(updates).length) {
     return res.status(400).json({ error: 'No valid fields to update' })
@@ -152,7 +160,7 @@ router.patch('/me', async (req, res) => {
   try {
     const result = await query(
       `UPDATE customers SET ${setClauses.join(', ')} WHERE id = $1
-       RETURNING id, email, company, price_default, abandonment_rate, avg_order_value, webhook_url`,
+       RETURNING id, email, company, price_default, abandonment_rate, avg_order_value, webhook_url, interrupt_after_minutes`,
       [customer.id, ...values]
     )
     return res.status(200).json({ ok: true, customer: result.rows[0] })

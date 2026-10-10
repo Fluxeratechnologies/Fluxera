@@ -15,6 +15,7 @@ export function groupByWorkflow(rows){
 
 function checkupLine(e){
   if(e.status==="success")return "Clean run";
+  if(e.status==="interrupted")return `Interrupted${e.failed_step?` · ${e.failed_step}`:""}`;
   const step=e.failed_step||"unknown step";
   const err=e.error_type?` · ${e.error_type}`:"";
   const rec=e.recovery_action?` → ${String(e.recovery_action).replace(/_/g," ")}`:"";
@@ -46,7 +47,7 @@ export function Executions({apiKey,isDemo,go,workflow="",grouped=false}){
   return(
     <div style={{display:"flex",flexDirection:"column",gap:16}}>
       <div style={{display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}}>
-        {["","success","partial","failed"].map(s=>(
+        {["","success","partial","failed","interrupted"].map(s=>(
           <button key={s||"all"} onClick={()=>setStatus(s)} style={{padding:"5px 12px",border:"1px solid var(--gray2)",borderRadius:6,background:status===s?"var(--gray1)":"var(--white)",color:"var(--ink)",fontSize:12,cursor:"pointer"}}>{s||"all"}</button>
         ))}
         {workflow&&<button onClick={()=>go("history")} style={{padding:"5px 12px",border:"1px solid var(--gray2)",borderRadius:6,background:"var(--white)",color:"var(--ink)",fontSize:12,cursor:"pointer"}}>All workflows</button>}
@@ -64,7 +65,7 @@ export function Executions({apiKey,isDemo,go,workflow="",grouped=false}){
                   {grouped&&<p style={{fontSize:12,color:e.status==="success"?"var(--gray4)":"var(--gray5)",marginTop:2}}>{checkupLine(e)}</p>}
                 </div>
                 <div style={{display:"flex",alignItems:"center",gap:14,flexShrink:0}}>
-                  <span style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:"var(--ink)"}}><Dot color={e.status==="success"?"var(--green)":e.status==="partial"?"var(--amber)":"var(--red)"} />{e.status}</span>
+                  <span style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:"var(--ink)"}}><Dot color={e.status==="success"?"var(--green)":e.status==="partial"||e.status==="interrupted"?"var(--amber)":"var(--red)"} />{e.status}</span>
                   {!grouped&&<span style={{fontSize:12,color:"var(--gray5)"}}>{fMs(e.duration_ms)}</span>}
                   <span style={{fontSize:13,fontWeight:600,color:parseFloat(e.failed_cost)>0?"var(--red)":"var(--gray4)",minWidth:52,textAlign:"right"}}>{f$(e.failed_cost)}</span>
                 </div>

@@ -24,14 +24,15 @@ async function upsertTool(customerId, name, price) {
   return result.rows[0].id
 }
 
-async function upsertExecution(customerId, { id, workflowId, startedAt, endedAt, status, durationMs }) {
+async function upsertExecution(customerId, { id, workflowId, startedAt, endedAt, status, durationMs, recoveryOf }) {
   const result = await query(
     `INSERT INTO workflow_executions
-       (id, customer_id, workflow_id, status, started_at, ended_at, duration_ms)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)
+       (id, customer_id, workflow_id, status, started_at, ended_at, duration_ms, recovery_of)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        ON CONFLICT (id) DO UPDATE SET
          ended_at    = COALESCE(EXCLUDED.ended_at, workflow_executions.ended_at),
-         duration_ms = COALESCE(EXCLUDED.duration_ms, workflow_executions.duration_ms)
+         duration_ms = COALESCE(EXCLUDED.duration_ms, workflow_executions.duration_ms),
+         recovery_of = COALESCE(workflow_executions.recovery_of, EXCLUDED.recovery_of)
      RETURNING id`,
     [
       id,
@@ -41,6 +42,7 @@ async function upsertExecution(customerId, { id, workflowId, startedAt, endedAt,
       startedAt || new Date(),
       endedAt || null,
       durationMs == null ? null : durationMs,
+      recoveryOf || null,
     ]
   )
   return result.rows[0].id
@@ -74,4 +76,33 @@ async function upsertStep(customerId, { id, executionId, parentStepId, name, sta
   return result.rows[0].id
 }
 
-module.exports = { upsertWorkflow, upsertTool, upsertExecution, upsertStep }
+async function applyCheckpoint(customerId, { stepId, executionId, name, cursor, progressDone, progressTotal }) {
+  if (!stepId || !executionId) return null
+  const done = Number.isInteger(progressDone) ? progressDone : null
+  const total = Number.isInteger(progressTotal) ? progressTotal : null
+  const token = cursor != null && String(cursor) !== '' ? String(cursor).slice(0, 4096) : null
+  const result = await query(
+    `INSERT INTO execution_steps
+       (id, customer_id, execution_id, name, status, cursor, progress_done, progress_total, checkpoint_at)
+     VALUES ($1, $2, $3, $4, 'success', $5, $6, $7, now())
+     ON CONFLICT (id) DO UPDATE SET
+       cursor = EXCLUDED.cursor,
+       progress_done = EXCLUDED.progress_done,
+       progress_total = EXCLUDED.progress_total,
+       checkpoint_at = now()
+     RETURNING id`,
+    [stepId, customerId, executionId, String(name || 'step').slice(0, 255), token, done, total]
+  )
+  return result.rows[0].id
+}
+
+async function resolveRecoveryOf(customerId, recoveryOf) {
+  if (!recoveryOf) return null
+  const result = await query(
+    `SELECT id FROM workflow_executions WHERE id = $1 AND customer_id = $2`,
+    [recoveryOf, customerId]
+  )
+  return result.rows[0]?.id || null
+}
+
+module.exports = { upsertWorkflow, upsertTool, upsertExecution, upsertStep, applyCheckpoint, resolveRecoveryOf }

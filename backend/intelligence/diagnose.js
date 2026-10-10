@@ -1,6 +1,7 @@
 const { query } = require('../../db/pool')
 const { isFail } = require('./status')
 const { costFromLeaves } = require('./rollup')
+const { isInterrupted } = require('./interrupt')
 
 function mostCommon(values) {
   const counts = {}
@@ -27,34 +28,94 @@ function recommendFrom({ failedStep, leaves, retried, timedOut }) {
   return { action: 'retry', reason: err ? `Failed with ${err} — retry the step` : 'Retry the failed step' }
 }
 
-function diagnosePayload({ execution, steps, leaves, customer, workflowName }) {
+function stepHasCursor(step) {
+  if (!step) return false
+  return (step.cursor != null && String(step.cursor) !== '')
+    || step.progress_done != null
+    || step.checkpoint_at != null
+}
+
+function recommendResume(step) {
+  const done = step.progress_done
+  const total = step.progress_total
+  const progress = done != null && total != null ? ` at ${done}/${total}` : ''
+  return { action: 'resume', reason: `Resume ${step.name}${progress} from the last cursor` }
+}
+
+// ponytail: latest child only. Summing every failed resume is the upgrade.
+function resumeCost({ original, child }) {
+  const originalN = parseFloat(original) || 0
+  if (!child) {
+    return {
+      original: originalN,
+      potential_reexecution: originalN,
+      recovery: null,
+      avoided: null,
+    }
+  }
+  const ended = !!child.ended_at
+  const recovery = ended ? (parseFloat(child.total_cost) || 0) : null
+  let avoided = null
+  if (ended) {
+    avoided = child.status === 'success' ? Math.max(0, originalN - recovery) : 0
+  }
+  return {
+    original: originalN,
+    potential_reexecution: originalN,
+    recovery,
+    avoided,
+  }
+}
+
+function diagnosePayload({ execution, steps, leaves, customer, workflowName, child, now }) {
   const ordered = [...(steps || [])].sort((a, b) => new Date(a.started_at) - new Date(b.started_at))
   const failedStep = ordered.find(s => s.status === 'fail') || ordered.find(s => isFail(s.status)) || null
-  const stepLeaves = failedStep
-    ? (leaves || []).filter(l => l.step_id === failedStep.id)
+  const interrupted = isInterrupted({
+    execution,
+    steps,
+    leaves,
+    interruptAfterMinutes: customer?.interrupt_after_minutes,
+    now,
+  })
+  const openStep = ordered.find(s => !s.ended_at) || ordered[ordered.length - 1] || null
+  const resumeTarget = (failedStep && stepHasCursor(failedStep))
+    ? failedStep
+    : (interrupted && openStep && stepHasCursor(openStep) ? openStep : null)
+
+  const targetStep = failedStep || (interrupted ? openStep : null)
+  const stepLeaves = targetStep
+    ? (leaves || []).filter(l => l.step_id === targetStep.id)
     : (leaves || []).filter(l => l.status === 'fail')
   const retried = stepLeaves.some(l => (parseInt(l.attempt) || 1) > 1)
   const timedOut = stepLeaves.some(l => l.error_type === 'timeout')
-  const rec = recommendFrom({ failedStep, leaves: stepLeaves, retried, timedOut })
+
+  let rec
+  if (resumeTarget) rec = recommendResume(resumeTarget)
+  else if (interrupted && openStep) rec = { action: 'retry', reason: `Retry ${openStep.name} from scratch — no cursor` }
+  else rec = recommendFrom({ failedStep, leaves: stepLeaves, retried, timedOut })
+
   const costs = costFromLeaves(leaves)
+  const resume = resumeCost({ original: costs.total, child })
   const failedLeaves = (leaves || []).filter(l => l.status === 'fail')
 
   const abandonment = parseFloat(customer?.abandonment_rate) || 0
   const aov = parseFloat(customer?.avg_order_value) || 0
   const impactConfigured = abandonment > 0 && aov > 0
-  // Phase 1: same formula as the leak report, scoped to this execution's failed leaves.
   const usersAffected = impactConfigured ? Math.round(failedLeaves.length * (abandonment / 100)) : null
 
   return {
     what_failed: failedStep
       ? { type: 'step', id: failedStep.id, name: failedStep.name, status: failedStep.status }
-      : failedLeaves[0]
-        ? { type: 'leaf', id: failedLeaves[0].id, name: failedLeaves[0].endpoint, status: 'fail' }
-        : null,
+      : interrupted && openStep
+        ? { type: 'step', id: openStep.id, name: openStep.name, status: openStep.status }
+        : failedLeaves[0]
+          ? { type: 'leaf', id: failedLeaves[0].id, name: failedLeaves[0].endpoint, status: 'fail' }
+          : null,
     why: {
       error_type: mostCommon(stepLeaves.filter(l => l.status === 'fail').map(l => l.error_type)),
       retries_fired: retried,
       child_tool_timeout: timedOut,
+      interrupted,
     },
     affected: {
       execution_id: execution?.id || null,
@@ -68,8 +129,20 @@ function diagnosePayload({ execution, steps, leaves, customer, workflowName }) {
       total: costs.total,
       failed: costs.failed,
       retry_wasted: costs.retry,
+      original: resume.original,
+      potential_reexecution: resume.potential_reexecution,
+      recovery: resume.recovery,
+      avoided: resume.avoided,
     },
     recover: rec,
+    checkpoint: resumeTarget || (openStep && stepHasCursor(openStep) ? openStep : null)
+      ? {
+          step: (resumeTarget || openStep).name,
+          done: (resumeTarget || openStep).progress_done ?? null,
+          total: (resumeTarget || openStep).progress_total ?? null,
+          token: !!(resumeTarget || openStep).cursor,
+        }
+      : null,
     bottleneck: bottleneckStep(ordered),
   }
 }
@@ -116,13 +189,23 @@ async function diagnoseExecution(customer, executionId) {
     `SELECT * FROM request_logs WHERE execution_id = $1 ORDER BY logged_at ASC`,
     [executionId]
   )
+  const child = await query(
+    `SELECT id, status, total_cost, ended_at, started_at
+     FROM workflow_executions
+     WHERE recovery_of = $1
+     ORDER BY started_at DESC
+     LIMIT 1`,
+    [executionId]
+  )
   const diagnosis = diagnosePayload({
     execution,
     steps: steps.rows,
     leaves: leaves.rows,
     customer,
     workflowName: execution.workflow_name,
+    child: child.rows[0] || null,
   })
+  if (diagnosis.why.interrupted) execution.status = 'interrupted'
   await persistRecommendation(customer.id, executionId, diagnosis)
   const recovery = await query(
     `SELECT * FROM recovery_actions WHERE execution_id = $1 ORDER BY created_at DESC LIMIT 1`,
@@ -131,4 +214,13 @@ async function diagnoseExecution(customer, executionId) {
   return { execution, steps: steps.rows, leaves: leaves.rows, diagnosis, recovery: recovery.rows[0] || null }
 }
 
-module.exports = { mostCommon, recommendFrom, diagnosePayload, diagnoseExecution, persistRecommendation }
+module.exports = {
+  mostCommon,
+  recommendFrom,
+  recommendResume,
+  diagnosePayload,
+  diagnoseExecution,
+  persistRecommendation,
+  resumeCost,
+  stepHasCursor,
+}

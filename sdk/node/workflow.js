@@ -14,6 +14,7 @@ async function workflow(client, name, fn, opts = {}) {
     started_at: startedAt,
     request_id: randomUUID(),
     endpoint: name,
+    recovery_of: opts.recovery_of || null,
   })
   try {
     return await runWith({ executionId, workflow: name }, () =>

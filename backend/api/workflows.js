@@ -34,7 +34,14 @@ router.get('/', async (req, res) => {
          ROUND((PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY e.duration_ms)
            FILTER (WHERE e.started_at > now() - INTERVAL '${interval}'))::numeric) AS p50_ms,
          ROUND((PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY e.duration_ms)
-           FILTER (WHERE e.started_at > now() - INTERVAL '${interval}'))::numeric) AS p95_ms
+           FILTER (WHERE e.started_at > now() - INTERVAL '${interval}'))::numeric) AS p95_ms,
+         COALESCE((
+           SELECT SUM(GREATEST(0, p.total_cost - c.total_cost))
+           FROM workflow_executions c
+           JOIN workflow_executions p ON p.id = c.recovery_of
+           WHERE p.workflow_id = w.id
+             AND c.status = 'success'
+         ), 0) AS cost_avoided
        FROM workflows w
        LEFT JOIN workflow_executions e ON e.workflow_id = w.id
        WHERE w.customer_id = $1

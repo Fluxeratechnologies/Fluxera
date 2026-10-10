@@ -15,15 +15,34 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Institute name required' })
   }
 
+  const name = company.slice(0, 255)
   const apiKey = 'fx_' + crypto.randomBytes(20).toString('hex')
 
   try {
+    const clash = await query(
+      `SELECT email, company FROM customers
+       WHERE email = $1 OR lower(company) = lower($2)
+       LIMIT 1`,
+      [email, name]
+    )
+    if (clash.rows.length) {
+      const row = clash.rows[0]
+      if (row.email === email) {
+        return res.status(409).json({
+          error: 'This email already has an institute. Sign in with your fx_ key.',
+        })
+      }
+      return res.status(409).json({
+        error: 'This institute already has a Fluxera key. Sign in with that key.',
+      })
+    }
+
     const result = await query(
       `INSERT INTO customers (email, company, api_key, plan, price_default)
        VALUES ($1, $2, $3, 'free', 0.04)
        ON CONFLICT (email) DO NOTHING
        RETURNING id, email, company, api_key, plan, price_default, created_at`,
-      [email, company.slice(0, 255), apiKey]
+      [email, name, apiKey]
     )
 
     if (!result.rows.length) {
@@ -50,6 +69,14 @@ router.post('/', async (req, res) => {
       },
     })
   } catch (err) {
+    if (err.code === '23505') {
+      const emailClash = /email/i.test(err.constraint || '')
+      return res.status(409).json({
+        error: emailClash
+          ? 'This email already has an institute. Sign in with your fx_ key.'
+          : 'This institute already has a Fluxera key. Sign in with that key.',
+      })
+    }
     console.error('[signup]', err.message)
     return res.status(500).json({ error: 'Failed to create institute' })
   }
