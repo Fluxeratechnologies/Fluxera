@@ -40,6 +40,11 @@ async function wrap(client, fn, extra) {
       attempt: extra.attempt || 1,
       ...extra,
     }
+    if (event.hitsBox) {
+      const n = event.hitsBox.hits
+      event.hits = typeof n === 'number' && Number.isInteger(n) ? n : null
+    }
+    delete event.hitsBox
     client._enqueue(event)
   }
   return result

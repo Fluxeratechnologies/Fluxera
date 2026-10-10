@@ -252,6 +252,43 @@ async function seedSalesAgent(customer) {
   console.log('  sales-agent failed on pricing-api')
 }
 
+async function seedMemoryMiss(customer) {
+  const customerId = customer.id
+  const agentWorkflow = await upsertWorkflow(customerId, 'sales-agent', 'agent')
+  const memoryWorkflow = await upsertWorkflow(customerId, 'customer-kb', 'memory')
+  const executionId = randomUUID()
+  const started = new Date(Date.now() - 25 * 60 * 1000)
+  await upsertExecution(customerId, {
+    id: executionId, workflowId: agentWorkflow, startedAt: started,
+    endedAt: new Date(started.getTime() + 1800),
+    status: 'success', durationMs: 1800,
+  })
+  const stepId = randomUUID()
+  await upsertStep(customerId, {
+    id: stepId, executionId, name: 'qualify', status: 'fail',
+    startedAt: started, endedAt: new Date(started.getTime() + 1800), durationMs: 1800,
+  })
+  await applyCheckpoint(customerId, {
+    stepId, executionId, name: 'qualify', cursor: 'before-qualify',
+  })
+  const memoryExecution = randomUUID()
+  const memoryStart = new Date(started.getTime() + 200)
+  await upsertExecution(customerId, {
+    id: memoryExecution, workflowId: memoryWorkflow, startedAt: memoryStart,
+    endedAt: new Date(memoryStart.getTime() + 400),
+    status: 'success', durationMs: 400,
+    forExecutionId: executionId, forStep: 'qualify', hitCount: 0,
+  })
+  await insertLeaf(customerId, {
+    executionId: memoryExecution, endpoint: 'vector-search', status: 'success',
+    latency: 400, price: 0.01, at: memoryStart, costKind: 'memory',
+  })
+  await rollupExecution(memoryExecution)
+  await rollupExecution(executionId)
+  await diagnoseExecution(customer, executionId)
+  console.log('  sales-agent qualify missed customer-kb')
+}
+
 async function seed() {
   const apiKey = String(process.argv[2] || '').trim()
   if (!apiKey.startsWith('fx_')) {
@@ -276,6 +313,7 @@ async function seed() {
   await seedCheckout(customer)
   await seedInterruptedResume(customer)
   await seedSalesAgent(customer)
+  await seedMemoryMiss(customer)
   console.log('Done. Sign in with that institute key and open Workflows / Executions.')
   await pool.end()
 }

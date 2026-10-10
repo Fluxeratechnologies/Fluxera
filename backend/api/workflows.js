@@ -24,10 +24,16 @@ router.get('/', async (req, res) => {
       `SELECT
          w.id, w.name, w.actor, w.created_at,
          COUNT(e.id) AS executions,
-         COUNT(e.id) FILTER (WHERE e.status = 'failed') AS failed,
+         COUNT(e.id) FILTER (
+           WHERE e.status = 'failed'
+              OR (w.actor = 'memory' AND e.status = 'success' AND e.hit_count = 0)
+         ) AS failed,
          COUNT(e.id) FILTER (WHERE e.status = 'partial') AS partial,
          ROUND(
-           COUNT(e.id) FILTER (WHERE e.status IN ('failed','partial'))::NUMERIC
+           COUNT(e.id) FILTER (
+             WHERE e.status IN ('failed','partial')
+                OR (w.actor = 'memory' AND e.status = 'success' AND e.hit_count = 0)
+           )::NUMERIC
            / NULLIF(COUNT(e.id), 0) * 100, 2
          ) AS failure_rate,
          COALESCE(SUM(e.total_cost), 0) AS total_cost,

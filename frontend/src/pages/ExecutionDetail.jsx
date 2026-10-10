@@ -53,15 +53,20 @@ export function ExecutionDetail({apiKey,executionId,go}){
 
 function costLine(cost){
   const head=`${f$(cost?.failed)} failed · ${f$(cost?.retry_wasted)} retry waste`;
-  const kinds=["model","tool","api","compute","third_party"]
+  const kinds=["model","tool","api","compute","third_party","memory"]
     .filter(k=>parseFloat(cost?.by_kind?.[k])>0)
     .map(k=>`${k} ${f$(cost.by_kind[k])}`);
-  return kinds.length?`${head} · ${kinds.join(" · ")}`:head;
+  const linked=cost?.linked_memory==null?"":` · linked memory ${f$(cost.linked_memory)}`;
+  return (kinds.length?`${head} · ${kinds.join(" · ")}`:head)+linked;
 }
 
 function contextLine(e){
-  if(e.actor&&e.actor!=="workflow")return `${e.actor} · `;
-  return "";
+  const bits=[];
+  if(e.actor&&e.actor!=="workflow")bits.push(e.actor);
+  if(e.for_agent_name)bits.push(`for ${e.for_agent_name}`);
+  if(e.actor==="memory"&&e.for_step)bits.push(e.for_step);
+  if(e.actor==="memory"&&e.hit_count!=null)bits.push(`${e.hit_count} hits`);
+  return bits.length?bits.join(" · ")+" · ":"";
 }
 
 function affectLine(affected, execution){

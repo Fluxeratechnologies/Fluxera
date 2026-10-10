@@ -374,7 +374,7 @@ Control plane only. SDK reports checkpoints. Recover webhook tells the customer 
 - `interrupted` is derived on read: no `ended_at` and last event older than `customers.interrupt_after_minutes` (default 15, Settings, 1–10080). Not stored.
 - Webhook verbs: `resume` | `retry` | `fallback`. Payload includes `completed_steps` and `cursor`.
 - Resume is a new execution with `recovery_of`. Cost avoided is measured on that child after it ends `success`. Latest child only.
-- Leaf `cost_kind`: `api | tool | model | compute | third_party`. Default `tool` inside `tool()`, else `api`.
+- Leaf `cost_kind`: `api | tool | model | compute | third_party | memory`. Default `tool` inside `tool()`, else `api`. Pass `memory` on a retrieval leaf.
 - `resume` verifies only when the linked child succeeds. Same-workflow later-success verify excludes `action = 'resume'`.
 
 Later: business-value recovery, Python SDK, estimated recovery cost from the cursor percentage, stored `interrupted`, summing every failed resume.
@@ -390,6 +390,19 @@ Later: business-value recovery, Python SDK, estimated recovery cost from the cur
 - Agent state is the last checkpoint cursor. No conversation store.
 - Cost, failures, interrupt, and recover stay the existing rollup, diagnose, and resume/retry/fallback webhook.
 - Workflows and Executions filter with `?actor=`. Execution detail splits cost by `cost_kind` (`diagnosis.cost.by_kind`). No new nav.
+
+---
+
+## Early V1 — memory intelligence
+
+**Landed.** A memory run is its own workflow execution. Fluxera does not run retrieval.
+
+- `fluxera.memory(name, fn, opts)` is `workflow()` with `actor=memory`. No `retrieve()`. `opts.hits` if it is an integer, otherwise `returnValue.hits` if that is an integer, read after `fn` returns. `0` is kept. Anything else leaves `hit_count` null.
+- Link only when the parent async context `actor` is `agent`: `for_execution_id`, plus `for_step` (step name) when inside `step()`. Top-level, inside `workflow()`, or inside another `memory()` stays unlinked. Ingest drops the link unless that parent execution is the same institute and `actor=agent`.
+- A miss is a failed or partial memory execution, or `hit_count = 0`. Null hits is not a miss. On a failed or interrupted agent, diagnose names the miss on that step (latest if several). A null-step miss is the fallback. A miss on a different step is ignored. A successful agent gets no sentence. The agent verb stays resume or retry. The sentence is appended: `customer-kb missed for step qualify — retry memory, then resume`.
+- Webhook payload adds `memory_execution_id` and `memory_workflow` only when a miss is named. No new action.
+- `miss` is derived on read: memory actor, stored `success`, `hit_count = 0`. A thrown run stays `failed`. Executions accepts `?status=miss`. Workflow failure rate counts a 0-hit memory run.
+- Agent `total_cost` is still only the agent leaves. Detail adds `linked memory` as the sum of executions with `for_execution_id` set to that agent. No query text, chunks, or vectors.
 
 ---
 

@@ -19,11 +19,15 @@ router.get('/', async (req, res) => {
   const quiet = interruptedSql('e', 2)
   const where = ['e.customer_id = $1']
 
+  const zeroHit = `w.actor = 'memory' AND e.status = 'success' AND e.hit_count = 0`
   if (status === 'interrupted') {
     where.push(quiet)
+  } else if (status === 'miss') {
+    where.push(`NOT (${quiet}) AND ${zeroHit}`)
   } else if (status && ['success', 'failed', 'partial'].includes(status)) {
     params.push(status)
     where.push(`NOT (${quiet}) AND e.status = $${params.length}`)
+    if (status === 'success') where.push(`NOT (${zeroHit})`)
   }
   if (workflow) {
     params.push(workflow)
@@ -40,6 +44,7 @@ router.get('/', async (req, res) => {
       `SELECT e.*, w.name AS workflow_name, w.actor,
          CASE
            WHEN ${quiet} THEN 'interrupted'
+           WHEN w.actor = 'memory' AND e.status = 'success' AND e.hit_count = 0 THEN 'miss'
            ELSE e.status
          END AS status,
          (

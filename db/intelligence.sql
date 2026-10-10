@@ -131,3 +131,16 @@ ALTER TABLE workflows ADD COLUMN IF NOT EXISTS actor TEXT NOT NULL DEFAULT 'work
 ALTER TABLE workflows DROP CONSTRAINT IF EXISTS workflows_actor_check;
 ALTER TABLE workflows ADD CONSTRAINT workflows_actor_check
   CHECK (actor IN ('workflow', 'agent', 'memory'));
+
+-- Memory intelligence: a second execution linked to an agent. No query text or chunks.
+ALTER TABLE workflow_executions ADD COLUMN IF NOT EXISTS for_execution_id UUID REFERENCES workflow_executions(id) ON DELETE SET NULL;
+ALTER TABLE workflow_executions ADD COLUMN IF NOT EXISTS for_step TEXT;
+ALTER TABLE workflow_executions ADD COLUMN IF NOT EXISTS hit_count INTEGER;
+
+CREATE INDEX IF NOT EXISTS idx_executions_for
+  ON workflow_executions(for_execution_id)
+  WHERE for_execution_id IS NOT NULL;
+
+ALTER TABLE request_logs DROP CONSTRAINT IF EXISTS request_logs_cost_kind_check;
+ALTER TABLE request_logs ADD CONSTRAINT request_logs_cost_kind_check
+  CHECK (cost_kind IN ('api', 'tool', 'model', 'compute', 'third_party', 'memory'));

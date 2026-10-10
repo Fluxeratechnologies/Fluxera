@@ -16,6 +16,7 @@
     "wrap.js",
     "workflow.js",
     "agent.js",
+    "memory.js",
     "step.js",
     "tool.js",
     "checkpoint.js",

@@ -30,15 +30,20 @@ async function upsertTool(customerId, name, price) {
   return result.rows[0].id
 }
 
-async function upsertExecution(customerId, { id, workflowId, startedAt, endedAt, status, durationMs, recoveryOf }) {
+async function upsertExecution(customerId, { id, workflowId, startedAt, endedAt, status, durationMs, recoveryOf, forExecutionId, forStep, hitCount }) {
+  const hits = Number.isInteger(hitCount) ? hitCount : null
   const result = await query(
     `INSERT INTO workflow_executions
-       (id, customer_id, workflow_id, status, started_at, ended_at, duration_ms, recovery_of)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       (id, customer_id, workflow_id, status, started_at, ended_at, duration_ms, recovery_of,
+        for_execution_id, for_step, hit_count)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        ON CONFLICT (id) DO UPDATE SET
          ended_at    = COALESCE(EXCLUDED.ended_at, workflow_executions.ended_at),
          duration_ms = COALESCE(EXCLUDED.duration_ms, workflow_executions.duration_ms),
-         recovery_of = COALESCE(workflow_executions.recovery_of, EXCLUDED.recovery_of)
+         recovery_of = COALESCE(workflow_executions.recovery_of, EXCLUDED.recovery_of),
+         for_execution_id = COALESCE(workflow_executions.for_execution_id, EXCLUDED.for_execution_id),
+         for_step = COALESCE(workflow_executions.for_step, EXCLUDED.for_step),
+         hit_count = COALESCE(EXCLUDED.hit_count, workflow_executions.hit_count)
      RETURNING id`,
     [
       id,
@@ -49,6 +54,9 @@ async function upsertExecution(customerId, { id, workflowId, startedAt, endedAt,
       endedAt || null,
       durationMs == null ? null : durationMs,
       recoveryOf || null,
+      forExecutionId || null,
+      forStep || null,
+      hits,
     ]
   )
   return result.rows[0].id
@@ -111,4 +119,16 @@ async function resolveRecoveryOf(customerId, recoveryOf) {
   return result.rows[0]?.id || null
 }
 
-module.exports = { upsertWorkflow, upsertTool, upsertExecution, upsertStep, applyCheckpoint, resolveRecoveryOf }
+async function resolveForAgent(customerId, forExecutionId) {
+  if (!forExecutionId) return null
+  const result = await query(
+    `SELECT e.id
+     FROM workflow_executions e
+     JOIN workflows w ON w.id = e.workflow_id
+     WHERE e.id = $1 AND e.customer_id = $2 AND w.actor = 'agent'`,
+    [forExecutionId, customerId]
+  )
+  return result.rows[0]?.id || null
+}
+
+module.exports = { upsertWorkflow, upsertTool, upsertExecution, upsertStep, applyCheckpoint, resolveRecoveryOf, resolveForAgent }

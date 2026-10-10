@@ -59,6 +59,11 @@ async function executeRecover(customer, packed, action) {
     completed_steps: (packed.steps || []).filter(s => s.status === 'success').map(s => s.name),
     cursor: cursorPayload(packed.steps, packed.diagnosis),
   }
+  const miss = packed.diagnosis.memory
+  if (miss?.execution_id) {
+    payload.memory_execution_id = miss.execution_id
+    payload.memory_workflow = miss.workflow || null
+  }
 
   const ac = new AbortController()
   const timer = setTimeout(() => ac.abort(), 5000)

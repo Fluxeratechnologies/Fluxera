@@ -1,6 +1,6 @@
 const LEAF_KINDS = new Set(['api_call', 'tool_call'])
 const TREE_KINDS = new Set(['workflow_start', 'workflow_end', 'step_end', 'checkpoint'])
-const COST_KINDS = new Set(['api', 'tool', 'model', 'compute', 'third_party'])
+const COST_KINDS = new Set(['api', 'tool', 'model', 'compute', 'third_party', 'memory'])
 const ACTORS = new Set(['workflow', 'agent', 'memory'])
 
 function isLeafKind(kind) {
