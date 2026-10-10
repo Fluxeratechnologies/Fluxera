@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { apiGet } from "../api";
 import { f$, fMs } from "../format";
-import { Dot, Pill } from "../components/ui";
+import { Dot } from "../components/ui";
 
 export function groupByWorkflow(rows) {
   const map = new Map();
@@ -13,18 +13,38 @@ export function groupByWorkflow(rows) {
   return [...map.entries()];
 }
 
+const ACTORS = ["", "workflow", "agent", "memory"];
+
 function checkupLine(e) {
   if (e.status === "success") return "Clean execution run";
+  if (e.status === "interrupted") return `Interrupted${e.failed_step ? ` · ${e.failed_step}` : ""}`;
+  if (e.status === "miss") return "0 hits";
   const step = e.failed_step || "unknown step";
   const err = e.error_type ? ` · ${e.error_type}` : "";
   const rec = e.recovery_action ? ` → ${String(e.recovery_action).replace(/_/g, " ")}` : "";
   return `${step}${err}${rec}`;
 }
 
+function statusColor(status) {
+  if (status === "success") return "#10b981";
+  if (status === "partial" || status === "interrupted" || status === "miss") return "#f59e0b";
+  return "#e11d48";
+}
+
+function ActorBadge({ actor }) {
+  if (!actor || actor === "workflow") return null;
+  return (
+    <span className="ml-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500 border border-slate-200 rounded px-1.5 py-0.5">
+      {actor}
+    </span>
+  );
+}
+
 export function Executions({ apiKey, isDemo, go, workflow = "", grouped = false }) {
   const [rows, setRows] = useState([]);
   const [err, setErr] = useState("");
   const [status, setStatus] = useState("");
+  const [actor, setActor] = useState("");
   const [loading, setLoading] = useState(!isDemo && !!apiKey);
 
   useEffect(() => {
@@ -38,6 +58,7 @@ export function Executions({ apiKey, isDemo, go, workflow = "", grouped = false 
     const p = new URLSearchParams();
     if (status) p.set("status", status);
     if (workflow) p.set("workflow", workflow);
+    if (actor) p.set("actor", actor);
     const q = p.toString() ? `?${p}` : "";
     apiGet("/api/executions" + q, apiKey)
       .then(async (r) => {
@@ -47,7 +68,7 @@ export function Executions({ apiKey, isDemo, go, workflow = "", grouped = false 
       })
       .catch((e) => setErr(e.message))
       .finally(() => setLoading(false));
-  }, [apiKey, isDemo, status, workflow]);
+  }, [apiKey, isDemo, status, workflow, actor]);
 
   if (isDemo) {
     return (
@@ -78,9 +99,8 @@ export function Executions({ apiKey, isDemo, go, workflow = "", grouped = false 
 
   return (
     <div className="flex flex-col gap-6 max-w-6xl mx-auto">
-      {/* Filters Bar */}
       <div className="flex gap-2 flex-wrap items-center">
-        {["", "success", "partial", "failed"].map((s) => (
+        {["", "success", "partial", "failed", "interrupted", "miss"].map((s) => (
           <button
             key={s || "all"}
             onClick={() => setStatus(s)}
@@ -91,6 +111,20 @@ export function Executions({ apiKey, isDemo, go, workflow = "", grouped = false 
             }`}
           >
             {s ? s.toUpperCase() : "ALL STATUSES"}
+          </button>
+        ))}
+        <span className="w-2" />
+        {ACTORS.map((a) => (
+          <button
+            key={a || "any"}
+            onClick={() => setActor(a)}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+              actor === a
+                ? "bg-slate-900 text-white border-slate-900 shadow-sm"
+                : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+            }`}
+          >
+            {a ? a.toUpperCase() : "ANY ACTOR"}
           </button>
         ))}
         {workflow && (
@@ -116,7 +150,10 @@ export function Executions({ apiKey, isDemo, go, workflow = "", grouped = false 
           <div key={name || "flat"} className="flex flex-col gap-2">
             {grouped && (
               <div className="flex items-center justify-between px-1">
-                <span className="font-mono text-xs font-bold text-slate-800">{name}</span>
+                <span className="font-mono text-xs font-bold text-slate-800">
+                  {name}
+                  <ActorBadge actor={list[0]?.actor} />
+                </span>
                 <span className="text-xs text-slate-400 font-medium">
                   {list.length} {list.length === 1 ? "run" : "runs"}
                 </span>
@@ -132,7 +169,10 @@ export function Executions({ apiKey, isDemo, go, workflow = "", grouped = false 
                   >
                     <div className="min-w-0">
                       {!grouped && (
-                        <p className="font-mono text-xs font-bold text-slate-800 mb-0.5">{e.workflow_name}</p>
+                        <p className="font-mono text-xs font-bold text-slate-800 mb-0.5">
+                          {e.workflow_name}
+                          <ActorBadge actor={e.actor} />
+                        </p>
                       )}
                       <p className="text-xs font-medium text-slate-600">{new Date(e.started_at).toLocaleString()}</p>
                       {grouped && <p className="text-xs text-slate-500 mt-1 font-mono">{checkupLine(e)}</p>}
@@ -140,17 +180,12 @@ export function Executions({ apiKey, isDemo, go, workflow = "", grouped = false 
 
                     <div className="flex items-center gap-4 flex-shrink-0">
                       <span className="flex items-center gap-1.5 text-xs font-semibold capitalize text-slate-700">
-                        <Dot
-                          color={
-                            e.status === "success"
-                              ? "#10b981"
-                              : e.status === "partial"
-                              ? "#f59e0b"
-                              : "#e11d48"
-                          }
-                        />
+                        <Dot color={statusColor(e.status)} />
                         {e.status}
                       </span>
+                      {e.actor === "memory" && e.hit_count != null && (
+                        <span className="font-mono text-xs text-slate-500">{e.hit_count} hits</span>
+                      )}
                       {!grouped && (
                         <span className="font-mono text-xs text-slate-500">{fMs(e.duration_ms)}</span>
                       )}

@@ -1,6 +1,8 @@
 const { query } = require('../../db/pool')
 const { isFail } = require('./status')
 const { costFromLeaves } = require('./rollup')
+const { isInterrupted } = require('./interrupt')
+const { normalizeCostKind } = require('./kinds')
 
 function mostCommon(values) {
   const counts = {}
@@ -27,16 +29,138 @@ function recommendFrom({ failedStep, leaves, retried, timedOut }) {
   return { action: 'retry', reason: err ? `Failed with ${err} — retry the step` : 'Retry the failed step' }
 }
 
-function diagnosePayload({ execution, steps, leaves, customer, workflowName }) {
+function stepHasCursor(step) {
+  if (!step) return false
+  return (step.cursor != null && String(step.cursor) !== '')
+    || step.progress_done != null
+    || step.checkpoint_at != null
+}
+
+function recommendResume(step) {
+  const done = step.progress_done
+  const total = step.progress_total
+  const progress = done != null && total != null ? ` at ${done}/${total}` : ''
+  return { action: 'resume', reason: `Resume ${step.name}${progress} from the last cursor` }
+}
+
+// ponytail: latest child only. Summing every failed resume is the upgrade.
+function resumeCost({ original, child }) {
+  const originalN = parseFloat(original) || 0
+  if (!child) {
+    return {
+      original: originalN,
+      potential_reexecution: originalN,
+      recovery: null,
+      avoided: null,
+    }
+  }
+  const ended = !!child.ended_at
+  const recovery = ended ? (parseFloat(child.total_cost) || 0) : null
+  let avoided = null
+  if (ended) {
+    avoided = child.status === 'success' ? Math.max(0, originalN - recovery) : 0
+  }
+  return {
+    original: originalN,
+    potential_reexecution: originalN,
+    recovery,
+    avoided,
+  }
+}
+
+function costByKind(leaves) {
+  const by = {}
+  for (const l of leaves || []) {
+    const k = normalizeCostKind(l.cost_kind, !!l.tool_id)
+    by[k] = (by[k] || 0) + (parseFloat(l.price) || 0)
+  }
+  return by
+}
+
+function isMemoryMiss(run) {
+  if (!run) return false
+  if (run.status === 'failed' || run.status === 'partial') return true
+  return run.hit_count != null && run.hit_count !== '' && Number(run.hit_count) === 0
+}
+
+function pickMemoryMiss(memoryRuns, stepName) {
+  const misses = (memoryRuns || []).filter(isMemoryMiss)
+  const onStep = stepName ? misses.filter(r => r.for_step === stepName) : []
+  const pool = onStep.length ? onStep : misses.filter(r => !r.for_step)
+  if (!pool.length) return null
+  return pool.slice().sort((a, b) => new Date(b.started_at) - new Date(a.started_at))[0]
+}
+
+function memoryMissReason(miss) {
+  const name = miss.workflow_name || miss.workflow || 'memory'
+  const where = miss.for_step ? ` for step ${miss.for_step}` : ''
+  return `${name} missed${where} — retry memory, then resume`
+}
+
+function linkedMemoryTotal(runs) {
+  if (!runs || !runs.length) return null
+  return runs.reduce((sum, r) => sum + (parseFloat(r.total_cost) || 0), 0)
+}
+
+function shownStatus({ actor, status, hitCount, interrupted }) {
+  if (interrupted) return 'interrupted'
+  if (actor === 'memory' && status === 'success' && hitCount != null && Number(hitCount) === 0) return 'miss'
+  return status
+}
+
+function diagnosePayload({ execution, steps, leaves, customer, workflowName, child, now, memoryRuns }) {
   const ordered = [...(steps || [])].sort((a, b) => new Date(a.started_at) - new Date(b.started_at))
   const failedStep = ordered.find(s => s.status === 'fail') || ordered.find(s => isFail(s.status)) || null
-  const stepLeaves = failedStep
-    ? (leaves || []).filter(l => l.step_id === failedStep.id)
+  const interrupted = isInterrupted({
+    execution,
+    steps,
+    leaves,
+    interruptAfterMinutes: customer?.interrupt_after_minutes,
+    now,
+  })
+  const openStep = ordered.find(s => !s.ended_at) || ordered[ordered.length - 1] || null
+  const resumeTarget = (failedStep && stepHasCursor(failedStep))
+    ? failedStep
+    : (interrupted && openStep && stepHasCursor(openStep) ? openStep : null)
+
+  const targetStep = failedStep || (interrupted ? openStep : null)
+  const stepLeaves = targetStep
+    ? (leaves || []).filter(l => l.step_id === targetStep.id)
     : (leaves || []).filter(l => l.status === 'fail')
   const retried = stepLeaves.some(l => (parseInt(l.attempt) || 1) > 1)
   const timedOut = stepLeaves.some(l => l.error_type === 'timeout')
-  const rec = recommendFrom({ failedStep, leaves: stepLeaves, retried, timedOut })
+
+  let rec
+  if (resumeTarget) rec = recommendResume(resumeTarget)
+  else if (interrupted && openStep) rec = { action: 'retry', reason: `Retry ${openStep.name} from scratch — no cursor` }
+  else rec = recommendFrom({ failedStep, leaves: stepLeaves, retried, timedOut })
+
+  let memory = null
+  if (targetStep) {
+    const miss = pickMemoryMiss(memoryRuns, targetStep.name)
+    if (miss) {
+      const clause = memoryMissReason(miss)
+      rec = { ...rec, reason: rec.reason ? `${rec.reason} ${clause}` : clause }
+      memory = {
+        execution_id: miss.id,
+        workflow: miss.workflow_name || miss.workflow || null,
+        for_step: miss.for_step || null,
+        hit_count: miss.hit_count == null ? null : Number(miss.hit_count),
+      }
+    }
+  }
+
+  if (rec.action === 'none' && shownStatus({
+    actor: execution?.actor,
+    status: execution?.status,
+    hitCount: execution?.hit_count,
+    interrupted,
+  }) === 'miss') {
+    rec = { action: 'retry', reason: '0 hits — retry retrieval' }
+  }
+
   const costs = costFromLeaves(leaves)
+  const resume = resumeCost({ original: costs.total, child })
   const failedLeaves = (leaves || []).filter(l => l.status === 'fail')
 
   const abandonment = parseFloat(customer?.abandonment_rate) || 0
@@ -48,13 +172,16 @@ function diagnosePayload({ execution, steps, leaves, customer, workflowName }) {
   return {
     what_failed: failedStep
       ? { type: 'step', id: failedStep.id, name: failedStep.name, status: failedStep.status }
-      : failedLeaves[0]
-        ? { type: 'leaf', id: failedLeaves[0].id, name: failedLeaves[0].endpoint, status: 'fail' }
-        : null,
+      : interrupted && openStep
+        ? { type: 'step', id: openStep.id, name: openStep.name, status: openStep.status }
+        : failedLeaves[0]
+          ? { type: 'leaf', id: failedLeaves[0].id, name: failedLeaves[0].endpoint, status: 'fail' }
+          : null,
     why: {
       error_type: mostCommon(stepLeaves.filter(l => l.status === 'fail').map(l => l.error_type)),
       retries_fired: retried,
       child_tool_timeout: timedOut,
+      interrupted,
     },
     affected: {
       execution_id: execution?.id || null,
@@ -68,8 +195,23 @@ function diagnosePayload({ execution, steps, leaves, customer, workflowName }) {
       total: costs.total,
       failed: costs.failed,
       retry_wasted: costs.retry,
+      original: resume.original,
+      potential_reexecution: resume.potential_reexecution,
+      recovery: resume.recovery,
+      avoided: resume.avoided,
+      by_kind: costByKind(leaves),
+      linked_memory: linkedMemoryTotal(memoryRuns),
     },
+    memory,
     recover: rec,
+    checkpoint: resumeTarget || (openStep && stepHasCursor(openStep) ? openStep : null)
+      ? {
+          step: (resumeTarget || openStep).name,
+          done: (resumeTarget || openStep).progress_done ?? null,
+          total: (resumeTarget || openStep).progress_total ?? null,
+          token: !!(resumeTarget || openStep).cursor,
+        }
+      : null,
     bottleneck: bottleneckStep(ordered),
   }
 }
@@ -100,9 +242,11 @@ async function persistRecommendation(customerId, executionId, diagnosis) {
 
 async function diagnoseExecution(customer, executionId) {
   const exec = await query(
-    `SELECT e.*, w.name AS workflow_name
+    `SELECT e.*, w.name AS workflow_name, w.actor, pw.name AS for_agent_name
      FROM workflow_executions e
      JOIN workflows w ON w.id = e.workflow_id
+     LEFT JOIN workflow_executions parent_exec ON parent_exec.id = e.for_execution_id
+     LEFT JOIN workflows pw ON pw.id = parent_exec.workflow_id
      WHERE e.id = $1 AND e.customer_id = $2`,
     [executionId, customer.id]
   )
@@ -116,12 +260,36 @@ async function diagnoseExecution(customer, executionId) {
     `SELECT * FROM request_logs WHERE execution_id = $1 ORDER BY logged_at ASC`,
     [executionId]
   )
+  const child = await query(
+    `SELECT id, status, total_cost, ended_at, started_at
+     FROM workflow_executions
+     WHERE recovery_of = $1
+     ORDER BY started_at DESC
+     LIMIT 1`,
+    [executionId]
+  )
+  const linked = await query(
+    `SELECT e.id, e.status, e.hit_count, e.for_step, e.started_at, e.total_cost, w.name AS workflow_name
+     FROM workflow_executions e
+     JOIN workflows w ON w.id = e.workflow_id
+     WHERE e.for_execution_id = $1 AND e.customer_id = $2
+     ORDER BY e.started_at ASC`,
+    [executionId, customer.id]
+  )
   const diagnosis = diagnosePayload({
     execution,
     steps: steps.rows,
     leaves: leaves.rows,
     customer,
     workflowName: execution.workflow_name,
+    child: child.rows[0] || null,
+    memoryRuns: linked.rows,
+  })
+  execution.status = shownStatus({
+    actor: execution.actor,
+    status: execution.status,
+    hitCount: execution.hit_count,
+    interrupted: diagnosis.why.interrupted,
   })
   await persistRecommendation(customer.id, executionId, diagnosis)
   const recovery = await query(
@@ -131,4 +299,18 @@ async function diagnoseExecution(customer, executionId) {
   return { execution, steps: steps.rows, leaves: leaves.rows, diagnosis, recovery: recovery.rows[0] || null }
 }
 
-module.exports = { mostCommon, recommendFrom, diagnosePayload, diagnoseExecution, persistRecommendation }
+module.exports = {
+  mostCommon,
+  recommendFrom,
+  recommendResume,
+  diagnosePayload,
+  diagnoseExecution,
+  persistRecommendation,
+  resumeCost,
+  stepHasCursor,
+  isMemoryMiss,
+  pickMemoryMiss,
+  memoryMissReason,
+  linkedMemoryTotal,
+  shownStatus,
+}

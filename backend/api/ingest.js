@@ -1,13 +1,10 @@
 const express = require('express')
 const { v4: uuid } = require('uuid')
-const { query } = require('../../db/pool')
 const { requireAuth } = require('./auth')
-const { upsertWorkflow, upsertTool, upsertExecution, upsertStep } = require('../intelligence/upsert')
-const { rollupExecution } = require('../intelligence/rollup')
+const { applyBatch } = require('../intelligence/apply')
+const { TREE_KINDS, isLeafKind } = require('../intelligence/kinds')
 
 const router = express.Router()
-const LEAF_KINDS = new Set(['api_call', 'tool_call'])
-const TREE_KINDS = new Set(['workflow_start', 'workflow_end', 'step_end'])
 
 router.post('/', async (req, res) => {
   const customer = await requireAuth(req, res)
@@ -45,7 +42,7 @@ router.post('/', async (req, res) => {
       continue
     }
 
-    const isLeaf = LEAF_KINDS.has(kind) || !TREE_KINDS.has(kind)
+    const isLeaf = isLeafKind(kind)
     const endpoint = (log.endpoint || log.tool || '').toString()
 
     if (isLeaf && !TREE_KINDS.has(kind) && !endpoint) {
@@ -76,6 +73,15 @@ router.post('/', async (req, res) => {
       attempt: parseInt(log.attempt) > 0 ? parseInt(log.attempt) : 1,
       started_at: log.started_at ? new Date(log.started_at) : null,
       ended_at: log.ended_at || log.timestamp ? new Date(log.ended_at || log.timestamp) : null,
+      recovery_of: log.recovery_of || null,
+      actor: log.actor || null,
+      for_execution_id: log.for_execution_id || null,
+      for_step: log.for_step ? String(log.for_step).slice(0, 255) : null,
+      hits: Number.isInteger(log.hits) ? log.hits : null,
+      cursor: log.cursor != null ? log.cursor : null,
+      progress_done: Number.isInteger(log.progress_done) ? log.progress_done : (Number.isInteger(log.done) ? log.done : null),
+      progress_total: Number.isInteger(log.progress_total) ? log.progress_total : (Number.isInteger(log.total) ? log.total : null),
+      cost_kind: log.cost_kind || null,
     })
   }
 
@@ -83,94 +89,8 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'No valid log entries', invalid })
   }
 
-  const executionIds = new Set()
-  const leaves = []
-
   try {
-    for (const ev of valid) {
-      let workflowId = null
-      let toolId = null
-      let executionId = ev.execution_id
-      let stepId = ev.step_id
-
-      if (ev.workflow) {
-        workflowId = await upsertWorkflow(customer.id, ev.workflow)
-        if (!executionId) executionId = uuid()
-        const ended = ev.kind === 'workflow_end' ? (ev.ended_at || new Date()) : null
-        await upsertExecution(customer.id, {
-          id: executionId,
-          workflowId,
-          startedAt: ev.started_at || new Date(),
-          endedAt: ended,
-          status: ev.status === 'fail' ? 'failed' : 'success',
-          durationMs: ev.kind === 'workflow_end' ? ev.latency_ms : null,
-        })
-        executionIds.add(executionId)
-      }
-
-      if (ev.step && executionId) {
-        if (!stepId) stepId = uuid()
-        await upsertStep(customer.id, {
-          id: stepId,
-          executionId,
-          parentStepId: ev.parent_step_id,
-          name: ev.step,
-          status: ev.status,
-          startedAt: ev.started_at || new Date(),
-          endedAt: ev.ended_at || new Date(),
-          durationMs: ev.latency_ms,
-          dependsOn: ev.depends_on,
-        })
-        executionIds.add(executionId)
-      }
-
-      if (ev.tool) {
-        toolId = await upsertTool(customer.id, ev.tool, parseFloat(ev.price) || null)
-      }
-
-      if (executionId) executionIds.add(executionId)
-
-      if (ev.isLeaf) {
-        leaves.push({
-          ...ev,
-          execution_id: executionId,
-          step_id: stepId,
-          tool_id: toolId,
-        })
-      }
-    }
-
-    if (leaves.length) {
-      const placeholders = leaves.map((_, i) => {
-        const b = i * 11
-        return `($${b+1},$${b+2},$${b+3},$${b+4},$${b+5},$${b+6},$${b+7},$${b+8},$${b+9},$${b+10},$${b+11})`
-      }).join(',')
-      const params = leaves.flatMap(l => [
-        customer.id,
-        l.request_id,
-        l.endpoint,
-        l.status,
-        l.latency_ms,
-        l.price,
-        l.error_type,
-        l.execution_id,
-        l.step_id,
-        l.tool_id,
-        l.attempt,
-      ])
-      await query(
-        `INSERT INTO request_logs
-           (customer_id, request_id, endpoint, status, latency_ms, price, error_type,
-            execution_id, step_id, tool_id, attempt)
-         VALUES ${placeholders}
-         ON CONFLICT (customer_id, request_id) WHERE request_id IS NOT NULL DO NOTHING`,
-        params
-      )
-    }
-
-    for (const id of executionIds) {
-      await rollupExecution(id)
-    }
+    await applyBatch(customer, valid)
 
     return res.status(200).json({
       ok:       true,

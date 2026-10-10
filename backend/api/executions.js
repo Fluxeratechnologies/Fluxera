@@ -3,6 +3,8 @@ const { query } = require('../../db/pool')
 const { requireAuth } = require('./auth')
 const { diagnoseExecution } = require('../intelligence/diagnose')
 const { executeRecover } = require('./recover')
+const { interruptedSql } = require('../intelligence/interrupt')
+const { actorFilter } = require('../intelligence/kinds')
 
 const router = express.Router()
 
@@ -12,21 +14,39 @@ router.get('/', async (req, res) => {
 
   const status = req.query.status
   const workflow = req.query.workflow
-  const params = [customer.id]
+  const minutes = parseInt(customer.interrupt_after_minutes, 10) || 15
+  const params = [customer.id, minutes]
+  const quiet = interruptedSql('e', 2)
   const where = ['e.customer_id = $1']
 
-  if (status && ['success', 'failed', 'partial'].includes(status)) {
+  const zeroHit = `w.actor = 'memory' AND e.status = 'success' AND e.hit_count = 0`
+  if (status === 'interrupted') {
+    where.push(quiet)
+  } else if (status === 'miss') {
+    where.push(`NOT (${quiet}) AND ${zeroHit}`)
+  } else if (status && ['success', 'failed', 'partial'].includes(status)) {
     params.push(status)
-    where.push(`e.status = $${params.length}`)
+    where.push(`NOT (${quiet}) AND e.status = $${params.length}`)
+    if (status === 'success') where.push(`NOT (${zeroHit})`)
   }
   if (workflow) {
     params.push(workflow)
     where.push(`w.name = $${params.length}`)
   }
+  const actor = actorFilter(req.query.actor)
+  if (actor) {
+    params.push(actor)
+    where.push(`w.actor = $${params.length}`)
+  }
 
   try {
     const result = await query(
-      `SELECT e.*, w.name AS workflow_name,
+      `SELECT e.*, w.name AS workflow_name, w.actor,
+         CASE
+           WHEN ${quiet} THEN 'interrupted'
+           WHEN w.actor = 'memory' AND e.status = 'success' AND e.hit_count = 0 THEN 'miss'
+           ELSE e.status
+         END AS status,
          (
            SELECT s.name FROM execution_steps s
            WHERE s.execution_id = e.id AND s.status IN ('fail','cascade')
@@ -41,7 +61,18 @@ router.get('/', async (req, res) => {
            SELECT r.action FROM recovery_actions r
            WHERE r.execution_id = e.id
            ORDER BY r.created_at DESC LIMIT 1
-         ) AS recovery_action
+         ) AS recovery_action,
+         (
+           SELECT CASE
+             WHEN c.status = 'success' AND c.ended_at IS NOT NULL
+             THEN GREATEST(0, e.total_cost - c.total_cost)
+             ELSE NULL
+           END
+           FROM workflow_executions c
+           WHERE c.recovery_of = e.id
+           ORDER BY c.started_at DESC
+           LIMIT 1
+         ) AS cost_avoided
        FROM workflow_executions e
        JOIN workflows w ON w.id = e.workflow_id
        WHERE ${where.join(' AND ')}

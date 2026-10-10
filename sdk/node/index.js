@@ -14,8 +14,11 @@ const { randomUUID } = require('crypto')
 const { current } = require('./context')
 const { classifyError } = require('./wrap')
 const { workflow } = require('./workflow')
+const { agent } = require('./agent')
+const { memory } = require('./memory')
 const { step } = require('./step')
 const { tool } = require('./tool')
+const { checkpoint } = require('./checkpoint')
 
 const DEFAULT_HOST    = 'api.fluxeratechnologies.ai'
 const DEFAULT_TIMEOUT = 5000  // 5s — never block your app
@@ -39,9 +42,12 @@ class FluxeraClient {
     this._startFlushTimer()
     this._log('Fluxera SDK initialized')
 
-    this.workflow = (name, fn, opts) => workflow(this, name, fn, opts)
-    this.step     = (name, fn, opts) => step(this, name, fn, opts)
-    this.tool     = (name, fn, opts) => tool(this, name, fn, opts)
+    this.workflow   = (name, fn, opts) => workflow(this, name, fn, opts)
+    this.agent      = (name, fn, opts) => agent(this, name, fn, opts)
+    this.memory     = (name, fn, opts) => memory(this, name, fn, opts)
+    this.step       = (name, fn, opts) => step(this, name, fn, opts)
+    this.tool       = (name, fn, opts) => tool(this, name, fn, opts)
+    this.checkpoint = (opts) => checkpoint(this, opts)
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -88,6 +94,7 @@ class FluxeraClient {
         execution_id: ctx.executionId || null,
         step_id:      ctx.stepId || null,
         workflow:     ctx.workflow || null,
+        cost_kind:    opts.cost_kind || 'api',
       })
     }
 

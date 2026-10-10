@@ -53,7 +53,6 @@ export function ExecutionDetail({ apiKey, executionId, go }) {
         ← Back to Executions
       </button>
 
-      {/* 4 Diagnostic Questions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <DiagCard
           k="What failed?"
@@ -71,17 +70,14 @@ export function ExecutionDetail({ apiKey, executionId, go }) {
           }
         />
         <DiagCard k="What did it affect?" v={affectLine(d.affected, e)} />
-        <DiagCard
-          k="How much did it cost?"
-          v={`${f$(d.cost?.failed)} direct loss · ${f$(d.cost?.retry_wasted)} retry waste`}
-          red
-        />
+        <DiagCard k="How much did it cost?" v={costLine(d.cost)} red />
       </div>
 
       {err && <p className="text-xs text-rosebrand-600 p-3 bg-rosebrand-50 rounded-xl border border-rosebrand-200">{err}</p>}
 
       <div className="glass-card p-4 rounded-2xl border border-slate-200/80 flex items-center justify-between text-xs text-slate-600 font-mono">
         <span>
+          {contextLine(e)}
           Status: <strong className="uppercase text-slate-900">{e.status}</strong> · Duration: {fMs(e.duration_ms)} · Started:{" "}
           {e.started_at ? new Date(e.started_at).toLocaleString() : "—"}
         </span>
@@ -92,7 +88,6 @@ export function ExecutionDetail({ apiKey, executionId, go }) {
         )}
       </div>
 
-      {/* Workflow Trace Tree */}
       <div className="flex flex-col gap-2">
         <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
           Execution Step Tree & Tool Calls
@@ -113,6 +108,24 @@ export function ExecutionDetail({ apiKey, executionId, go }) {
       />
     </div>
   );
+}
+
+function costLine(cost) {
+  const head = `${f$(cost?.failed)} failed · ${f$(cost?.retry_wasted)} retry waste`;
+  const kinds = ["model", "tool", "api", "compute", "third_party", "memory"]
+    .filter((k) => parseFloat(cost?.by_kind?.[k]) > 0)
+    .map((k) => `${k} ${f$(cost.by_kind[k])}`);
+  const linked = cost?.linked_memory == null ? "" : ` · linked memory ${f$(cost.linked_memory)}`;
+  return (kinds.length ? `${head} · ${kinds.join(" · ")}` : head) + linked;
+}
+
+function contextLine(e) {
+  const bits = [];
+  if (e.actor && e.actor !== "workflow") bits.push(e.actor);
+  if (e.for_agent_name) bits.push(`for ${e.for_agent_name}`);
+  if (e.actor === "memory" && e.for_step) bits.push(e.for_step);
+  if (e.actor === "memory" && e.hit_count != null) bits.push(`${e.hit_count} hits`);
+  return bits.length ? bits.join(" · ") + " · " : "";
 }
 
 function affectLine(affected, execution) {

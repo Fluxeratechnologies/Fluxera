@@ -224,7 +224,7 @@ Auth on the landing:
 - **Sign up** — [frontend/src/pages/Onboarding.jsx](frontend/src/pages/Onboarding.jsx): email + institute name → mint → show the key (copy) + SDK snippet → same step sets the dashboard session.
 - **Sign in** — key only (`GET /api/customers/me`). No email on the form. Does not create a demo session.
 - **View demo** — leak-lens mock, no key.
-- **Settings** — Apply key still switches institutes. No rotate, no forgot-key.
+- **Settings** — live institute: copy the one key, no rotate, no switcher. Demo: paste an fx_ key to enter that institute. Lost key + lost session → ops looks it up.
 
 Nav (keep leak, add intelligence):
 
@@ -361,6 +361,48 @@ SDK poll (`GET /api/recover/pending`) stays later.
 5. UI badges + tests + this section marked landed
 
 Hourly snapshots in `intelligence.js` remain later.
+
+---
+
+## Early V1 — work + cost recovery
+
+Control plane only. SDK reports checkpoints. Recover webhook tells the customer where to continue. Fluxera does not re-execute work.
+
+**Landed.** Schema, ingest, diagnose, webhook, Settings threshold, RecoveryCard four-line cost, executions `interrupted`, workflow `cost_avoided`.
+
+- Checkpoint hangs on the existing execution (`cursor`, `progress_done`, `progress_total`, `checkpoint_at` on the step). `fluxera.checkpoint({ done, total, cursor })` inside `step()`.
+- `interrupted` is derived on read: no `ended_at` and last event older than `customers.interrupt_after_minutes` (default 15, Settings, 1–10080). Not stored.
+- Webhook verbs: `resume` | `retry` | `fallback`. Payload includes `completed_steps` and `cursor`.
+- Resume is a new execution with `recovery_of`. Cost avoided is measured on that child after it ends `success`. Latest child only.
+- Leaf `cost_kind`: `api | tool | model | compute | third_party | memory`. Default `tool` inside `tool()`, else `api`. Pass `memory` on a retrieval leaf.
+- `resume` verifies only when the linked child succeeds. Same-workflow later-success verify excludes `action = 'resume'`.
+
+Later: business-value recovery, Python SDK, estimated recovery cost from the cursor percentage, stored `interrupted`, summing every failed resume.
+
+---
+
+## Early V1 — agent intelligence
+
+**Landed.** An agent run is a workflow execution. Fluxera does not run the agent.
+
+- `fluxera.agent(name, fn)` is `workflow()` with `actor=agent`. Inside it, reuse `step` / `tool` / `track` / `checkpoint`. Model calls stay leaves with `cost_kind=model`. No `fluxera.model()`.
+- `workflows.actor` is `workflow | agent | memory` (default `workflow`). First sight wins, except a one-way upgrade `workflow → agent|memory`. Never demote, never switch agent ↔ memory.
+- Agent state is the last checkpoint cursor. No conversation store.
+- Cost, failures, interrupt, and recover stay the existing rollup, diagnose, and resume/retry/fallback webhook.
+- Workflows and Executions filter with `?actor=`. Execution detail splits cost by `cost_kind` (`diagnosis.cost.by_kind`). No new nav.
+
+---
+
+## Early V1 — memory intelligence
+
+**Landed.** A memory run is its own workflow execution. Fluxera does not run retrieval.
+
+- `fluxera.memory(name, fn, opts)` is `workflow()` with `actor=memory`. No `retrieve()`. `opts.hits` if it is an integer, otherwise `returnValue.hits` if that is an integer, read after `fn` returns. `0` is kept. Anything else leaves `hit_count` null.
+- Link only when the parent async context `actor` is `agent`: `for_execution_id`, plus `for_step` (step name) when inside `step()`. Top-level, inside `workflow()`, or inside another `memory()` stays unlinked. Ingest drops the link unless that parent execution is the same institute and `actor=agent`.
+- A miss is a failed or partial memory execution, or `hit_count = 0`. Null hits is not a miss. On a failed or interrupted agent, diagnose names the miss on that step (latest if several). A null-step miss is the fallback. A miss on a different step is ignored. A successful agent gets no sentence. The agent verb stays resume or retry. The sentence is appended: `customer-kb missed for step qualify — retry memory, then resume`.
+- Webhook payload adds `memory_execution_id` and `memory_workflow` only when a miss is named. No new action.
+- `miss` is derived on read: memory actor, stored `success`, `hit_count = 0`. A thrown run stays `failed`. Executions accepts `?status=miss`. Workflow failure rate counts a 0-hit memory run.
+- Agent `total_cost` is still only the agent leaves. Detail adds `linked memory` as the sum of executions with `for_execution_id` set to that agent. No query text, chunks, or vectors.
 
 ---
 

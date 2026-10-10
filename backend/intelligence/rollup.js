@@ -12,12 +12,25 @@ function costFromLeaves(leaves) {
 
 async function verifyRecovered(executionId) {
   const exec = await query(
-    `SELECT id, customer_id, workflow_id, status, started_at
+    `SELECT id, customer_id, workflow_id, status, started_at, recovery_of
      FROM workflow_executions WHERE id = $1`,
     [executionId]
   )
   const row = exec.rows[0]
   if (!row || row.status !== 'success') return
+
+  if (row.recovery_of) {
+    await query(
+      `UPDATE recovery_actions
+       SET verified_at = now()
+       WHERE execution_id = $1
+         AND kind = 'executed'
+         AND action = 'resume'
+         AND verified_at IS NULL`,
+      [row.recovery_of]
+    )
+  }
+
   await query(
     `UPDATE recovery_actions ra
      SET verified_at = now()
@@ -26,6 +39,7 @@ async function verifyRecovered(executionId) {
        AND e.workflow_id = $1
        AND e.customer_id = $2
        AND ra.kind = 'executed'
+       AND ra.action <> 'resume'
        AND ra.verified_at IS NULL
        AND ra.created_at < $3`,
     [row.workflow_id, row.customer_id, row.started_at]

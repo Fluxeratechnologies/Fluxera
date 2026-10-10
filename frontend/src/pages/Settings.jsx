@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { API_BASE, apiGet, apiPatch } from "../api";
-import { useIsMobile } from "../format";
 
 export function Settings({
   apiKey,
@@ -12,7 +11,6 @@ export function Settings({
   regen,
   onApplyKey,
 }) {
-  const isMobile = useIsMobile();
   const [keyDraft, setKeyDraft] = useState(apiKey || "");
   const [copied, setCopied] = useState(false);
   const [keyErr, setKeyErr] = useState("");
@@ -28,6 +26,7 @@ export function Settings({
   const [webhook, setWebhook] = useState("");
   const [hookSaved, setHookSaved] = useState(false);
   const [hookErr, setHookErr] = useState("");
+  const [interruptMin, setInterruptMin] = useState(15);
 
   useEffect(() => {
     setKeyDraft(apiKey || "");
@@ -40,6 +39,7 @@ export function Settings({
         if (!r.ok) return;
         const c = await r.json();
         setWebhook(c.webhook_url || "");
+        setInterruptMin(c.interrupt_after_minutes ?? 15);
       })
       .catch(() => {});
   }, [apiKey, isDemo]);
@@ -153,7 +153,10 @@ export function Settings({
     if (isDemo) return;
     setSaving(true);
     try {
-      const r = await apiPatch("/api/customers/me", apiKey, { webhook_url: webhook.trim() });
+      const r = await apiPatch("/api/customers/me", apiKey, {
+        webhook_url: webhook.trim(),
+        interrupt_after_minutes: Number(interruptMin),
+      });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.error || "Couldn't save webhook");
       setHookSaved(true);
@@ -169,51 +172,60 @@ export function Settings({
 
   return (
     <div className="flex flex-col gap-6 max-w-2xl mx-auto">
-      {/* API Key Panel */}
       <section className="glass-card p-6 sm:p-8 rounded-3xl border border-rosebrand-100 shadow-card-glass">
-        <h3 className="text-base font-bold text-slate-900 mb-1">Master Telemetry Key</h3>
+        <h3 className="text-base font-bold text-slate-900 mb-1">Institute key</h3>
         <p className="text-xs text-slate-500 mb-4 leading-relaxed">
           {isDemo
-            ? "Paste your institute's fx_ key to stream live telemetry. Leave blank to stay in demo mode."
-            : "This key authenticates your dashboard and SDK telemetry ingestion."}
+            ? "Demo has no key. Paste an institute’s fx_ key to load that workspace. One key per institute — it is login and SDK auth."
+            : `${company || "This institute"} has one Fluxera key. Copy it for the SDK. Fluxera does not rotate keys.`}
         </p>
 
-        <div className="flex gap-2 flex-wrap sm:flex-nowrap mb-2">
-          <input
-            type="text"
-            value={keyDraft}
-            placeholder="fx_live_..."
-            spellCheck={false}
-            autoComplete="off"
-            onChange={(e) => {
-              setKeyDraft(e.target.value);
-              setKeyErr("");
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") applyKey();
-            }}
-            className="flex-1 min-w-[200px] px-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-mono bg-white focus:outline-none focus:border-rosebrand-400"
-          />
-          <button
-            type="button"
-            onClick={applyKey}
-            disabled={saving || !canApply}
-            className="shimmer-btn text-white text-xs font-semibold px-5 py-2.5 rounded-xl cursor-pointer border-0 shadow-sm disabled:opacity-50"
-          >
-            {keySaved ? "Applied ✓" : saving ? "Checking..." : "Apply Key"}
-          </button>
-          <button
-            type="button"
-            onClick={copy}
-            className="glass-pill text-xs font-semibold text-slate-700 hover:bg-white px-4 py-2.5 rounded-xl border border-slate-200 cursor-pointer"
-          >
-            {copied ? "Copied!" : "Copy"}
-          </button>
-        </div>
+        {isDemo ? (
+          <div className="flex gap-2 flex-wrap sm:flex-nowrap mb-2">
+            <input
+              type="text"
+              value={keyDraft}
+              placeholder="fx_…"
+              spellCheck={false}
+              autoComplete="off"
+              autoCorrect="off"
+              onChange={(e) => {
+                setKeyDraft(e.target.value);
+                setKeyErr("");
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") applyKey();
+              }}
+              className="flex-1 min-w-[200px] px-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-mono bg-white focus:outline-none focus:border-rosebrand-400"
+            />
+            <button
+              type="button"
+              onClick={applyKey}
+              disabled={saving || !canApply}
+              className="shimmer-btn text-white text-xs font-semibold px-5 py-2.5 rounded-xl cursor-pointer border-0 shadow-sm disabled:opacity-50"
+            >
+              {keySaved ? "Applied ✓" : saving ? "Checking..." : "Apply Key"}
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-2 flex-wrap sm:flex-nowrap mb-2">
+            <input
+              readOnly
+              value={apiKey || ""}
+              className="flex-1 min-w-[200px] px-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-mono bg-slate-50 focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={copy}
+              className="glass-pill text-xs font-semibold text-slate-700 hover:bg-white px-4 py-2.5 rounded-xl border border-slate-200 cursor-pointer"
+            >
+              {copied ? "Copied!" : "Copy"}
+            </button>
+          </div>
+        )}
         {keyErr && <p className="text-xs text-rosebrand-600 mt-2 font-medium">{keyErr}</p>}
       </section>
 
-      {/* Cost per Request */}
       <section className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-card-glass">
         <h3 className="text-base font-bold text-slate-900 mb-1">Default Cost Per Request</h3>
         <p className="text-xs text-slate-500 mb-4 leading-relaxed">
@@ -240,7 +252,6 @@ export function Settings({
         {priceErr && <p className="text-xs text-rosebrand-600 mt-2">Please enter a valid price amount.</p>}
       </section>
 
-      {/* Revenue-at-Risk Formula */}
       <section className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-card-glass">
         <h3 className="text-base font-bold text-slate-900 mb-1">Revenue-at-Risk Business Model</h3>
         <p className="text-xs text-slate-500 mb-4 leading-relaxed">
@@ -285,7 +296,6 @@ export function Settings({
         )}
       </section>
 
-      {/* Recovery Webhook */}
       <section className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-card-glass">
         <h3 className="text-base font-bold text-slate-900 mb-1">Automated Recovery Webhook</h3>
         <p className="text-xs text-slate-500 mb-4 leading-relaxed">
@@ -314,6 +324,21 @@ export function Settings({
             </button>
           )}
         </div>
+        <label className="block text-xs font-semibold text-slate-700 mt-4 mb-1.5">
+          Quiet before interrupted (minutes)
+        </label>
+        <input
+          type="number"
+          min={1}
+          max={10080}
+          value={interruptMin}
+          disabled={isDemo}
+          onChange={(e) => {
+            setInterruptMin(e.target.value);
+            setHookErr("");
+          }}
+          className="w-40 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-mono bg-white focus:outline-none focus:border-rosebrand-400 disabled:opacity-50"
+        />
         {hookErr && <p className="text-xs text-rosebrand-600 mt-2">{hookErr}</p>}
       </section>
     </div>

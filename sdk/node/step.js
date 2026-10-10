@@ -6,7 +6,7 @@ async function step(client, name, fn, opts = {}) {
   if (typeof fn !== 'function') throw new Error('[Fluxera] step() requires a function')
   const ctx = current()
   const stepId = opts.step_id || randomUUID()
-  return runWith({ stepId, parentStepId: ctx.stepId || null }, () =>
+  return runWith({ stepId, parentStepId: ctx.stepId || null, step: name }, () =>
     wrap(client, fn, {
       kind: 'step_end',
       step: name,

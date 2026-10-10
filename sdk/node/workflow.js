@@ -14,15 +14,23 @@ async function workflow(client, name, fn, opts = {}) {
     started_at: startedAt,
     request_id: randomUUID(),
     endpoint: name,
+    recovery_of: opts.recovery_of || null,
+    actor: opts.actor || 'workflow',
+    for_execution_id: opts.for_execution_id || null,
+    for_step: opts.for_step || null,
   })
   try {
-    return await runWith({ executionId, workflow: name }, () =>
+    return await runWith({ executionId, workflow: name, actor: opts.actor || 'workflow' }, () =>
       wrap(client, fn, {
         kind: 'workflow_end',
         workflow: name,
         execution_id: executionId,
         endpoint: name,
         started_at: startedAt,
+        actor: opts.actor || 'workflow',
+        for_execution_id: opts.for_execution_id || null,
+        for_step: opts.for_step || null,
+        hitsBox: opts.hitsBox || null,
       })
     )
   } catch (err) {

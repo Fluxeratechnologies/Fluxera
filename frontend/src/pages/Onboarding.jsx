@@ -155,6 +155,10 @@ export function Onboarding({ onLogin, go }) {
             {loading ? "Creating..." : "Create Institute & Get Key →"}
           </button>
         </form>
+        <p style={{fontSize:13,color:"var(--gray4)",marginTop:20}}>
+          Already have a key?{" "}
+          <button type="button" onClick={()=>go("overview")} style={{background:"none",border:"none",color:"var(--ink)",fontWeight:600,cursor:"pointer",padding:0,fontSize:13}}>Sign in</button>
+        </p>
       </div>
     </div>
   );

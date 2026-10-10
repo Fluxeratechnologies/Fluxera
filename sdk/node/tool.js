@@ -19,6 +19,7 @@ async function tool(client, name, fn, opts = {}) {
         endpoint: opts.endpoint || name,
         price,
         attempt,
+        cost_kind: opts.cost_kind || 'tool',
       })
     } catch (err) {
       lastErr = err
