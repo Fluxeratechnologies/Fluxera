@@ -78,6 +78,35 @@ body {
   border-color: rgba(244, 63, 94, 0.45);
 }
 
+/* Mobile Responsiveness & Layout Safety Overrides */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden !important;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .hero-perspective-stage {
+    perspective: none !important;
+    transform-style: flat !important;
+  }
+  
+  .dashboard-viewport-peek {
+    transform: none !important;
+    box-shadow: 0 12px 35px -5px rgba(244, 63, 94, 0.22), 0 0 0 1px rgba(226, 232, 240, 0.9) !important;
+    border-radius: 1.25rem !important;
+  }
+
+  .dashboard-viewport-peek:hover {
+    transform: none !important;
+  }
+
+  .horizon-arc-dome {
+    border-radius: 2.5rem 2.5rem 0 0 !important;
+    background: radial-gradient(ellipse at bottom, rgba(255, 255, 255, 0.99) 0%, rgba(255, 241, 242, 0.9) 60%, rgba(254, 205, 211, 0.55) 100%) !important;
+  }
+}
+
 /* 3D PURE WHITE iPHONE STYLING */
 .iphone-integrated-stage {
   perspective: 1200px;
@@ -252,3 +281,139 @@ body {
 .floating-pill:nth-child(4n) {
   animation-delay: 2.4s;
 }
+
+/* ========================================== */
+/* AMBIENT BACKGROUND MICRO-ANIMATIONS & SHIMMER */
+/* ========================================== */
+
+/* 1. Animated Ambient Grid Matrix Shift */
+@keyframes gridShift {
+  0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
+  100% { background-position: 0 0, 0 0, 0 0, 0 0, 48px 48px, 48px 48px; }
+}
+
+.animated-grid {
+  animation: gridShift 35s linear infinite;
+}
+
+/* 2. Floating Ambient Light Orbs */
+@keyframes floatOrb1 {
+  0% { transform: translate(-50%, 0px) scale(1); opacity: 0.85; }
+  50% { transform: translate(-48%, -25px) scale(1.08); opacity: 1; }
+  100% { transform: translate(-52%, 15px) scale(0.95); opacity: 0.9; }
+}
+
+@keyframes floatOrb2 {
+  0% { transform: translate(0px, 0px) scale(1); opacity: 0.8; }
+  50% { transform: translate(25px, -30px) scale(1.1); opacity: 1; }
+  100% { transform: translate(-15px, 20px) scale(0.92); opacity: 0.85; }
+}
+
+.ambient-orb-1 {
+  animation: floatOrb1 12s ease-in-out infinite alternate;
+}
+
+.ambient-orb-2 {
+  animation: floatOrb2 16s ease-in-out infinite alternate;
+}
+
+/* 3. Subtle Particle Drifting Points */
+@keyframes floatParticleUp {
+  0% { transform: translateY(0px) rotate(0deg); opacity: 0.2; }
+  50% { opacity: 0.7; }
+  100% { transform: translateY(-120px) rotate(180deg); opacity: 0; }
+}
+
+.floating-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: floatParticleUp 8s ease-in-out infinite;
+}
+
+/* 4. Shimmering Card Gradient Border Effect */
+@keyframes borderShimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.shimmer-border {
+  background-size: 200% 200%;
+  animation: borderShimmer 6s ease infinite;
+}
+
+/* 5. Concentric Glowing LED Dot Pulse */
+@keyframes dotPulseRing {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+}
+
+.pulse-led-ring {
+  animation: dotPulseRing 2.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+/* ========================================================================= */
+/* DESIGN-ORIENTED ARCHITECTURAL BACKGROUND GRID (DOT MATRIX + FINE LINES)   */
+/* ========================================================================= */
+
+.design-dot-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  background-image: 
+    /* Primary Dot Matrix */
+    radial-gradient(circle at 1px 1px, rgba(148, 163, 184, 0.35) 1.5px, transparent 0),
+    /* Secondary Accent Dot Matrix */
+    radial-gradient(circle at 17px 17px, rgba(244, 63, 94, 0.15) 1.2px, transparent 0),
+    /* Horizontal Architectural Grid Lines */
+    linear-gradient(to right, rgba(226, 232, 240, 0.45) 1px, transparent 1px),
+    /* Vertical Architectural Grid Lines */
+    linear-gradient(to bottom, rgba(226, 232, 240, 0.45) 1px, transparent 1px);
+  background-size: 32px 32px, 32px 32px, 32px 32px, 32px 32px;
+  background-position: -1px -1px;
+  mask-image: radial-gradient(ellipse 90% 85% at 50% 20%, rgba(0,0,0,0.95) 25%, rgba(0,0,0,0.5) 70%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 20%, rgba(0,0,0,0.95) 25%, rgba(0,0,0,0.5) 70%, transparent 100%);
+}
+
+/* Pulsing Intersection Node Points for Design Grid */
+.grid-node-glow {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f43f5e;
+  box-shadow: 0 0 10px #f43f5e, 0 0 20px rgba(244, 63, 94, 0.6);
+  pointer-events: none;
+  animation: gridNodePulse 3.5s ease-in-out infinite alternate;
+}
+
+.grid-node-glow-sky {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 10px #38bdf8, 0 0 20px rgba(56, 189, 248, 0.6);
+  pointer-events: none;
+  animation: gridNodePulse 4s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes gridNodePulse {
+  0% { transform: scale(0.75); opacity: 0.35; box-shadow: 0 0 4px currentColor; }
+  100% { transform: scale(1.35); opacity: 0.95; box-shadow: 0 0 14px currentColor, 0 0 28px currentColor; }
+}
+
+.grid-crosshair {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  pointer-events: none;
+  opacity: 0.45;
+  color: #94a3b8;
+  transform: translate(-50%, -50%);
+}
+

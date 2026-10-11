@@ -174,14 +174,17 @@
 <body class="relative min-h-screen antialiased selection:bg-rose-500 selection:text-white">
 
   <!-- High-Tech Cyber Grid & Aurora Glow Layers -->
-  <div class="fixed inset-0 cyber-grid pointer-events-none -z-10"></div>
+  <div class="fixed inset-0 cyber-grid design-dot-grid pointer-events-none -z-10"></div>
   <div class="fixed top-10 left-1/2 -translate-x-1/2 w-[900px] h-[550px] spatial-orb-rose pointer-events-none -z-10"></div>
   <div class="fixed top-48 right-[-10%] w-[650px] h-[650px] spatial-orb-cyan pointer-events-none -z-10"></div>
   <div class="fixed bottom-36 left-[-10%] w-[600px] h-[600px] spatial-orb-rose pointer-events-none -z-10"></div>
+  <div class="grid-node-glow top-[15%] left-[12%] hidden lg:block pointer-events-none z-0"></div>
+  <div class="grid-node-glow-sky top-[28%] right-[15%] hidden lg:block pointer-events-none z-0"></div>
+  <div class="grid-node-glow top-[55%] left-[8%] hidden lg:block pointer-events-none z-0"></div>
 
   <!-- SITE NAVIGATION (Unified: Home, Vision, Sign In, Red Dashboard) -->
-  <header class="fixed top-5 inset-x-0 z-50 flex justify-center px-4" data-purpose="primary-navigation">
-    <nav class="w-full max-w-4xl rounded-full bg-white/85 backdrop-blur-xl border border-slate-200/80 shadow-[0_10px_35px_-8px_rgba(15,23,42,0.08)] px-4 sm:px-6 py-2.5 flex items-center justify-between transition-all duration-300 holo-border-subtle">
+  <header class="fixed top-5 inset-x-0 z-50 flex justify-center px-4 pointer-events-none" data-purpose="primary-navigation">
+    <nav class="pointer-events-auto w-full max-w-4xl rounded-full bg-white/85 backdrop-blur-xl border border-slate-200/80 shadow-[0_10px_35px_-8px_rgba(15,23,42,0.08)] px-4 sm:px-6 py-2.5 flex items-center justify-between transition-all duration-300 holo-border-subtle">
       <!-- Brand Logo Badge -->
       <a class="flex items-center space-x-2.5 group shrink-0" href="./index.html">
         <span class="w-8 h-8 rounded-full bg-gradient-to-tr from-rose-600 via-rose-500 to-rose-400 text-white font-bold text-xs flex items-center justify-center shadow-md shadow-rose-500/40 group-hover:scale-105 transition-all font-mono">
@@ -201,15 +204,50 @@
 
       <!-- Action Buttons -->
       <div class="flex items-center gap-2 shrink-0">
-        <a class="text-xs font-semibold text-slate-700 hover:text-rose-600 px-3.5 py-1.5 rounded-full hover:bg-slate-100 transition-all" href="./dashboard.html">
+        <a class="hidden sm:inline-block text-xs font-semibold text-slate-700 hover:text-rose-600 px-3.5 py-1.5 rounded-full hover:bg-slate-100 transition-all" href="./dashboard.html">
           Sign In
         </a>
-        <a class="px-5 py-2 text-xs font-bold rounded-full bg-gradient-to-r from-rose-600 via-rose-500 to-rose-600 hover:from-rose-500 hover:to-rose-600 text-white shadow-md shadow-rose-500/30 transition-all duration-200 hover:shadow-rose-500/50 hover:scale-[1.03]" href="./dashboard.html">
+        <a class="px-4 sm:px-5 py-2 text-xs font-bold rounded-full bg-gradient-to-r from-rose-600 via-rose-500 to-rose-600 hover:from-rose-500 hover:to-rose-600 text-white shadow-md shadow-rose-500/30 transition-all duration-200 hover:shadow-rose-500/50 hover:scale-[1.03]" href="./dashboard.html">
           Dashboard
         </a>
+        <button id="mobile-menu-toggle" aria-label="Toggle Mobile Menu" class="md:hidden p-1.5 text-slate-700 hover:text-rose-600 focus:outline-none cursor-pointer">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
       </div>
     </nav>
   </header>
+
+  <!-- MOBILE NAVIGATION DROPDOWN MENU (Top Attached Below Header) -->
+  <div id="mobile-menu" class="hidden md:hidden pointer-events-auto fixed top-[72px] left-4 right-4 bg-white/95 backdrop-blur-2xl border border-slate-200/90 shadow-2xl rounded-2xl p-4 z-50 flex flex-col gap-2">
+    <a class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-800 font-bold text-sm hover:bg-rose-50 hover:text-rose-600 transition-colors" href="./index.html#overview">
+      <span class="flex items-center gap-2.5">
+        <span class="text-base">🏠</span>
+        <span>Home</span>
+      </span>
+      <span class="text-xs text-slate-400">→</span>
+    </a>
+    <a class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-800 font-bold text-sm hover:bg-rose-50 hover:text-rose-600 transition-colors" href="./vision.html">
+      <span class="flex items-center gap-2.5">
+        <span class="text-base">👁️</span>
+        <span>Vision</span>
+      </span>
+      <span class="text-xs text-slate-400">→</span>
+    </a>
+    <a class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-800 font-bold text-sm hover:bg-rose-50 hover:text-rose-600 transition-colors" href="./dashboard.html">
+      <span class="flex items-center gap-2.5">
+        <span class="text-base">📊</span>
+        <span>Dashboard</span>
+      </span>
+      <span class="text-xs text-slate-400">→</span>
+    </a>
+    <hr class="border-slate-100 my-1" />
+    <div class="flex items-center gap-2 pt-1">
+      <a class="w-full text-center text-xs font-semibold text-slate-700 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors" href="./dashboard.html">Sign In</a>
+      <a class="w-full text-center text-xs font-bold text-white py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-rose-500 shadow-md shadow-rose-500/30 hover:scale-[1.02] transition-transform" href="./dashboard.html">Open Dashboard</a>
+    </div>
+  </div>
 
   <!-- BEGIN: Hero Section -->
   <main class="relative pt-32 md:pt-40 pb-0">
@@ -218,17 +256,17 @@
       <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-rose-50 via-white to-sky-50 border border-rose-200/90 text-rose-600 text-[11px] font-semibold tracking-widest uppercase mb-6 shadow-[0_4px_16px_-4px_rgba(255,77,109,0.25)] backdrop-blur-md">
         <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
         <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 mr-0.5"></span>
-        <span>HOW FLUXERA WORKS · VISION</span>
+        <span>THE RELIABILITY &amp; RECOVERY ENGINE · VISION</span>
       </div>
 
-      <!-- Hero Main Headline with Dual-Color Cyber Luster -->
+      <!-- Hero Main Headline -->
       <h1 class="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-slate-950 leading-[1.1] mb-5 drop-shadow-sm">
-        ONE RELIABILITY LAYER
+        Keep Your Systems Running. <span class="bg-clip-text text-transparent bg-gradient-to-r from-rose-600 via-rose-500 to-coral-500">Recover Costs.</span>
       </h1>
 
-      <!-- Core Value Banner Statement with Holographic Accent -->
-      <div class="inline-block px-6 py-2.5 rounded-2xl bg-gradient-to-r from-rose-50/90 via-white to-sky-50/90 border border-rose-200/80 shadow-[0_8px_25px_-5px_rgba(244,63,94,0.15)] text-xs md:text-sm font-semibold text-rose-950 tracking-tight backdrop-blur-md">
-        Fluxera connects their failures, dependencies, execution state, and impact.
+      <!-- Core Value Banner Statement -->
+      <div class="max-w-3xl mx-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-rose-50/90 via-white to-sky-50/90 border border-rose-200/80 shadow-[0_8px_25px_-5px_rgba(244,63,94,0.15)] text-xs md:text-sm font-semibold text-slate-700 leading-relaxed tracking-tight backdrop-blur-md">
+        Fluxera detects and diagnoses failures across your tech stack, recovers interrupted work, keeps services running, and reduces wasted compute, API spend, and operational costs.
       </div>
     </section>
 
@@ -782,17 +820,17 @@
                 fx
               </div>
             </div>
-            <h2 class="text-3xl sm:text-5xl font-extrabold text-slate-950 tracking-tight leading-tight">
-              Stop Losing Work When <br />
-              Dependencies Fail
+            <h2 class="text-2xl sm:text-3xl md:text-5xl font-extrabold text-slate-950 tracking-tight leading-snug px-2 sm:px-4">
+              Keep Your Systems Running. <br class="hidden sm:inline" />
+              <span class="text-rose-600 block sm:inline mt-1 sm:mt-0">Stop Paying for Failed Work.</span>
             </h2>
-            <p class="mt-3 text-sm sm:text-base text-slate-600 max-w-xl mx-auto font-medium">
-              Deploy the intelligence and recovery layer built for mission-critical modern SaaS architectures.
+            <p class="mt-4 text-xs sm:text-base text-slate-600 max-w-xl mx-auto font-medium leading-relaxed px-2">
+              Add a reliability and recovery layer to your software stack—designed to restore interrupted work, keep services running, and reduce wasted compute and operational costs.
             </p>
-            <div class="mt-8 max-w-md mx-auto">
-              <form class="flex flex-col sm:flex-row items-center gap-2 p-1.5 rounded-full bg-white/95 border border-slate-200 shadow-xl shadow-rose-500/15 backdrop-blur-md" onsubmit="event.preventDefault(); alert('Thank you for requesting early access to Fluxera!');">
-                <input class="w-full sm:flex-1 px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 bg-transparent rounded-full focus:outline-none focus:ring-0 border-0" placeholder="Enter your work email address" required="" type="email" />
-                <button class="w-full sm:w-auto px-6 py-2.5 rounded-full bg-gradient-to-r from-rose-600 via-rose-500 to-rose-600 text-white font-bold text-xs tracking-wide shadow-md shadow-rose-500/35 hover:shadow-rose-500/50 hover:scale-[1.02] transition-all whitespace-nowrap" type="submit">
+            <div class="mt-8 max-w-md mx-auto w-full">
+              <form class="flex flex-col sm:flex-row items-center gap-2 p-2 sm:p-1.5 rounded-2xl sm:rounded-full bg-white/95 border border-slate-200/90 shadow-xl shadow-rose-500/15 backdrop-blur-md" onsubmit="event.preventDefault(); alert('Thank you for requesting early access to Fluxera!');">
+                <input class="w-full sm:flex-1 px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 bg-transparent rounded-xl sm:rounded-full focus:outline-none focus:ring-0 border-0 text-center sm:text-left" placeholder="Enter your work email address" required="" type="email" />
+                <button class="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl sm:rounded-full bg-gradient-to-r from-rose-600 via-rose-500 to-rose-600 text-white font-bold text-xs tracking-wide shadow-md shadow-rose-500/35 hover:shadow-rose-500/50 hover:scale-[1.02] transition-all whitespace-nowrap" type="submit">
                   Get Early Access
                 </button>
               </form>
@@ -805,19 +843,23 @@
   </main>
 
   <!-- SITE FOOTER -->
-  <footer class="border-t border-slate-200/60 py-6 px-6 text-xs text-slate-500 relative z-10 bg-white/50 backdrop-blur-md" data-purpose="site-footer">
-    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-2 order-1">
-        <div class="w-5 h-5 rounded bg-rose-600 flex items-center justify-center text-white text-[10px] font-mono font-bold">fx</div>
-        <span class="font-bold text-slate-800">Fluxera</span>
+  <footer class="border-t border-slate-200/60 py-6 px-4 sm:px-6 text-xs text-slate-500 relative z-10 bg-white/50 backdrop-blur-md" data-purpose="site-footer">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+      <div class="flex flex-col sm:flex-row items-center gap-2 order-1">
+        <div class="flex items-center gap-2">
+          <div class="w-5 h-5 rounded bg-rose-600 flex items-center justify-center text-white text-[10px] font-mono font-bold">fx</div>
+          <span class="font-bold text-slate-800">Fluxera — Reliability &amp; Cost Intelligence</span>
+        </div>
+        <span class="hidden sm:inline text-slate-300">•</span>
         <span class="text-slate-400">© 2026 Fluxera Inc. All Rights Reserved.</span>
       </div>
-      <div class="flex items-center gap-6 order-2">
+      <div class="flex items-center justify-center gap-6 order-2 font-medium">
         <a class="hover:text-rose-600 transition-colors" href="./index.html">Home</a>
-        <a class="text-rose-600 font-semibold" href="./vision.html">Vision</a>
+        <a class="text-rose-600 font-semibold border-b border-rose-500 pb-0.5" href="./vision.html">Vision</a>
         <a class="hover:text-rose-600 transition-colors" href="./dashboard.html">Dashboard</a>
       </div>
     </div>
   </footer>
+  <script type="module" src="./script.js"></script>
 </body>
 </html>
