@@ -49,8 +49,8 @@
         <div class="pb-3 mb-3 border-b border-slate-100">
           <p class="text-[10px] font-semibold text-slate-400 tracking-wider uppercase mb-0.5">WORKSPACE</p>
           <div class="flex items-center justify-between">
-            <p class="text-xs font-bold text-slate-900">Demo Production</p>
-            <span class="text-[10px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
+            <p id="workspace-name" class="text-xs font-bold text-slate-900">Demo Production</p>
+            <span id="workspace-badge" class="text-[10px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
               DEMO MODE
             </span>
           </div>
@@ -785,29 +785,41 @@
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
               <span>Fluxera Engine API Key</span>
             </h3>
-            <p class="text-xs text-slate-500">Use this token to authenticate SDK agents and HTTP recovery proxies.</p>
+            <p class="text-xs text-slate-500">One key per institute. It signs in to this dashboard and authenticates the SDK.</p>
+
+            <form id="onboard-form" class="space-y-3">
+              <h4 class="text-xs font-bold text-slate-800">Create an institute</h4>
+              <input id="onboard-email" type="email" required placeholder="you@institute.edu" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-rose-500" />
+              <input id="onboard-company" type="text" required placeholder="Institute name" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-rose-500" />
+              <p id="onboard-err" class="hidden text-xs text-rose-700 bg-rose-50 p-2.5 rounded-xl border border-rose-200"></p>
+              <button type="submit" id="onboard-btn" class="w-full px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold cursor-pointer">
+                Create institute and get key
+              </button>
+            </form>
+
+            <div id="sdk-block" class="hidden space-y-2">
+              <p class="text-[11px] font-semibold text-slate-700">SDK</p>
+              <pre id="sdk-node" class="bg-slate-950 text-slate-100 p-3 rounded-xl text-[11px] font-mono overflow-x-auto"></pre>
+              <pre id="sdk-python" class="bg-slate-950 text-slate-100 p-3 rounded-xl text-[11px] font-mono overflow-x-auto"></pre>
+            </div>
 
             <div class="flex items-center gap-2">
-              <input type="text" readonly value="fx_live_99a8b1c4e2098d7f3391" class="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-800" />
+              <input id="api-key-input" type="text" readonly value="fx_live_99a8b1c4e2098d7f3391" class="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-800" />
               <button onclick="copyApiKey()" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold cursor-pointer">
                 Copy
               </button>
             </div>
 
             <div class="pt-4 border-t border-slate-100 space-y-3">
-              <h4 class="text-xs font-bold text-slate-800">Auto-Healing Configuration</h4>
-              <label class="flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer">
-                <input type="checkbox" checked class="rounded text-rose-600 focus:ring-rose-500" />
-                <span>Automatic Fallback Model Routing on 429/500 errors</span>
-              </label>
-              <label class="flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer">
-                <input type="checkbox" checked class="rounded text-rose-600 focus:ring-rose-500" />
-                <span>Exponential Jitter Retries with Idempotency Keys</span>
-              </label>
-              <label class="flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer">
-                <input type="checkbox" checked class="rounded text-rose-600 focus:ring-rose-500" />
-                <span>Webhook notifications for sudden failure rate anomalies</span>
-              </label>
+              <h4 class="text-xs font-bold text-slate-800">Recovery webhook</h4>
+              <p class="text-xs text-slate-500">Fluxera POSTs the recovery payload here when you trigger Recover. It does not retry the in-flight request.</p>
+              <input id="webhook-url" type="url" placeholder="https://api.yourcompany.com/fluxera/recover" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-mono focus:outline-none focus:border-rose-500" />
+              <label class="block text-[11px] font-semibold text-slate-600">Quiet before interrupted (minutes)</label>
+              <input id="webhook-minutes" type="number" min="1" max="10080" value="15" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-mono focus:outline-none focus:border-rose-500" />
+              <p id="webhook-err" class="hidden text-xs text-rose-700 bg-rose-50 p-2.5 rounded-xl border border-rose-200"></p>
+              <button type="button" id="webhook-save" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold cursor-pointer">
+                Save Webhook
+              </button>
             </div>
           </div>
         </div>
@@ -944,9 +956,6 @@
       if (hash) switchTab(hash);
     });
 
-    // Run immediately as well
-    initDashboard();
-
     // Timeframe filter toggle (24h, 7d, 30d)
     const periodData = {
       '24h': { cost: '$7.13', failed: '152', risk: '$5,185.00', users: '61', failRate: '19.0%', latency: '859ms', reqs: '800', runRate: '$213.95', badge: 'LAST 24H' },
@@ -1007,6 +1016,8 @@
       { id: 'req_44c201', ep: '/v1/audio/transcribe', status: 'fail', lat: '1,890ms', cost: '$0.03', time: '2m ago', err: 'timeout' },
       { id: 'req_55b312', ep: '/v1/completions', status: 'success', lat: '95ms', cost: '$0.00', time: '2m ago', err: null }
     ];
+
+    initDashboard();
 
     function renderInitialLogs() {
       const container = document.getElementById('logs-stream-container');
@@ -1194,10 +1205,150 @@
       }
     });
 
+    const API_BASE = "http://127.0.0.1:3000";
+
+    function loadDashSession() {
+      try {
+        const raw = localStorage.getItem("fluxera_session");
+        return raw ? JSON.parse(raw) : null;
+      } catch { return null; }
+    }
+
+    function saveDashSession(partial) {
+      const next = Object.assign({}, loadDashSession() || {}, partial, { isDemo: false });
+      localStorage.setItem("fluxera_session", JSON.stringify(next));
+      return next;
+    }
+
+    function currentKey() {
+      const el = document.getElementById("api-key-input");
+      return el ? el.value.trim() : "";
+    }
+
+    function showFormError(id, msg) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (!msg) { el.textContent = ""; el.classList.add("hidden"); return; }
+      el.textContent = msg;
+      el.classList.remove("hidden");
+    }
+
+    function applyAccount(customer, key) {
+      const input = document.getElementById("api-key-input");
+      if (input) input.value = key;
+      const name = document.getElementById("workspace-name");
+      const badge = document.getElementById("workspace-badge");
+      if (name && customer.company) name.textContent = customer.company;
+      if (badge) badge.textContent = "LIVE";
+      const url = document.getElementById("webhook-url");
+      const mins = document.getElementById("webhook-minutes");
+      if (url) url.value = customer.webhook_url || "";
+      if (mins && customer.interrupt_after_minutes) mins.value = customer.interrupt_after_minutes;
+      saveDashSession({
+        email: customer.email || "",
+        company: customer.company || "",
+        apiKey: key,
+        webhookUrl: customer.webhook_url || "",
+        interruptMinutes: customer.interrupt_after_minutes || 15,
+      });
+    }
+
+    async function refreshAccount() {
+      const key = currentKey();
+      if (!key.startsWith("fx_")) return;
+      try {
+        const r = await fetch(API_BASE + "/api/customers/me", { headers: { Authorization: "Bearer " + key } });
+        if (!r.ok) return;
+        applyAccount(await r.json(), key);
+      } catch { /* API down — keep the key on screen */ }
+    }
+
+    async function createInstitute(e) {
+      e.preventDefault();
+      showFormError("onboard-err", "");
+      const email = document.getElementById("onboard-email").value.trim();
+      const company = document.getElementById("onboard-company").value.trim();
+      if (!email.includes("@")) { showFormError("onboard-err", "Enter a valid email address."); return; }
+      if (!company) { showFormError("onboard-err", "Enter an institute name."); return; }
+      const btn = document.getElementById("onboard-btn");
+      btn.disabled = true;
+      btn.textContent = "Creating...";
+      try {
+        const r = await fetch(API_BASE + "/api/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, company }),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(j.error || "Couldn't create the institute.");
+        const key = j.customer && j.customer.api_key;
+        if (!key) throw new Error("Signup did not return an institute key.");
+        applyAccount(j.customer, key);
+        const node = (j.sdk_config && j.sdk_config.node) || ("const fluxera = require('@fluxera/sdk')('" + key + "')");
+        const python = (j.sdk_config && j.sdk_config.python) || ("import fluxera\nfluxera.init('" + key + "')");
+        document.getElementById("sdk-node").textContent = node;
+        document.getElementById("sdk-python").textContent = python;
+        document.getElementById("sdk-block").classList.remove("hidden");
+        showToast("Institute key ready");
+      } catch (err) {
+        const offline = err instanceof TypeError;
+        showFormError("onboard-err", offline ? "Couldn't reach " + API_BASE : err.message);
+      }
+      btn.disabled = false;
+      btn.textContent = "Create institute and get key";
+    }
+
+    async function saveLiveWebhook() {
+      showFormError("webhook-err", "");
+      const key = currentKey();
+      const url = document.getElementById("webhook-url").value.trim();
+      const minutes = Number(document.getElementById("webhook-minutes").value);
+      if (!key.startsWith("fx_")) { showFormError("webhook-err", "Create or paste an fx_ key first."); return; }
+      if (url && !/^https?:\/\//i.test(url)) { showFormError("webhook-err", "Webhook URL must start with http:// or https://"); return; }
+      if (!Number.isInteger(minutes) || minutes < 1 || minutes > 10080) { showFormError("webhook-err", "Quiet period must be 1–10080 minutes."); return; }
+      const btn = document.getElementById("webhook-save");
+      btn.disabled = true;
+      btn.textContent = "Saving...";
+      try {
+        const r = await fetch(API_BASE + "/api/customers/me", {
+          method: "PATCH",
+          headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+          body: JSON.stringify({ webhook_url: url, interrupt_after_minutes: minutes }),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(j.error || "Couldn't save webhook");
+        applyAccount(j.customer || j, key);
+        btn.textContent = "Saved";
+        showToast("Recovery webhook saved");
+        setTimeout(() => { btn.textContent = "Save Webhook"; }, 2000);
+      } catch (err) {
+        const offline = err instanceof TypeError;
+        showFormError("webhook-err", offline ? "Couldn't reach " + API_BASE : err.message);
+        btn.textContent = "Save Webhook";
+      }
+      btn.disabled = false;
+    }
+
     function copyApiKey() {
-      navigator.clipboard.writeText("fx_live_99a8b1c4e2098d7f3391");
+      const key = currentKey();
+      navigator.clipboard.writeText(key);
       showToast("API Key copied to clipboard!");
     }
+
+    document.getElementById("onboard-form").addEventListener("submit", createInstitute);
+    document.getElementById("webhook-save").addEventListener("click", saveLiveWebhook);
+    (function bootAccount() {
+      const s = loadDashSession();
+      const input = document.getElementById("api-key-input");
+      if (s && s.apiKey && String(s.apiKey).startsWith("fx_") && input) input.value = s.apiKey;
+      if (s && s.company) {
+        const name = document.getElementById("workspace-name");
+        if (name) name.textContent = s.company;
+      }
+      if (s && s.webhookUrl) document.getElementById("webhook-url").value = s.webhookUrl;
+      if (s && s.interruptMinutes) document.getElementById("webhook-minutes").value = s.interruptMinutes;
+      refreshAccount();
+    })();
 
     function showToast(msg) {
       const toast = document.getElementById('toast');
