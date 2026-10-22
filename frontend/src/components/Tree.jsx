@@ -36,12 +36,12 @@ export function Tree({ steps = [], leaves = [], failedId, bottleneckId }) {
           style={{ marginLeft: depth ? depth * 20 : 0 }}
           className={`glass-card p-4 rounded-2xl mb-2 transition-all ${
             failed
-              ? "border-rosebrand-300 bg-rosebrand-50/40 shadow-glow-rose"
+              ? "border-rosebrand-300 bg-rosebrand-50/40"
               : cascade
               ? "border-amber-300 bg-amber-50/40"
               : bottleneck
               ? "border-indigo-300 bg-indigo-50/40"
-              : "border-slate-200/80 bg-white/90"
+              : "border-slate-200/80"
           }`}
         >
           <div className="flex justify-between items-center mb-2">
@@ -52,12 +52,12 @@ export function Tree({ steps = [], leaves = [], failedId, bottleneckId }) {
               />
               <span className="font-mono text-xs font-bold text-slate-900">{st.name}</span>
               {cascade && (
-                <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-800">
+                <span className="status-warn text-[10px] font-semibold uppercase px-2 py-0.5 rounded">
                   Cascade Failure
                 </span>
               )}
               {bottleneck && (
-                <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-indigo-100 text-indigo-800">
+                <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded text-indigo-200 bg-indigo-500/15 border border-indigo-300/40">
                   Bottleneck
                 </span>
               )}
@@ -74,10 +74,10 @@ export function Tree({ steps = [], leaves = [], failedId, bottleneckId }) {
           {(byStep[st.id] || []).map((l) => (
             <div
               key={l.id}
-              className={`font-mono text-xs pl-4 py-1.5 border-l-2 my-1 rounded-r ${
+              className={`font-mono text-xs px-3 py-1.5 my-1 rounded-lg border ${
                 l.status === "fail"
-                  ? "border-rosebrand-400 text-rosebrand-700 bg-rosebrand-50/50"
-                  : "border-slate-300 text-slate-600 bg-slate-50/50"
+                  ? "status-bad"
+                  : "border-slate-200 text-slate-400 bg-white/5"
               }`}
             >
               {l.endpoint} · <strong className="uppercase">{l.status}</strong>

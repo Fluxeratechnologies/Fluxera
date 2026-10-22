@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 export const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+*,*::before,*::after{box-sizing:border-box;}
 
 :root{
   --bg:#fafafa;

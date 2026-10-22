@@ -104,10 +104,8 @@ export function Executions({ apiKey, isDemo, go, workflow = "", grouped = false 
           <button
             key={s || "all"}
             onClick={() => setStatus(s)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
-              status === s
-                ? "bg-rosebrand-600 text-white border-rosebrand-600 shadow-sm"
-                : "bg-white text-slate-600 border-slate-200 hover:border-rosebrand-200"
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+              status === s ? "btn-rose" : "btn-quiet"
             }`}
           >
             {s ? s.toUpperCase() : "ALL STATUSES"}
@@ -118,10 +116,8 @@ export function Executions({ apiKey, isDemo, go, workflow = "", grouped = false 
           <button
             key={a || "any"}
             onClick={() => setActor(a)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
-              actor === a
-                ? "bg-slate-900 text-white border-slate-900 shadow-sm"
-                : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+              actor === a ? "btn-ink" : "btn-quiet"
             }`}
           >
             {a ? a.toUpperCase() : "ANY ACTOR"}
@@ -130,7 +126,7 @@ export function Executions({ apiKey, isDemo, go, workflow = "", grouped = false 
         {workflow && (
           <button
             onClick={() => go("history")}
-            className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white text-rosebrand-600 border border-rosebrand-200 hover:bg-rosebrand-50 transition-all cursor-pointer"
+            className="status-bad px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer"
           >
             Clear Filter ({workflow})
           </button>

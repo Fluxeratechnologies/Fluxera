@@ -47,6 +47,11 @@ app.use('/api/signup', rateLimit({
   max: 20,
   message: { error: 'Too many signup attempts' }
 }))
+app.use('/api/waitlist', rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { error: 'Too many waitlist attempts' }
+}))
 
 // ─── ROUTES ───────────────────────────────────────────────────
 app.use('/api/ingest',    ingestRoute)

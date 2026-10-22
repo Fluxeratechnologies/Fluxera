@@ -1,3 +1,37 @@
+@import "tailwindcss";
+
+@theme {
+  --color-rosebrand-50: #fff1f2;
+  --color-rosebrand-100: #ffe4e6;
+  --color-rosebrand-200: #fecdd3;
+  --color-rosebrand-300: #fda4af;
+  --color-rosebrand-400: #fb7185;
+  --color-rosebrand-500: #f43f5e;
+  --color-rosebrand-600: #e11d48;
+  --color-rosebrand-700: #be123c;
+  --color-rosebrand-800: #9f1239;
+  --color-rosebrand-900: #881337;
+  --shadow-card-glass: 0 20px 50px -12px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+  --shadow-glow-soft: 0 10px 30px -12px rgba(244, 63, 94, 0.25);
+  --shadow-glow-rose: 0 0 50px -10px rgba(255, 51, 102, 0.35);
+}
+
+@layer components {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(16px);
+  }
+  .glass-pill {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+  }
+  .badge-soft-rose {
+    color: #e11d48;
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+  }
+}
+
 /* ========================================================================= */
 /* FLUXERA DESIGN SYSTEM & 3D CYBERNETIC VISUALS                            */
 /* ========================================================================= */
@@ -258,5 +292,306 @@ body {
 }
 .floating-pill:nth-child(4n) {
   animation-delay: 2.4s;
+}
+
+/* Product app: landing rose/sky/glass, night ground. Landing rules above stay light. */
+html.product-root,
+html.product-root body {
+  background: #09070d;
+  color: #f4f0f2;
+}
+
+.product {
+  --ink: #f4f0f2;
+  --muted: #a39aa3;
+  color: var(--ink);
+  background: #09070d;
+  min-height: 100vh;
+  position: relative;
+  color-scheme: dark;
+}
+
+.product ::selection {
+  background: #f43f5e;
+  color: #fff;
+}
+
+.product-wash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 420px;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 72% 80% at 50% -20%, rgba(244, 63, 94, 0.22), transparent 62%),
+    radial-gradient(ellipse 46% 70% at 86% -10%, rgba(56, 189, 248, 0.14), transparent 58%);
+}
+
+.product button:focus-visible,
+.product a:focus-visible,
+.product input:focus-visible,
+.product select:focus-visible {
+  outline: 2px solid #fb7185;
+  outline-offset: 2px;
+}
+
+.product input,
+.product select,
+.product textarea {
+  background: rgba(9, 7, 13, 0.55);
+  color: var(--ink);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.product input:focus,
+.product select:focus,
+.product textarea:focus {
+  border-color: #fb7185;
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.28);
+}
+
+.product input::placeholder,
+.product textarea::placeholder {
+  color: var(--muted);
+}
+
+.product .bg-white,
+.product .bg-white\/95,
+.product .bg-white\/90,
+.product .bg-white\/80,
+.product .bg-slate-50,
+.product .bg-slate-50\/80,
+.product .bg-slate-50\/50,
+.product .bg-slate-100,
+.product .bg-\[\#fafbfd\] {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.product .glass-card {
+  background: rgba(22, 18, 28, 0.82);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--ink);
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.product .shadow-card-glass {
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.product .glass-pill {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.product .badge-soft-rose {
+  color: #fda4af;
+  background: rgba(244, 63, 94, 0.14);
+  border-color: rgba(251, 113, 133, 0.32);
+}
+
+.product .bg-rose-50,
+.product .bg-rosebrand-50,
+.product .bg-rosebrand-50\/30,
+.product .bg-rosebrand-50\/40,
+.product .bg-rosebrand-50\/50,
+.product .glass-card.bg-rosebrand-50\/30,
+.product .glass-card.bg-rosebrand-50\/40 {
+  background-color: rgba(244, 63, 94, 0.12);
+}
+
+.product .bg-emerald-50,
+.product .bg-emerald-50\/40,
+.product .glass-card.bg-emerald-50\/40 {
+  background-color: rgba(16, 185, 129, 0.12);
+}
+
+.product .bg-amber-50,
+.product .bg-amber-50\/40,
+.product .bg-amber-100,
+.product .glass-card.bg-amber-50\/40 {
+  background-color: rgba(245, 158, 11, 0.12);
+}
+
+.product .bg-indigo-50\/40,
+.product .bg-indigo-100,
+.product .glass-card.bg-indigo-50\/40 {
+  background-color: rgba(99, 102, 241, 0.14);
+}
+
+.product .border-slate-100,
+.product .border-slate-200,
+.product .border-slate-200\/60,
+.product .border-slate-200\/80,
+.product .border-slate-200\/90,
+.product .border-slate-300 {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.product .border-rose-200,
+.product .border-rose-200\/80,
+.product .border-rosebrand-100,
+.product .border-rosebrand-100\/80,
+.product .border-rosebrand-200,
+.product .border-rosebrand-200\/80,
+.product .border-rosebrand-300 {
+  border-color: rgba(251, 113, 133, 0.35);
+}
+
+.product .border-emerald-200 { border-color: rgba(52, 211, 153, 0.4); }
+.product .border-amber-200,
+.product .border-amber-300 { border-color: rgba(251, 191, 36, 0.4); }
+.product .border-sky-200 { border-color: rgba(125, 211, 252, 0.4); }
+.product .border-indigo-300 { border-color: rgba(165, 180, 252, 0.45); }
+.product .border-rose-600,
+.product .border-rosebrand-400 { border-color: #fb7185; }
+
+.product .divide-y > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.product .text-slate-900,
+.product .text-slate-800,
+.product .text-slate-700,
+.product .hover\:text-slate-900:hover {
+  color: var(--ink);
+}
+
+.product .text-slate-600,
+.product .text-slate-500,
+.product .text-slate-400,
+.product .text-slate-300 {
+  color: var(--muted);
+}
+
+.product .text-rose-500,
+.product .text-rose-600,
+.product .text-rose-700,
+.product .text-rosebrand-600,
+.product .text-rosebrand-700,
+.product .hover\:text-rosebrand-600:hover,
+.product .hover\:text-rosebrand-700:hover {
+  color: #fda4af;
+}
+
+.product .text-emerald-600,
+.product .text-emerald-700,
+.product .text-emerald-800 { color: #6ee7b7; }
+
+.product .text-amber-600,
+.product .text-amber-700,
+.product .text-amber-800 { color: #fcd34d; }
+
+.product .text-sky-600 { color: #7dd3fc; }
+.product .text-indigo-800 { color: #c4b5fd; }
+
+.product .hover\:bg-white:hover,
+.product .hover\:bg-slate-50:hover,
+.product .hover\:bg-rose-50:hover,
+.product .hover\:bg-rosebrand-50:hover,
+.product .hover\:bg-rosebrand-50\/30:hover {
+  background-color: rgba(244, 63, 94, 0.1);
+}
+
+.product .hover\:border-rosebrand-200:hover,
+.product .hover\:border-slate-300:hover {
+  border-color: rgba(251, 113, 133, 0.45);
+}
+
+.product .chrome {
+  background: rgba(12, 10, 16, 0.92);
+  backdrop-filter: blur(16px);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.product .rail {
+  background: #100e14;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.product .nav-on {
+  background: rgba(244, 63, 94, 0.14);
+  color: #fda4af;
+  border-color: rgba(251, 113, 133, 0.32);
+  font-weight: 600;
+}
+
+.product .nav-off {
+  color: var(--muted);
+  background: transparent;
+  border-color: transparent;
+}
+
+.product .nav-off:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.product .crumb {
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.product .chip-track {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.product .chip-on {
+  background: rgba(244, 63, 94, 0.18);
+  color: #fda4af;
+  font-weight: 600;
+  box-shadow: 0 8px 16px -12px rgba(244, 63, 94, 0.9);
+}
+
+.product .btn-quiet {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.product .btn-quiet:hover {
+  color: var(--ink);
+  border-color: rgba(251, 113, 133, 0.45);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.product .btn-rose {
+  background: #e11d48;
+  color: #fff;
+  border: 1px solid #e11d48;
+}
+
+.product .btn-ink {
+  background: #f4f0f2;
+  color: #09070d;
+  border: 1px solid #f4f0f2;
+}
+
+.product .status-ok {
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.32);
+}
+
+.product .status-warn {
+  color: #fcd34d;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.32);
+}
+
+.product .status-bad {
+  color: #fda4af;
+  background: rgba(244, 63, 94, 0.12);
+  border: 1px solid rgba(251, 113, 133, 0.32);
+}
+
+.product input.bg-white,
+.product input.bg-slate-50,
+.product select.bg-white,
+.product textarea.bg-white {
+  background: rgba(9, 7, 13, 0.55);
+  color: var(--ink);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 

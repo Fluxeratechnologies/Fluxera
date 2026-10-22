@@ -19,15 +19,15 @@ export function Logs({ data }) {
     <div className="flex flex-col gap-6 max-w-6xl mx-auto">
       {/* Control bar */}
       <div className="flex gap-3 items-center flex-wrap">
-        <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
+        <div className="chip-track flex gap-1 p-1 rounded-xl">
           {["all", "fail", "success"].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={`px-3.5 py-1 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer border-0 ${
                 filter === f
-                  ? "bg-white text-rosebrand-600 shadow-sm"
-                  : "bg-transparent text-slate-600 hover:text-slate-900"
+                  ? "chip-on"
+                  : "bg-transparent text-slate-400 hover:text-slate-100"
               }`}
             >
               {f}
@@ -51,7 +51,7 @@ export function Logs({ data }) {
         )}
 
         <div className="ml-auto">
-          <Pill color="#64748b">{fNum(rows.length)} Transactions</Pill>
+          <Pill color="#a39aa3" bg="rgba(255,255,255,0.06)" border="rgba(255,255,255,0.1)">{fNum(rows.length)} Transactions</Pill>
         </div>
       </div>
 

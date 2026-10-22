@@ -25,13 +25,13 @@ export function RecoveryCard({ diagnosis, recovery, onRecover, recovering }) {
   const resume = rec?.action === "resume" || recovery?.action === "resume";
 
   return (
-    <div className="glass-card p-6 sm:p-7 rounded-3xl border border-rosebrand-200/80 bg-gradient-to-br from-white via-rosebrand-50/30 to-white shadow-glow-soft flex flex-col gap-3">
+      <div className="glass-card p-6 sm:p-7 rounded-3xl border border-rosebrand-200/80 shadow-glow-soft flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <span className="badge-soft-rose text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md">
           Automated Recovery Playbook
         </span>
         {verified && (
-          <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+          <span className="status-ok text-xs font-semibold px-2.5 py-0.5 rounded-full">
             Verified Success ✓
           </span>
         )}

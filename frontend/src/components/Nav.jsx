@@ -53,6 +53,12 @@ export function Nav({ route, go, hasSession, onViewDemo, onSignIn, onSignUp }) {
         {/* Right Action Buttons */}
         <div className="flex items-center gap-2 shrink-0">
           <button
+            onClick={() => onSignUp?.()}
+            className="text-xs font-semibold text-slate-700 hover:text-rose-600 px-3.5 py-1.5 rounded-full hover:bg-slate-100 transition-all cursor-pointer border-0 bg-transparent"
+          >
+            Get a key
+          </button>
+          <button
             onClick={onSignIn}
             className="text-xs font-semibold text-slate-700 hover:text-rose-600 px-3.5 py-1.5 rounded-full hover:bg-slate-100 transition-all cursor-pointer border-0 bg-transparent"
           >

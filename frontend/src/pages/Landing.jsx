@@ -120,12 +120,10 @@ export function WhatPage({ go, onDemo, onSignUp }) {
 
   const handleEarlyAccessSubmit = (e) => {
     e.preventDefault();
-    if (emailInput.trim()) {
-      setEmailSubmitted(true);
-      setTimeout(() => {
-        onSignUp();
-      }, 1200);
-    }
+    const email = emailInput.trim();
+    if (!email) return;
+    setEmailSubmitted(true);
+    onSignUp(email);
   };
 
   return (
@@ -1510,11 +1508,11 @@ export function WhatPage({ go, onDemo, onSignUp }) {
                       type="submit"
                       className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-gradient-to-r from-rose-600 via-rose-500 to-rose-600 text-white font-bold text-xs tracking-wide shadow-md shadow-rose-500/35 hover:shadow-rose-500/50 hover:scale-[1.02] transition-all whitespace-nowrap cursor-pointer border-0"
                     >
-                      {emailSubmitted ? "Access Requested ✓" : "Get Early Access"}
+                      {emailSubmitted ? "Opening…" : "Get institute key"}
                     </button>
                   </form>
                   <p className="text-[11px] text-slate-400 mt-3 font-medium">
-                    Limited onboarding cohorts for early SaaS design partners.
+                    Creates your institute and an fx_ key. One key per institute.
                   </p>
                 </div>
               </div>
@@ -1914,7 +1912,7 @@ export function WhyPage({ go, onSignUp }) {
   );
 }
 
-export function Login({ onLogin }) {
+export function Login({ onLogin, go }) {
   const [key, setKey] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
@@ -1985,6 +1983,12 @@ export function Login({ onLogin }) {
             {loading ? "Verifying..." : "Sign In with API Key →"}
           </button>
         </form>
+        <p className="text-xs text-slate-500 mt-5">
+          No key yet?{" "}
+          <button type="button" onClick={() => go && go("signup")} className="font-semibold text-slate-900 cursor-pointer bg-transparent border-0 p-0 text-xs">
+            Create an institute
+          </button>
+        </p>
       </div>
     </div>
   );

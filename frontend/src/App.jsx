@@ -33,6 +33,7 @@ export default function App(){
   const[executionId,setExecutionId]=useState(null);
   const[toolId,setToolId]=useState(null);
   const[workflowFilter,setWorkflowFilter]=useState("");
+  const[signupEmail,setSignupEmail]=useState("");
 
   const productPages=["overview","endpoints","logs","settings","workflows","tools","tool","executions","execution","history"];
   const isProductPage=productPages.includes(route);
@@ -42,6 +43,7 @@ export default function App(){
     if(id==="tool")setToolId(extra);
     if(id==="history")setWorkflowFilter(typeof extra==="string"?extra:"");
     if(id==="executions")setWorkflowFilter("");
+    if(id==="signup")setSignupEmail(typeof extra==="string"?extra:"");
     setRoute(id);
     window.scrollTo(0,0);
   }
@@ -49,7 +51,7 @@ export default function App(){
   const regen=useCallback(async()=>{
     if(!session)return;
     setError(null);
-    if(session.isDemo||!session.apiKey){setData(mock());return;}
+    if(session.isDemo||!session.apiKey){setData(mock(period));return;}
     try{
       const r=await apiGet(`/api/report?period=${period}`,session.apiKey);
       if(!r.ok){
@@ -94,6 +96,12 @@ export default function App(){
   },[session]);
 
   useEffect(()=>{
+    const on=isProductPage&&!!session;
+    document.documentElement.classList.toggle("product-root",on);
+    return()=>document.documentElement.classList.remove("product-root");
+  },[isProductPage,session]);
+
+  useEffect(()=>{
     if(!live||!session||!session.isDemo)return;
     const iv=setInterval(()=>{
       const fail=Math.random()<.17;
@@ -102,7 +110,7 @@ export default function App(){
         if(!prev)return prev;
         const logs=[entry,...prev.logs].slice(0,1000);
         const failed=logs.filter(l=>l.status==="fail");
-        return{...prev,logs,totalLost:failed.reduce((s,l)=>s+l.price,0),totalFailed:failed.length};
+        return{...prev,logs,totalLost:failed.reduce((s,l)=>s+l.price,0),totalFailed:failed.length,totalRequests:logs.length,failRate:logs.length?(failed.length/logs.length)*100:0};
       });
     },800);
     return()=>clearInterval(iv);
@@ -117,34 +125,42 @@ export default function App(){
     <>
       <style>{CSS}</style>
       <div style={{minHeight:"100vh",background:"var(--bg)"}}>
-        <Nav
+        {!(isProductPage&&session)&&<Nav
           route={route}
           go={go}
           hasSession={!!session}
           onViewDemo={()=>enterDashboard("overview")}
           onSignIn={()=>go("overview")}
-          onSignUp={()=>go("signup")}
-        />
+          onSignUp={(email)=>go("signup", email)}
+        />}
 
-        {(route==="what"||route==="features")&&<WhatPage go={go} onDemo={()=>enterDashboard("overview")} onSignUp={()=>go("signup")} />}
+        {(route==="what"||route==="features")&&<WhatPage go={go} onDemo={()=>enterDashboard("overview")} onSignUp={(email)=>go("signup", email)} />}
         {route==="how"&&<HowPage go={go} />}
-        {route==="why"&&<WhyPage go={go} onSignUp={()=>go("signup")} />}
-        {route==="signup"&&<Onboarding onLogin={setSession} go={go} />}
+        {route==="why"&&<WhyPage go={go} onSignUp={(email)=>go("signup", email)} />}
+        {route==="signup"&&<Onboarding onLogin={setSession} go={go} initialEmail={signupEmail} session={session} />}
 
-        {isProductPage&&!session&&<Login onLogin={setSession} />}
+        {isProductPage&&!session&&<Login onLogin={setSession} go={go} />}
         {isProductPage&&session&&["overview","logs","settings"].includes(route)&&!data&&error&&(
-          <div style={{padding:80,textAlign:"center"}}>
-            <p style={{fontSize:14,fontWeight:600,color:"var(--red)",marginBottom:8}}>Unable to load your Fluxera report</p>
-            <p style={{fontSize:13,color:"var(--gray4)",marginBottom:20}}>{error}</p>
-            <button onClick={regen} style={{padding:"9px 20px",background:"var(--ink)",color:"#fff",border:"none",borderRadius:8,fontSize:13,cursor:"pointer"}}>Try again</button>
+          <div className="product min-h-screen flex items-center justify-center px-6">
+            <div className="product-wash" aria-hidden="true" />
+            <div className="relative z-10 text-center max-w-md">
+              <p className="text-sm font-semibold text-rose-300 mb-2">Unable to load your Fluxera report</p>
+              <p className="text-sm text-slate-400 mb-5">{error}</p>
+              <button onClick={regen} className="shimmer-btn text-white text-sm font-semibold px-5 py-2.5 rounded-full cursor-pointer border-0">Try again</button>
+            </div>
           </div>
         )}
-        {isProductPage&&session&&["overview","logs","settings"].includes(route)&&!data&&!error&&<div style={{padding:80,textAlign:"center",color:"var(--gray4)"}}>Loading...</div>}
+        {isProductPage&&session&&["overview","logs","settings"].includes(route)&&!data&&!error&&(
+          <div className="product min-h-screen flex items-center justify-center px-6">
+            <div className="product-wash" aria-hidden="true" />
+            <p className="relative z-10 text-sm text-slate-400 font-mono">Loading...</p>
+          </div>
+        )}
         {isProductPage&&session&&(data||["workflows","tools","tool","executions","execution","history"].includes(route))&&(
-          <ProductShell page={route} go={go} company={session.company} isDemo={session.isDemo} live={live} setLive={setLive} period={period} setPeriod={setPeriod} onLogout={()=>{setSession(null);setData(null);go("what");}}>
-            {route==="overview"&&data&&<Overview data={data} period={period} go={go} />}
+          <ProductShell page={route} go={go} company={session.company} isDemo={session.isDemo} live={live} setLive={setLive} period={period} setPeriod={setPeriod} onLogout={()=>{setSession(null);setData(null);go("what");}} logCount={data?.logs?.length ?? null} healRate={data&&data.totalRequests?((data.totalRequests-data.totalFailed)/data.totalRequests)*100:null}>
+            {route==="overview"&&data&&<Overview data={data} period={period} setPeriod={setPeriod} go={go} />}
             {route==="logs"&&data&&<Logs data={data} />}
-            {route==="settings"&&data&&<Settings apiKey={session.apiKey} company={session.company} isDemo={session.isDemo} pricePerReq={price} setPricePerReq={setPrice} impact={data.impact} regen={regen} onApplyKey={setSession} />}
+            {route==="settings"&&data&&<Settings apiKey={session.apiKey} company={session.company} isDemo={session.isDemo} pricePerReq={price} setPricePerReq={setPrice} impact={data.impact} regen={regen} onApplyKey={setSession} go={go} webhookUrl={session.webhookUrl||""} interruptMinutes={session.interruptMinutes??15} onPatchSession={(partial)=>setSession(s=>({...s,...partial}))} />}
             {route==="workflows"&&<Workflows apiKey={session.apiKey} isDemo={session.isDemo} go={go} />}
             {route==="tools"&&<Tools apiKey={session.apiKey} isDemo={session.isDemo} go={go} />}
             {route==="tool"&&<ToolDetail apiKey={session.apiKey} toolId={toolId} go={go} />}

@@ -10,6 +10,10 @@ export function Settings({
   impact,
   regen,
   onApplyKey,
+  go,
+  webhookUrl = "",
+  interruptMinutes = 15,
+  onPatchSession,
 }) {
   const [keyDraft, setKeyDraft] = useState(apiKey || "");
   const [copied, setCopied] = useState(false);
@@ -23,10 +27,10 @@ export function Settings({
   const [impactSaved, setImpactSaved] = useState(false);
   const [impactErr, setImpactErr] = useState("");
   const [saving, setSaving] = useState(false);
-  const [webhook, setWebhook] = useState("");
+  const [webhook, setWebhook] = useState(webhookUrl || "");
   const [hookSaved, setHookSaved] = useState(false);
   const [hookErr, setHookErr] = useState("");
-  const [interruptMin, setInterruptMin] = useState(15);
+  const [interruptMin, setInterruptMin] = useState(interruptMinutes ?? 15);
 
   useEffect(() => {
     setKeyDraft(apiKey || "");
@@ -148,21 +152,40 @@ export function Settings({
     setSaving(false);
   }
 
+  function webhookDraft() {
+    const url = webhook.trim();
+    const minutes = Number(interruptMin);
+    if (url && !/^https?:\/\//i.test(url)) return { error: "Webhook URL must start with http:// or https://" };
+    if (!Number.isInteger(minutes) || minutes < 1 || minutes > 10080) return { error: "Quiet period must be 1–10080 minutes." };
+    return { url, minutes };
+  }
+
   async function saveWebhook() {
     setHookErr("");
-    if (isDemo) return;
+    const draft = webhookDraft();
+    if (draft.error) {
+      setHookErr(draft.error);
+      return;
+    }
+    if (isDemo) {
+      onPatchSession?.({ webhookUrl: draft.url, interruptMinutes: draft.minutes });
+      setHookSaved(true);
+      setTimeout(() => setHookSaved(false), 2000);
+      return;
+    }
     setSaving(true);
     try {
       const r = await apiPatch("/api/customers/me", apiKey, {
-        webhook_url: webhook.trim(),
-        interrupt_after_minutes: Number(interruptMin),
+        webhook_url: draft.url,
+        interrupt_after_minutes: draft.minutes,
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.error || "Couldn't save webhook");
+      onPatchSession?.({ webhookUrl: draft.url, interruptMinutes: draft.minutes });
       setHookSaved(true);
       setTimeout(() => setHookSaved(false), 2000);
     } catch (e) {
-      setHookErr(e.message);
+      setHookErr(e instanceof TypeError ? "Couldn't reach " + API_BASE : e.message);
     }
     setSaving(false);
   }
@@ -181,6 +204,7 @@ export function Settings({
         </p>
 
         {isDemo ? (
+          <>
           <div className="flex gap-2 flex-wrap sm:flex-nowrap mb-2">
             <input
               type="text"
@@ -207,6 +231,14 @@ export function Settings({
               {keySaved ? "Applied ✓" : saving ? "Checking..." : "Apply Key"}
             </button>
           </div>
+          <button
+            type="button"
+            onClick={() => go && go("signup")}
+            className="mt-3 text-xs font-semibold text-rosebrand-600 hover:text-rosebrand-700 cursor-pointer bg-transparent border-0 p-0"
+          >
+            No key yet? Create an institute
+          </button>
+          </>
         ) : (
           <div className="flex gap-2 flex-wrap sm:flex-nowrap mb-2">
             <input
@@ -299,30 +331,27 @@ export function Settings({
       <section className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-card-glass">
         <h3 className="text-base font-bold text-slate-900 mb-1">Automated Recovery Webhook</h3>
         <p className="text-xs text-slate-500 mb-4 leading-relaxed">
-          Fluxera automatically POSTs diagnostic payloads and suggested recovery playbooks to this endpoint upon critical failures.
+          Fluxera POSTs the recovery payload here when you trigger Recover. It does not retry the in-flight request itself.
         </p>
         <div className="flex gap-2 flex-wrap sm:flex-nowrap">
           <input
             type="url"
             value={webhook}
             placeholder="https://api.yourcompany.com/fluxera/recover"
-            disabled={isDemo}
             onChange={(e) => {
               setWebhook(e.target.value);
               setHookErr("");
             }}
-            className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-mono bg-white focus:outline-none focus:border-rosebrand-400 disabled:opacity-50"
+            className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-mono bg-white focus:outline-none focus:border-rosebrand-400"
           />
-          {!isDemo && (
-            <button
-              type="button"
-              onClick={saveWebhook}
-              disabled={saving}
-              className="shimmer-btn text-white text-xs font-semibold px-5 py-2.5 rounded-xl cursor-pointer border-0 shadow-sm"
-            >
-              {hookSaved ? "Saved ✓" : "Save Webhook"}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={saveWebhook}
+            disabled={saving}
+            className="shimmer-btn text-white text-xs font-semibold px-5 py-2.5 rounded-xl cursor-pointer border-0 shadow-sm"
+          >
+            {hookSaved ? "Saved ✓" : "Save Webhook"}
+          </button>
         </div>
         <label className="block text-xs font-semibold text-slate-700 mt-4 mb-1.5">
           Quiet before interrupted (minutes)
@@ -332,12 +361,11 @@ export function Settings({
           min={1}
           max={10080}
           value={interruptMin}
-          disabled={isDemo}
           onChange={(e) => {
             setInterruptMin(e.target.value);
             setHookErr("");
           }}
-          className="w-40 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-mono bg-white focus:outline-none focus:border-rosebrand-400 disabled:opacity-50"
+          className="w-40 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-mono bg-white focus:outline-none focus:border-rosebrand-400"
         />
         {hookErr && <p className="text-xs text-rosebrand-600 mt-2">{hookErr}</p>}
       </section>

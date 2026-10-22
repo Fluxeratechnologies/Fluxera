@@ -73,9 +73,7 @@ export function ToolDetail({ apiKey, toolId, go }) {
           />
           <span
             className={`text-xs font-bold uppercase px-3 py-1 rounded-full ${
-              pack.availability === "down"
-                ? "bg-rosebrand-50 text-rosebrand-600 border border-rosebrand-200"
-                : "bg-emerald-50 text-emerald-600 border border-emerald-200"
+              pack.availability === "down" ? "status-bad" : "status-ok"
             }`}
           >
             {pack.availability || "Healthy"}

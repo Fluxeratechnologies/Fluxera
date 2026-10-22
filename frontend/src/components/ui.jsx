@@ -13,7 +13,7 @@ export function Dot({ active = false, color = "#e11d48" }) {
   );
 }
 
-export function Pill({ children, color = "#64748b", bg = "rgba(255, 255, 255, 0.85)", border = "rgba(226, 232, 240, 0.8)" }) {
+export function Pill({ children, color = "#fda4af", bg = "rgba(244, 63, 94, 0.14)", border = "rgba(251, 113, 133, 0.32)" }) {
   return (
     <span
       className="inline-flex items-center text-[10px] font-mono font-semibold tracking-wider uppercase px-2.5 py-0.5 rounded-full shadow-sm"
@@ -31,7 +31,7 @@ export function Pill({ children, color = "#64748b", bg = "rgba(255, 255, 255, 0.
 export function BarLine({ value, max, color = "#e11d48" }) {
   const w = Math.min((value / (max || 1)) * 100, 100);
   return (
-    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1.5 border border-slate-200/50">
+    <div className="w-full h-1.5 rounded-full overflow-hidden mt-1.5 border border-white/10 bg-white/10">
       <div
         className="h-full rounded-full transition-all duration-700"
         style={{

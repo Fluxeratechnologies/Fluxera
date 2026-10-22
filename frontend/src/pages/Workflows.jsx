@@ -66,10 +66,8 @@ export function Workflows({ apiKey, isDemo, go }) {
           <button
             key={a || "all"}
             onClick={() => setActor(a)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
-              actor === a
-                ? "bg-rosebrand-600 text-white border-rosebrand-600 shadow-sm"
-                : "bg-white text-slate-600 border-slate-200 hover:border-rosebrand-200"
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+              actor === a ? "btn-rose" : "btn-quiet"
             }`}
           >
             {a ? a.toUpperCase() : "ALL"}
@@ -86,7 +84,7 @@ export function Workflows({ apiKey, isDemo, go }) {
         <div className="glass-card rounded-3xl border border-slate-200/90 shadow-card-glass overflow-hidden">
           <div className="px-6 py-4 bg-slate-50/80 border-b border-slate-200/80 flex items-center justify-between">
             <h4 className="text-sm font-bold text-slate-900">Registered Workflows</h4>
-            <Pill color="#e11d48" bg="#fff1f2" border="#fecdd3">
+            <Pill>
               {rows.length} Active
             </Pill>
           </div>
@@ -124,9 +122,7 @@ export function Workflows({ apiKey, isDemo, go }) {
                 <div className="sm:col-span-2 text-left sm:text-center">
                   <span
                     className={`font-mono text-xs font-bold px-2 py-0.5 rounded ${
-                      parseFloat(w.failure_rate) > 0
-                        ? "bg-rosebrand-50 text-rosebrand-600 border border-rosebrand-200"
-                        : "bg-emerald-50 text-emerald-600 border border-emerald-200"
+                      parseFloat(w.failure_rate) > 0 ? "status-bad" : "status-ok"
                     }`}
                   >
                     {fPct(w.failure_rate)}

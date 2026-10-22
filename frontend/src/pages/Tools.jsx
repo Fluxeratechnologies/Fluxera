@@ -60,7 +60,7 @@ export function Tools({ apiKey, isDemo, go }) {
     <div className="glass-card rounded-3xl border border-slate-200/90 shadow-card-glass overflow-hidden max-w-6xl mx-auto">
       <div className="px-6 py-4 bg-slate-50/80 border-b border-slate-200/80 flex items-center justify-between">
         <h4 className="text-sm font-bold text-slate-900">Registered Tools & Integrations</h4>
-        <Pill color="#e11d48" bg="#fff1f2" border="#fecdd3">
+        <Pill>
           {rows.length} Monitored
         </Pill>
       </div>
@@ -97,9 +97,7 @@ export function Tools({ apiKey, isDemo, go }) {
             <div className="sm:col-span-2 text-left sm:text-center">
               <span
                 className={`font-mono text-xs font-bold px-2 py-0.5 rounded ${
-                  parseFloat(t.failure_rate) > 10
-                    ? "bg-rosebrand-50 text-rosebrand-600 border border-rosebrand-200"
-                    : "bg-emerald-50 text-emerald-600 border border-emerald-200"
+                  parseFloat(t.failure_rate) > 10 ? "status-bad" : "status-ok"
                 }`}
               >
                 {fPct(t.failure_rate)}
@@ -117,11 +115,7 @@ export function Tools({ apiKey, isDemo, go }) {
             <div className="sm:col-span-1 text-left sm:text-right">
               <span
                 className={`text-[11px] font-semibold uppercase px-2 py-0.5 rounded-full ${
-                  t.availability === "down"
-                    ? "bg-rosebrand-50 text-rosebrand-600"
-                    : t.still_failing
-                    ? "bg-amber-50 text-amber-600"
-                    : "bg-emerald-50 text-emerald-600"
+                  t.availability === "down" ? "status-bad" : t.still_failing ? "status-warn" : "status-ok"
                 }`}
               >
                 {t.availability === "down" ? "Down" : t.still_failing ? "Degraded" : "Healthy"}

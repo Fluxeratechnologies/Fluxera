@@ -8,3 +8,7 @@ coverage/
 tests/
 .agents/skills/
 skills-lock.json
+
+# video compositions
+film/
+social/
