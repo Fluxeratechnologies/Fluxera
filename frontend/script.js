@@ -594,9 +594,10 @@
     carouselWrapper.addEventListener('mouseleave', () => startAutoPlay());
   }
 
-  // Init Carousel
-  renderMobileCarousel();
-  startAutoPlay();
+  if (carouselWrapper) {
+    renderMobileCarousel();
+    startAutoPlay();
+  }
 })();
 
 // ==========================================

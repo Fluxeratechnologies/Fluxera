@@ -1,20 +1,15 @@
 import React from "react";
 
 const NAV = [
-  { id: "overview", label: "Overview", icon: "grid" },
-  { id: "workflows", label: "Workflows", icon: "flow" },
-  { id: "tools", label: "Tools & APIs", icon: "bolt" },
-  { id: "executions", label: "Executions & Traces", icon: "clock" },
-  { id: "logs", label: "Telemetry Logs", icon: "doc" },
-  { id: "settings", label: "Impact Settings", icon: "gear" },
+  { id: "health", label: "Software health and recovery", short: "Health", icon: "grid" },
+  { id: "cost", label: "Cost recovery", short: "Cost", icon: "bolt" },
+  { id: "logs", label: "Telemetry Logs", short: "Logs", icon: "doc" },
 ];
 
 const CRUMB = {
-  overview: "Overview Telemetry",
-  workflows: "Workflows Management",
-  tools: "Tool & API Health",
-  executions: "Executions & Traces",
-  logs: "Real-time Telemetry Logs",
+  health: "Software health and recovery",
+  cost: "Cost recovery",
+  logs: "Telemetry Logs",
   settings: "Impact Settings",
   execution: "Execution",
   history: "History",
@@ -39,25 +34,16 @@ export function ProductShell({
   isDemo,
   live,
   setLive,
-  period,
-  setPeriod,
   onLogout,
-  logCount,
-  healRate,
 }) {
   const title = NAV.find((n) => n.id === page)?.label || CRUMB[page] || page;
-  const showTitleBar = page !== "overview";
+  const showTitleBar = page !== "health" && page !== "cost";
   const showHistory = showTitleBar && page !== "settings";
-  const showPeriod = page === "logs";
 
   function active(id) {
-    return page === id || (page === "execution" && id === "executions") || (page === "tool" && id === "tools");
-  }
-
-  function badge(id) {
-    if (id === "logs" && logCount != null) return String(logCount);
-    if (id === "executions" && healRate != null) return `${Math.round(healRate)}% Healed`;
-    return null;
+    if (id === "health") return page === "health" || page === "execution" || page === "history";
+    if (id === "cost") return page === "cost" || page === "tool";
+    return page === id;
   }
 
   return (
@@ -87,6 +73,9 @@ export function ProductShell({
                 {live ? "Streaming Live" : "Live Stream Off"}
               </button>
             )}
+            <button onClick={() => go("settings")} className="md:hidden btn-quiet p-2 rounded-full cursor-pointer" aria-label="Impact Settings">
+              <Icon name="gear" />
+            </button>
             <button onClick={() => go("what")} className="btn-quiet text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer">
               ← Back to Website
             </button>
@@ -110,7 +99,6 @@ export function ProductShell({
             <nav className="space-y-1 text-xs font-medium">
               {NAV.map((n) => {
                 const on = active(n.id);
-                const b = badge(n.id);
                 return (
                   <button
                     key={n.id}
@@ -121,11 +109,14 @@ export function ProductShell({
                       <Icon name={n.icon} />
                       {n.label}
                     </span>
-                    {b && <span className={`text-[10px] font-mono ${on ? "text-rose-300" : "text-slate-400"}`}>{b}</span>}
                   </button>
                 );
               })}
             </nav>
+            <button onClick={() => go("settings")} className={`mt-2 w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border text-xs font-medium ${page === "settings" ? "nav-on" : "nav-off"}`}>
+              <Icon name="gear" />
+              Impact Settings
+            </button>
           </div>
           <div className="pt-3 border-t border-slate-200">
             <button onClick={onLogout} className="btn-quiet w-full text-xs font-medium px-3 py-2 rounded-xl cursor-pointer">
@@ -147,19 +138,6 @@ export function ProductShell({
                     History
                   </button>
                 )}
-                {showPeriod && (
-                  <div className="chip-track flex items-center p-0.5 rounded-lg text-xs font-medium">
-                    {["24h", "7d", "30d"].map((p) => (
-                      <button
-                        key={p}
-                        onClick={() => setPeriod(p)}
-                        className={`px-3 py-1 rounded cursor-pointer border-0 ${period === p ? "chip-on" : "bg-transparent text-slate-400 hover:text-slate-100"}`}
-                      >
-                        {p}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
           )}
@@ -173,7 +151,7 @@ export function ProductShell({
           return (
             <button key={n.id} onClick={() => go(n.id)} className={`p-2 flex flex-col items-center text-[10px] font-semibold border-0 bg-transparent cursor-pointer ${on ? "text-rose-300" : "text-slate-400"}`}>
               <Icon name={n.icon} />
-              <span className="mt-0.5 max-w-[4.5rem] truncate">{n.label.split(" ")[0]}</span>
+              <span className="mt-0.5">{n.short}</span>
             </button>
           );
         })}

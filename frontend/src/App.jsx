@@ -23,7 +23,7 @@ function loadSession(){
 }
 
 export default function App(){
-  const[route,setRoute]=useState(()=>loadSession()?"overview":"what");
+  const[route,setRoute]=useState(()=>loadSession()?"health":"what");
   const[session,setSession]=useState(loadSession);
   const[period,setPeriod]=useState("24h");
   const[data,setData]=useState(null);
@@ -35,16 +35,19 @@ export default function App(){
   const[workflowFilter,setWorkflowFilter]=useState("");
   const[signupEmail,setSignupEmail]=useState("");
 
-  const productPages=["overview","endpoints","logs","settings","workflows","tools","tool","executions","execution","history"];
+  const productPages=["health","cost","overview","endpoints","logs","settings","workflows","tools","tool","executions","execution","history"];
   const isProductPage=productPages.includes(route);
+  const needsReport=["health","cost","settings","overview","logs"].includes(route);
 
   function go(id, extra){
-    if(id==="execution")setExecutionId(extra);
+    const alias={overview:"health",executions:"health",endpoints:"health",workflows:"cost",tools:"cost"};
+    const next=alias[id]||id;
+    if(next==="execution")setExecutionId(extra);
     if(id==="tool")setToolId(extra);
     if(id==="history")setWorkflowFilter(typeof extra==="string"?extra:"");
     if(id==="executions")setWorkflowFilter("");
     if(id==="signup")setSignupEmail(typeof extra==="string"?extra:"");
-    setRoute(id);
+    setRoute(next);
     window.scrollTo(0,0);
   }
 
@@ -140,7 +143,7 @@ export default function App(){
         {route==="signup"&&<Onboarding onLogin={setSession} go={go} initialEmail={signupEmail} session={session} />}
 
         {isProductPage&&!session&&<Login onLogin={setSession} go={go} />}
-        {isProductPage&&session&&["overview","logs","settings"].includes(route)&&!data&&error&&(
+        {isProductPage&&session&&needsReport&&!data&&error&&(
           <div className="product min-h-screen flex items-center justify-center px-6">
             <div className="product-wash" aria-hidden="true" />
             <div className="relative z-10 text-center max-w-md">
@@ -150,21 +153,31 @@ export default function App(){
             </div>
           </div>
         )}
-        {isProductPage&&session&&["overview","logs","settings"].includes(route)&&!data&&!error&&(
+        {isProductPage&&session&&needsReport&&!data&&!error&&(
           <div className="product min-h-screen flex items-center justify-center px-6">
             <div className="product-wash" aria-hidden="true" />
             <p className="relative z-10 text-sm text-slate-400 font-mono">Loading...</p>
           </div>
         )}
-        {isProductPage&&session&&(data||["workflows","tools","tool","executions","execution","history"].includes(route))&&(
-          <ProductShell page={route} go={go} company={session.company} isDemo={session.isDemo} live={live} setLive={setLive} period={period} setPeriod={setPeriod} onLogout={()=>{setSession(null);setData(null);go("what");}} logCount={data?.logs?.length ?? null} healRate={data&&data.totalRequests?((data.totalRequests-data.totalFailed)/data.totalRequests)*100:null}>
-            {route==="overview"&&data&&<Overview data={data} period={period} setPeriod={setPeriod} go={go} />}
+        {isProductPage&&session&&(data||["tool","execution","history"].includes(route))&&(
+          <ProductShell page={route} go={go} company={session.company} isDemo={session.isDemo} live={live} setLive={setLive} onLogout={()=>{setSession(null);setData(null);go("what");}}>
+            {route==="health"&&data&&(
+              <div className="flex flex-col gap-10">
+                <Overview data={data} period={period} setPeriod={setPeriod} go={go} part="health" />
+                <Executions apiKey={session.apiKey} isDemo={session.isDemo} go={go} />
+              </div>
+            )}
+            {route==="cost"&&data&&(
+              <div className="flex flex-col gap-10">
+                <Overview data={data} period={period} setPeriod={setPeriod} go={go} part="cost" />
+                <Tools apiKey={session.apiKey} isDemo={session.isDemo} go={go} />
+                <Workflows apiKey={session.apiKey} isDemo={session.isDemo} go={go} actor="workflow" />
+                <Workflows apiKey={session.apiKey} isDemo={session.isDemo} go={go} actor="agent" />
+              </div>
+            )}
             {route==="logs"&&data&&<Logs data={data} />}
             {route==="settings"&&data&&<Settings apiKey={session.apiKey} company={session.company} isDemo={session.isDemo} pricePerReq={price} setPricePerReq={setPrice} impact={data.impact} regen={regen} onApplyKey={setSession} go={go} webhookUrl={session.webhookUrl||""} interruptMinutes={session.interruptMinutes??15} onPatchSession={(partial)=>setSession(s=>({...s,...partial}))} />}
-            {route==="workflows"&&<Workflows apiKey={session.apiKey} isDemo={session.isDemo} go={go} />}
-            {route==="tools"&&<Tools apiKey={session.apiKey} isDemo={session.isDemo} go={go} />}
             {route==="tool"&&<ToolDetail apiKey={session.apiKey} toolId={toolId} go={go} />}
-            {route==="executions"&&<Executions apiKey={session.apiKey} isDemo={session.isDemo} go={go} />}
             {route==="history"&&<Executions apiKey={session.apiKey} isDemo={session.isDemo} go={go} workflow={workflowFilter} grouped />}
             {route==="execution"&&<ExecutionDetail apiKey={session.apiKey} executionId={executionId} go={go} />}
           </ProductShell>

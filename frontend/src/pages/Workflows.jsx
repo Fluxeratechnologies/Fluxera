@@ -12,11 +12,13 @@ function actorEmpty(actor) {
   return "Wrap your workflow functions with fluxera.workflow() or fluxera.agent() to begin collecting intelligence.";
 }
 
-export function Workflows({ apiKey, isDemo, go }) {
+export function Workflows({ apiKey, isDemo, go, actor: lockedActor }) {
   const [rows, setRows] = useState([]);
   const [err, setErr] = useState("");
-  const [actor, setActor] = useState("");
+  const [actor, setActor] = useState(lockedActor || "");
   const [loading, setLoading] = useState(!isDemo && !!apiKey);
+  const activeActor = lockedActor || actor;
+  const heading = activeActor === "agent" ? "Agents" : activeActor === "workflow" ? "Workflows" : "Registered Workflows";
 
   useEffect(() => {
     if (isDemo || !apiKey) {
@@ -25,7 +27,7 @@ export function Workflows({ apiKey, isDemo, go }) {
       return;
     }
     setLoading(true);
-    const q = actor ? `?actor=${actor}` : "";
+    const q = activeActor ? `?actor=${activeActor}` : "";
     apiGet("/api/workflows" + q, apiKey)
       .then(async (r) => {
         if (!r.ok) throw new Error("Couldn't load workflows");
@@ -34,7 +36,20 @@ export function Workflows({ apiKey, isDemo, go }) {
       })
       .catch((e) => setErr(e.message))
       .finally(() => setLoading(false));
-  }, [apiKey, isDemo, actor]);
+  }, [apiKey, isDemo, activeActor]);
+
+  if (isDemo && lockedActor) {
+    return (
+      <section className="max-w-6xl mx-auto">
+        <h2 className="text-lg font-bold text-slate-900 mb-1">{heading}</h2>
+        <p className="text-xs text-slate-500">
+          {lockedActor === "agent"
+            ? "No agents yet. Wrap a run with fluxera.agent()."
+            : "No workflows yet. Wrap a run with fluxera.workflow()."}
+        </p>
+      </section>
+    );
+  }
 
   if (isDemo) {
     return (
@@ -60,7 +75,8 @@ export function Workflows({ apiKey, isDemo, go }) {
   if (loading) return <div className="p-8 text-center text-slate-400 font-mono text-xs">Loading workflows...</div>;
 
   return (
-    <div className="flex flex-col gap-4 max-w-6xl mx-auto">
+      <div className="flex flex-col gap-4 max-w-6xl mx-auto">
+      {!lockedActor && (
       <div className="flex gap-2 flex-wrap">
         {ACTORS.map((a) => (
           <button
@@ -74,16 +90,17 @@ export function Workflows({ apiKey, isDemo, go }) {
           </button>
         ))}
       </div>
+      )}
 
       {!rows.length ? (
         <div className="glass-card p-8 rounded-3xl border border-slate-200 text-center max-w-xl mx-auto">
-          <h4 className="text-sm font-bold text-slate-800 mb-2">No active workflows detected</h4>
-          <p className="text-xs text-slate-500">{actorEmpty(actor)}</p>
+          <h4 className="text-sm font-bold text-slate-800 mb-2">{heading}</h4>
+          <p className="text-xs text-slate-500">{actorEmpty(activeActor)}</p>
         </div>
       ) : (
         <div className="glass-card rounded-3xl border border-slate-200/90 shadow-card-glass overflow-hidden">
           <div className="px-6 py-4 bg-slate-50/80 border-b border-slate-200/80 flex items-center justify-between">
-            <h4 className="text-sm font-bold text-slate-900">Registered Workflows</h4>
+            <h4 className="text-sm font-bold text-slate-900">{heading}</h4>
             <Pill>
               {rows.length} Active
             </Pill>

@@ -3,6 +3,7 @@ import { ShaderBackground } from "../components/ShaderBackground";
 import { useIsMobile } from "../format";
 import { mock } from "../mock";
 import { apiGet } from "../api";
+import { BrandMark } from "../brandMarks";
 
 export function WhatPage({ go, onDemo, onSignUp }) {
   const [heroView, setHeroView] = useState("dashboard");
@@ -504,35 +505,8 @@ export function WhatPage({ go, onDemo, onSignUp }) {
                     key={`${tool.name}-${idx}`}
                     className="floating-pill group px-3.5 py-2 rounded-2xl bg-white/90 backdrop-blur-xl border border-slate-200/90 shadow-sm hover:border-rose-400 hover:shadow-[0_8px_20px_-4px_rgba(244,63,94,0.25)] hover:-translate-y-1 transition-all duration-200 flex items-center gap-2.5 shrink-0 cursor-default"
                   >
-                    <div className="w-6 h-6 rounded-lg bg-slate-50 border border-slate-200/70 flex items-center justify-center text-xs font-bold">
-                      {tool.icon === "openai" && (
-                        <svg className="w-3.5 h-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor"><path d="M22.28 9.82a5.98 5.98 0 0 0-.51-4.91 6.05 6.05 0 0 0-6.51-2.9 6.07 6.07 0 0 0-4.28 2.17 5.98 5.98 0 0 0-4 2.9 6.05 6.05 0 0 0 .74 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.51 2.9 5.98 5.98 0 0 0 3.74 1.91 6.06 6.06 0 0 0 5.77-4.2 5.99 5.99 0 0 0 4-2.9 6.06 6.06 0 0 0-.75-7.08zm-9.02 12.61a4.48 4.48 0 0 1-2.88-1.04l.14-.08 4.78-2.76a.8.8 0 0 0 .39-.68v-6.74l2.02 1.17c.02.01.04.03.04.05v5.58a4.5 4.5 0 0 1-4.49 4.5zM3.6 17.91a4.47 4.47 0 0 1-.53-3.01l.14.08 4.78 2.76a.77.77 0 0 0 .78 0l5.85-3.37v2.33c0 .03-.02.05-.04.06L9.74 19.95a4.5 4.5 0 0 1-6.14-2.04zm-1.88-8.84a4.47 4.47 0 0 1 2.34-1.97l-.01.16v5.52a.78.78 0 0 0 .39.68l5.84 3.37-2.02 1.17a.08.08 0 0 1-.07 0l-4.83-2.8a4.5 4.5 0 0 1-1.64-6.13zm16.6 3.86-5.85-3.37 2.02-1.17a.08.08 0 0 1 .07 0l4.83 2.8a4.5 4.5 0 0 1-.68 8.1v-5.68a.79.79 0 0 0-.39-.68zm2.01-3.02-.14-.09-4.78-2.78a.78.78 0 0 0-.78 0L8.81 10.4V8.07c0-.02.01-.05.03-.06l4.88-2.82a4.5 4.5 0 0 1 6.68 4.2zM12 13.5l-2.6-1.5L12 10.5l2.6 1.5-2.6 1.5z"/></svg>
-                      )}
-                      {tool.icon === "claude" && <span className="text-[#D97757] font-serif font-black">C</span>}
-                      {tool.icon === "stripe" && <span className="text-[#635BFF] font-mono font-bold">S</span>}
-                      {tool.icon === "postgres" && (
-                        <svg className="w-3.5 h-3.5 text-[#336791]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
-                      )}
-                      {tool.icon === "aws" && (
-                        <svg className="w-3.5 h-3.5 text-[#FF9900]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
-                      )}
-                      {tool.icon === "langchain" && <span>🦜</span>}
-                      {tool.icon === "supabase" && (
-                        <svg className="w-3.5 h-3.5 text-[#3ECF8E]" viewBox="0 0 24 24" fill="currentColor"><path d="M21.36 9.87a1.44 1.44 0 0 0-1.2-.64H13.5V1.44A1.44 1.44 0 0 0 11.04.42l-9.6 12.24a1.44 1.44 0 0 0 1.13 2.32h6.67v7.79a1.44 1.44 0 0 0 2.46 1.02l9.6-12.24a1.44 1.44 0 0 0 .06-1.68z"/></svg>
-                      )}
-                      {tool.icon === "pinecone" && (
-                        <svg className="w-3.5 h-3.5 text-cyan-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                      )}
-                      {tool.icon === "redis" && (
-                        <svg className="w-3.5 h-3.5 text-[#DC382D]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7.5v9L12 22l10-5.5v-9L12 2zm0 3.3l7 3.85-7 3.85-7-3.85 7-3.85zM4.5 9.8l6.5 3.58v6.82L4.5 16.62V9.8zm15 6.82l-6.5 3.58v-6.82l6.5-3.58v6.82z"/></svg>
-                      )}
-                      {tool.icon === "vercel" && (
-                        <svg className="w-3 h-3 text-slate-900" viewBox="0 0 24 24" fill="currentColor"><path d="m12 1 12 21H0z"/></svg>
-                      )}
-                      {tool.icon === "github" && (
-                        <svg className="w-3.5 h-3.5 text-slate-900" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-                      )}
-                      {tool.icon === "resend" && <span className="text-slate-900 font-mono">✉</span>}
+                    <div className="w-6 h-6 rounded-lg bg-slate-50 border border-slate-200/70 flex items-center justify-center">
+                      <BrandMark id={tool.icon} />
                     </div>
                     <span className="text-xs font-bold text-slate-800">{tool.name}</span>
                     <span className="text-[10px] font-mono text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded font-semibold border border-slate-200/80">
