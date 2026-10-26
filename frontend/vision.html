@@ -54,28 +54,6 @@
       overflow-x: hidden;
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
     }
-    
-    /* Cyber Grid Matrix Background */
-    .cyber-grid {
-      background-image: 
-        radial-gradient(circle at 50% 28%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 42%, transparent 70%),
-        radial-gradient(circle at 82% 18%, rgba(200, 215, 230, 0.05) 0%, transparent 65%),
-        radial-gradient(circle at 18% 65%, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
-        radial-gradient(circle at 50% 85%, rgba(255, 255, 255, 0.05) 0%, transparent 60%),
-        linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-      background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 48px 48px, 48px 48px;
-    }
-
-    /* Ambient Spatial Orbs */
-    .spatial-orb-rose {
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 45%, rgba(8, 8, 10, 0) 70%);
-      filter: blur(60px);
-    }
-    .spatial-orb-cyan {
-      background: radial-gradient(circle, rgba(200, 215, 230, 0.06) 0%, rgba(200, 215, 230, 0.01) 50%, rgba(8, 8, 10, 0) 72%);
-      filter: blur(65px);
-    }
 
     /* Horizon Arch Dome with Dual Aura */
     .horizon-dome-futuristic {
@@ -202,7 +180,7 @@
         <a class="hidden sm:inline-block text-xs font-semibold text-slate-400 hover:text-white px-3.5 py-1.5 rounded-full hover:bg-white/10 transition-all" href="./dashboard.html">
           Sign In
         </a>
-        <a class="px-4 sm:px-5 py-2 text-xs font-bold rounded-full bg-gradient-to-r from-white via-slate-100 to-slate-300 hover:from-slate-100 hover:to-white text-white shadow-md shadow-white/10 transition-all duration-200 hover:shadow-white/25 hover:scale-[1.03]" href="./dashboard.html">
+        <a class="px-4 sm:px-5 py-2 text-xs font-bold rounded-full bg-gradient-to-r from-white via-slate-100 to-slate-300 hover:from-slate-100 hover:to-white text-slate-950 shadow-[0_0_20px_rgba(255,255,255,0.22)] hover:shadow-[0_0_30px_rgba(255,255,255,0.38)] transition-all duration-200 hover:scale-[1.03]" href="./dashboard.html">
           Dashboard
         </a>
         <button id="mobile-menu-toggle" aria-label="Toggle Mobile Menu" class="md:hidden p-1.5 text-slate-400 hover:text-white focus:outline-none cursor-pointer">
@@ -237,16 +215,17 @@
       </span>
       <span class="text-xs text-slate-400">→</span>
     </a>
-    <hr class="border-slate-100 my-1" />
+    <hr class="border-white/10 my-1" />
     <div class="flex items-center gap-2 pt-1">
       <a class="w-full text-center text-xs font-semibold text-slate-300 py-2.5 rounded-xl bg-[#181822] hover:bg-[#20202e] border border-white/15 transition-colors" href="./dashboard.html">Sign In</a>
-      <a class="w-full text-center text-xs font-bold text-white py-2.5 rounded-xl bg-gradient-to-r from-white via-slate-100 to-slate-300 shadow-md hover:scale-[1.02] transition-transform" href="./dashboard.html">Open Dashboard</a>
+      <a class="w-full text-center text-xs font-bold text-slate-950 py-2.5 rounded-xl bg-gradient-to-r from-white via-slate-100 to-slate-300 shadow-md hover:scale-[1.02] transition-transform" href="./dashboard.html">Open Dashboard</a>
     </div>
   </div>
 
   <!-- BEGIN: Hero Section -->
   <main class="relative pt-28 sm:pt-36 md:pt-40 pb-0">
-    <section class="max-w-5xl mx-auto px-4 sm:px-6 text-center" data-purpose="hero-header">
+    <div class="absolute top-10 left-1/2 -translate-x-1/2 w-[720px] h-[360px] bg-white/[0.04] blur-[140px] pointer-events-none rounded-full"></div>
+    <section class="max-w-5xl mx-auto px-4 sm:px-6 text-center relative z-10" data-purpose="hero-header">
       <!-- Eyebrow Pill Badge -->
       <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-white/[0.06] border border-white/20 text-slate-200 text-[11px] font-semibold tracking-widest uppercase mb-6 shadow-[0_0_20px_rgba(255,255,255,0.06)] backdrop-blur-md">
         <span class="w-2 h-2 rounded-full bg-slate-300 animate-ping"></span>
@@ -592,60 +571,91 @@
       </div>
     </section>
 
-    <!-- BEGIN: Two Core Pillars Section -->
+    <!-- BEGIN: Three Core Pillars Section -->
     <section class="max-w-6xl mx-auto px-4 sm:px-6 mt-20" data-purpose="three-core-pillars">
       <div class="text-center max-w-2xl mx-auto mb-12">
         <div class="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-white/[0.06] border border-white/20 text-slate-300 text-[11px] font-semibold tracking-widest uppercase mb-3 shadow-xs">
           <span>CORE ARCHITECTURE</span>
         </div>
         <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-          TWO CORE PILLARS
+          THREE CORE PILLARS
         </h2>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Pillar 1: Service Continuity -->
+      <!-- 3 Pillar Bento Cards with 3D Depth -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Pillar 1: AI Reliability -->
         <div class="rounded-3xl bg-[#121217] backdrop-blur-xl border border-white/15 p-7 shadow-spatial-card hover:shadow-spatial-lift hover:border-rose-300 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between holo-border-subtle group">
           <div>
             <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-rose-100 to-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 mb-6 font-bold text-lg shadow-xs group-hover:scale-105 transition-transform">
               01
             </div>
             <div class="text-xs font-mono font-bold uppercase tracking-wider text-rose-600 mb-1">Pillar One</div>
-            <h3 class="text-xl font-bold text-white mb-3">SERVICE CONTINUITY</h3>
-            <p class="text-sm font-semibold text-slate-300 mb-3">Detect failures. Recover work. Restore operations.</p>
-            <ul class="text-xs text-slate-400 leading-relaxed space-y-1.5">
-              <li>Execution Monitoring</li>
-              <li>Failure Analysis</li>
-              <li>Work Recovery</li>
-              <li>Recovery Verification</li>
-              <li>System Health &amp; Visibility</li>
-            </ul>
+            <h3 class="text-xl font-bold text-white mb-3">AI RELIABILITY</h3>
+            <p class="text-sm font-semibold text-slate-300 mb-3">"Understand what failed and why."</p>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Captures deep execution states across LLM generations, external memory reads, tool calls, and agent steps. Pinpoints hallucinations, timeouts, and rate exhaustion instantly.
+            </p>
           </div>
-          <div class="mt-8 p-3.5 rounded-2xl bg-slate-50/90 border border-white/10 text-xs text-slate-700 leading-relaxed shadow-inner">
-            Restore interrupted work, reduce operational disruption, and verify recovery outcomes.
+          <div class="mt-8 p-3.5 rounded-2xl bg-slate-50/90 border border-white/10 font-mono text-[11px] space-y-1.5 shadow-inner">
+            <div class="flex justify-between text-slate-400">
+              <span>Agent Execution State:</span>
+              <span class="text-emerald-600 font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Preserved</span>
+            </div>
+            <div class="flex justify-between text-slate-400">
+              <span>Model Fallback SLA:</span>
+              <span class="text-white font-semibold">&lt; 14ms</span>
+            </div>
           </div>
         </div>
 
-        <!-- Pillar 2: Cost Recovery -->
+        <!-- Pillar 2: Work Recovery -->
+        <div class="rounded-3xl bg-[#121217] backdrop-blur-xl border border-white/15 p-7 shadow-spatial-card hover:shadow-spatial-lift hover:border-amber-300 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between relative holo-border-subtle group">
+          <div>
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-100 to-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 mb-6 font-bold text-lg shadow-xs group-hover:scale-105 transition-transform">
+              02
+            </div>
+            <div class="text-xs font-mono font-bold uppercase tracking-wider text-amber-600 mb-1">Pillar Two</div>
+            <h3 class="text-xl font-bold text-white mb-3">WORK RECOVERY</h3>
+            <p class="text-sm font-semibold text-slate-300 mb-3">"Recover what has already been done."</p>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Stops full pipeline restarts when step 8 out of 10 fails. Resumes deterministically from in-flight memory boundaries, preserving completed compute and customer progress.
+            </p>
+          </div>
+          <div class="mt-8 p-3.5 rounded-2xl bg-slate-50/90 border border-white/10 font-mono text-[11px] space-y-1.5 shadow-inner">
+            <div class="flex justify-between text-slate-400">
+              <span>Work Preserved Rate:</span>
+              <span class="text-rose-600 font-bold">94%</span>
+            </div>
+            <div class="flex justify-between text-slate-400">
+              <span>Zero Cold Reruns:</span>
+              <span class="text-emerald-600 font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Active</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pillar 3: Value Recovery -->
         <div class="rounded-3xl bg-[#121217] backdrop-blur-xl border border-white/15 p-7 shadow-spatial-card hover:shadow-spatial-lift hover:border-cyan-300 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between holo-border-subtle group">
           <div>
             <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-100 to-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-600 mb-6 font-bold text-lg shadow-xs group-hover:scale-105 transition-transform">
-              02
+              03
             </div>
-            <div class="text-xs font-mono font-bold uppercase tracking-wider text-cyan-600 mb-1">Pillar Two</div>
-            <h3 class="text-xl font-bold text-white mb-3">COST RECOVERY</h3>
-            <p class="text-sm font-semibold text-slate-300 mb-3">Fix cost-generating failures. Prevent unnecessary spending. Reduce execution waste.</p>
-            <ul class="text-xs text-slate-400 leading-relaxed space-y-1.5">
-              <li>Execution Cost Tracking</li>
-              <li>Cost-Generating Failure Detection</li>
-              <li>Failure Resolution</li>
-              <li>Waste Prevention</li>
-              <li>Cost Verification &amp; Analysis</li>
-              <li>Cost Optimization Recommendations</li>
-            </ul>
+            <div class="text-xs font-mono font-bold uppercase tracking-wider text-cyan-600 mb-1">Pillar Three</div>
+            <h3 class="text-xl font-bold text-white mb-3">VALUE RECOVERY</h3>
+            <p class="text-sm font-semibold text-slate-300 mb-3">"Recover what failure wastes."</p>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Protects token expenditure, cloud compute spend, customer trust, and engineer on-call sleep by systematically containing failure blast radius before it leaks into production value loss.
+            </p>
           </div>
-          <div class="mt-8 p-3.5 rounded-2xl bg-slate-50/90 border border-white/10 text-xs text-slate-700 leading-relaxed shadow-inner">
-            Fix failures that waste money, reduce unnecessary execution costs, and prevent avoidable spending from recurring.
+          <div class="mt-8 p-3.5 rounded-2xl bg-slate-50/90 border border-white/10 font-mono text-[11px] space-y-1.5 shadow-inner">
+            <div class="flex justify-between text-slate-400">
+              <span>Monthly Compute Saved:</span>
+              <span class="text-cyan-700 font-bold">$18,450 / avg</span>
+            </div>
+            <div class="flex justify-between text-slate-400">
+              <span>Silent Churn Prevented:</span>
+              <span class="text-emerald-600 font-semibold">-86%</span>
+            </div>
           </div>
         </div>
       </div>
@@ -653,12 +663,12 @@
       <!-- Synthesis Bridge -->
       <div class="mt-8 p-5 rounded-2xl bg-[#16161f] backdrop-blur-xl border border-white/15 shadow-spatial-card flex flex-col sm:flex-row items-center justify-center gap-4 text-center holo-border-subtle">
         <span class="text-xs font-bold uppercase tracking-widest text-slate-500 font-mono">TOGETHER:</span>
-        <div class="inline-flex flex-wrap items-center justify-center gap-x-2.5 gap-y-2 text-xs md:text-sm font-mono font-semibold">
-          <span class="px-4 py-1.5 rounded-full bg-slate-900 text-white shadow-md shadow-slate-900/20">SAME FAILURE</span>
+        <div class="inline-flex items-center space-x-2.5 text-xs md:text-sm font-mono font-semibold">
+          <span class="px-4 py-1.5 rounded-full bg-slate-900 text-white shadow-md shadow-slate-900/20">UNDERSTAND</span>
           <span class="text-rose-500 font-bold animate-pulse">→</span>
-          <span class="px-4 py-1.5 rounded-full bg-gradient-to-r from-rose-600 to-rose-500 text-white shadow-md shadow-rose-500/25">RESTORE THE WORK</span>
+          <span class="px-4 py-1.5 rounded-full bg-gradient-to-r from-rose-600 to-rose-500 text-white shadow-md shadow-rose-500/25">RECOVER</span>
           <span class="text-cyan-500 font-bold animate-pulse">→</span>
-          <span class="px-4 py-1.5 rounded-full bg-emerald-600 text-white shadow-md shadow-emerald-600/25">STOP THE WASTE</span>
+          <span class="px-4 py-1.5 rounded-full bg-emerald-600 text-white shadow-md shadow-emerald-600/25">VERIFY</span>
         </div>
       </div>
     </section>
@@ -824,20 +834,20 @@
   </main>
 
   <!-- SITE FOOTER -->
-  <footer class="border-t border-white/15/60 py-6 px-4 sm:px-6 text-xs text-slate-500 relative z-10 bg-white/50 backdrop-blur-md" data-purpose="site-footer">
-    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
-      <div class="flex flex-col sm:flex-row items-center gap-2 order-1">
+  <footer class="border-t border-white/10 py-6 px-6 text-xs text-slate-400 relative z-10 bg-[#0a0a0e]/90 backdrop-blur-md" data-purpose="site-footer">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex flex-col sm:flex-row items-center gap-2 order-1 text-center sm:text-left">
         <div class="flex items-center gap-2">
           <div class="w-5 h-5 rounded bg-[#181822] border border-white/20 flex items-center justify-center text-white text-[10px] font-mono font-bold">fx</div>
-          <span class="font-bold text-slate-800">Fluxera — Building Self-Evolving Systems</span>
+          <span class="font-bold text-white">Fluxera — Building Self-Evolving Systems</span>
         </div>
         <span class="hidden sm:inline text-slate-300">•</span>
-        <span class="text-slate-400">© 2026 Fluxera Inc. All Rights Reserved.</span>
+        <span class="text-slate-400 font-medium">Keep systems running. Recover interrupted work. Reduce costs.</span>
       </div>
-      <div class="flex items-center justify-center gap-6 order-2 font-medium">
-        <a class="hover:text-white transition-colors" href="./index.html">Home</a>
-        <a class="text-white font-semibold border-b border-white pb-0.5" href="./vision.html">Vision</a>
-        <a class="hover:text-white transition-colors" href="./dashboard.html">Dashboard</a>
+      <div class="flex items-center gap-6 order-2">
+        <a class="hover:text-white transition-colors text-slate-400" href="./index.html">Home</a>
+        <a class="hover:text-white transition-colors font-semibold text-slate-300" href="./vision.html">Vision</a>
+        <a class="hover:text-white transition-colors text-slate-400" href="./dashboard.html">Dashboard</a>
       </div>
     </div>
   </footer>
