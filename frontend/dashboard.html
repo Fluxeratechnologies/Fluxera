@@ -9,95 +9,13 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link rel="stylesheet" href="./style.css" />
-  <style>
-    /* Same night ground as the landing: matte black, silver hairlines, white type. */
-    body.dash { background: #08080a; color: #e2e8f0; }
-    body.dash ::selection { background: rgba(255,255,255,0.2); color: #fff; }
-    body.dash .bg-white,
-    body.dash .bg-white\/90,
-    body.dash .bg-white\/95 { background-color: #121217; }
-    body.dash .bg-slate-50,
-    body.dash .bg-slate-50\/50,
-    body.dash .bg-slate-50\/70,
-    body.dash .bg-slate-50\/80 { background-color: rgba(255,255,255,0.04); }
-    body.dash .bg-slate-200\/80 { background-color: rgba(255,255,255,0.08); color: #e2e8f0; }
-    body.dash .border-slate-300 { border-color: rgba(255,255,255,0.16); }
-    body.dash .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: rgba(255,255,255,0.08); }
-    body.dash .bg-slate-100,
-    body.dash .hover\:bg-slate-50:hover,
-    body.dash .hover\:bg-slate-100:hover,
-    body.dash .hover\:bg-rose-50\/30:hover,
-    body.dash .bg-rose-50\/30,
-    body.dash .bg-rose-50\/40 { background-color: rgba(255,255,255,0.06); }
-    body.dash .bg-rose-50,
-    body.dash .bg-rose-100,
-    body.dash .hover\:bg-rose-100:hover { background-color: rgba(255,255,255,0.1); }
-    body.dash .bg-emerald-50,
-    body.dash .bg-emerald-50\/70,
-    body.dash .bg-emerald-100 { background-color: rgba(16,185,129,0.14); }
-    body.dash .bg-amber-50,
-    body.dash .bg-amber-100 { background-color: rgba(245,158,11,0.14); }
-    body.dash .border-slate-100,
-    body.dash .border-slate-200,
-    body.dash .border-slate-200\/90 { border-color: rgba(255,255,255,0.1); }
-    body.dash .border-rose-100,
-    body.dash .border-rose-200,
-    body.dash .border-rose-200\/80,
-    body.dash .border-rose-200\/90,
-    body.dash .border-rose-300,
-    body.dash .hover\:border-rose-300:hover { border-color: rgba(251,113,133,0.4); }
-    body.dash .border-emerald-200,
-    body.dash .border-emerald-200\/90 { border-color: rgba(52,211,153,0.4); }
-    body.dash .border-amber-200,
-    body.dash .border-amber-200\/90 { border-color: rgba(251,191,36,0.4); }
-    body.dash .border-sky-200,
-    body.dash .border-sky-200\/90 { border-color: rgba(125,211,252,0.4); }
-    body.dash .text-slate-900,
-    body.dash .text-slate-800,
-    body.dash .hover\:text-slate-900:hover,
-    body.dash .hover\:text-slate-700:hover { color: #fff; }
-    body.dash .text-slate-700,
-    body.dash .text-slate-600 { color: #cbd5e1; }
-    body.dash .text-slate-500,
-    body.dash .text-slate-400,
-    body.dash .text-slate-300 { color: #94a3b8; }
-    body.dash .text-rose-600,
-    body.dash .text-rose-700,
-    body.dash .text-rose-800 { color: #fda4af; }
-    body.dash .text-emerald-600,
-    body.dash .text-emerald-700,
-    body.dash .text-emerald-800 { color: #6ee7b7; }
-    body.dash .text-amber-600,
-    body.dash .text-amber-700 { color: #fcd34d; }
-    body.dash .text-sky-600 { color: #7dd3fc; }
-    body.dash .bg-white\/10,
-    body.dash .hover\:bg-white\/10:hover,
-    body.dash .period-tab.bg-white,
-    body.dash .log-filter-btn.bg-white,
-    body.dash .tab-btn.bg-rose-50,
-    body.dash .tab-btn-mobile.bg-rose-50 {
-      background-color: rgba(255,255,255,0.12);
-      color: #fff;
-      border-color: rgba(255,255,255,0.2);
-    }
-    body.dash .border-white\/20 { border-color: rgba(255,255,255,0.2); }
-    body.dash .text-white { color: #fff; }
-    body.dash input,
-    body.dash select,
-    body.dash textarea {
-      background-color: #0c0c10;
-      color: #f8fafc;
-      border-color: rgba(255,255,255,0.14);
-    }
-    body.dash input::placeholder { color: #94a3b8; }
-    body.dash .bg-white.font-mono { background-color: #0c0c10; }
-  </style>
 </head>
-<body class="dash relative min-h-screen font-sans selection:bg-white/20 selection:text-white bg-[#08080a] text-slate-200 overflow-x-hidden">
+<body class="relative min-h-screen font-sans selection:bg-rose-500 selection:text-white bg-[#fafbfd] overflow-x-hidden">
 
   <!-- Full Bleed Ambient WebGL Canvas & Background Lighting -->
   <canvas id="shader-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-40"></canvas>
-  <div class="fixed inset-0 cyber-grid animated-grid design-dot-grid pointer-events-none z-0"></div>
+  <div class="fixed inset-0 cyber-grid animated-grid pointer-events-none z-0"></div>
+  <div class="fixed inset-0 design-dot-grid pointer-events-none z-0"></div>
   <div class="grid-node-glow top-[15%] left-[12%] hidden lg:block pointer-events-none z-0"></div>
   <div class="grid-node-glow-sky top-[28%] right-[15%] hidden lg:block pointer-events-none z-0"></div>
   <div class="grid-node-glow top-[55%] left-[8%] hidden lg:block pointer-events-none z-0"></div>
@@ -110,20 +28,17 @@
       <!-- Left: Logo & Breadcrumb -->
       <div class="flex items-center gap-2 sm:gap-3 shrink-0 min-w-0">
         <a href="./index.html" class="flex items-center gap-2 group shrink-0">
-          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-slate-800 to-slate-700 border border-white/25 flex items-center justify-center text-white shadow-md transition-transform group-hover:scale-105">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-rose-600 via-rose-500 to-rose-400 flex items-center justify-center text-white shadow-md shadow-rose-500/25 transition-transform group-hover:scale-105">
             <span class="font-mono font-bold text-xs">fx</span>
           </div>
-          <span class="font-bold text-base text-white group-hover:text-slate-300 transition-colors">Fluxera</span>
+          <span class="font-bold text-base text-slate-900 group-hover:text-rose-600 transition-colors">Fluxera</span>
         </a>
         <span class="text-slate-300 hidden sm:inline">/</span>
-        <span id="breadcrumb-title" class="hidden sm:inline-block text-xs font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg truncate max-w-[200px] md:max-w-none">Software health and recovery</span>
+        <span id="breadcrumb-title" class="hidden sm:inline-block text-xs font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg truncate max-w-[200px] md:max-w-none">Overview — Live Work Continuity</span>
       </div>
 
       <!-- Right: Status Badge & Back Button -->
       <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-        <button type="button" data-settings onclick="switchTab('settings')" class="md:hidden settings-link p-2 rounded-full text-slate-300 border border-transparent cursor-pointer" aria-label="Impact Settings">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
         <div class="flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-700 bg-emerald-50 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full border border-emerald-200 font-semibold whitespace-nowrap shrink-0">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span>Engine Active</span>
@@ -140,8 +55,17 @@
     </div>
   </header>
 
+  <!-- Mobile Horizontal Tab Bar -->
+  <div class="md:hidden flex items-center gap-2 overflow-x-auto bg-white border-b border-slate-200 px-4 py-2 sticky top-[57px] z-30 shadow-xs">
+    <button onclick="switchTab('overview')" data-tab="overview" class="tab-btn-mobile text-xs font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap bg-rose-50 text-rose-700 border border-rose-200">Overview</button>
+    <button onclick="switchTab('workflows')" data-tab="workflows" class="tab-btn-mobile text-xs font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap text-slate-600 hover:bg-slate-100">Workflows</button>
+    <button onclick="switchTab('tools')" data-tab="tools" class="tab-btn-mobile text-xs font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap text-slate-600 hover:bg-slate-100">Tools</button>
+    <button onclick="switchTab('executions')" data-tab="executions" class="tab-btn-mobile text-xs font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap text-slate-600 hover:bg-slate-100">Executions</button>
+    <button onclick="switchTab('logs')" data-tab="logs" class="tab-btn-mobile text-xs font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap text-slate-600 hover:bg-slate-100">Logs</button>
+    <button onclick="switchTab('settings')" data-tab="settings" class="tab-btn-mobile text-xs font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap text-slate-600 hover:bg-slate-100">Settings</button>
+  </div>
 
-  <div class="flex min-h-[calc(100vh-61px)] relative z-10">
+  <div class="flex min-h-[calc(100vh-61px)]">
     <!-- Dedicated Interactive Sidebar -->
     <aside class="w-64 border-r border-slate-200 bg-white p-4 flex flex-col justify-between shrink-0 hidden md:flex">
       <div>
@@ -156,31 +80,53 @@
         </div>
 
         <nav class="space-y-1 text-xs font-medium">
-          <button onclick="switchTab('health')" data-tab="health" class="tab-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-white/10 text-white font-semibold border border-white/20 transition-all cursor-pointer">
-            <div class="flex items-center gap-2.5 text-left">
-              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span>Software health and recovery</span>
+          <button onclick="switchTab('overview')" data-tab="overview" class="tab-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-rose-50 text-rose-700 font-semibold border border-rose-200/80 transition-all cursor-pointer">
+            <div class="flex items-center gap-2.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Overview</span>
             </div>
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
           </button>
 
-          <button onclick="switchTab('cost')" data-tab="cost" class="tab-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 border border-transparent transition-all cursor-pointer">
-            <div class="flex items-center gap-2.5 text-left">
-              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span>Cost recovery</span>
+          <button onclick="switchTab('workflows')" data-tab="workflows" class="tab-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all cursor-pointer">
+            <div class="flex items-center gap-2.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Workflows</span>
             </div>
+            <span class="text-[10px] font-mono text-slate-400">4 Active</span>
           </button>
 
-          <button onclick="switchTab('logs')" data-tab="logs" class="tab-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 border border-transparent transition-all cursor-pointer">
-            <div class="flex items-center gap-2.5 text-left">
-              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <button onclick="switchTab('tools')" data-tab="tools" class="tab-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all cursor-pointer">
+            <div class="flex items-center gap-2.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Tools &amp; APIs</span>
+            </div>
+            <span class="text-[10px] font-mono text-emerald-600">5 Healthy</span>
+          </button>
+
+          <button onclick="switchTab('executions')" data-tab="executions" class="tab-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all cursor-pointer">
+            <div class="flex items-center gap-2.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Executions &amp; Traces</span>
+            </div>
+            <span class="text-[10px] font-mono font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded">94% Healed</span>
+          </button>
+
+          <button onclick="switchTab('logs')" data-tab="logs" class="tab-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all cursor-pointer">
+            <div class="flex items-center gap-2.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               <span>Telemetry Logs</span>
+            </div>
+            <span id="logs-count-badge" class="text-[10px] font-mono text-slate-400">800</span>
+          </button>
+
+          <button onclick="switchTab('settings')" data-tab="settings" class="tab-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all cursor-pointer">
+            <div class="flex items-center gap-2.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Impact Settings</span>
             </div>
           </button>
         </nav>
-        <button type="button" data-settings onclick="switchTab('settings')" class="settings-link mt-2 w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 border border-transparent text-xs font-medium cursor-pointer">
-          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span>Impact Settings</span>
-        </button>
       </div>
 
       <!-- Quick Action Box -->
@@ -193,29 +139,39 @@
     </aside>
 
     <!-- Mobile Nav Bar (visible on small screens) -->
-    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-[#121217]/95 backdrop-blur-md border-t border-white/10 z-40 px-2 py-1.5 flex justify-around">
-      <button data-tab="health" class="tab-btn-mobile p-2 text-white flex flex-col items-center text-[10px] font-semibold">
-        <span>Health</span>
+    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 px-2 py-1.5 flex justify-around">
+      <button data-tab="overview" class="tab-btn-mobile p-2 text-rose-600 flex flex-col items-center text-[10px] font-semibold">
+        <span>📊</span><span>Overview</span>
       </button>
-      <button data-tab="cost" class="tab-btn-mobile p-2 text-slate-400 flex flex-col items-center text-[10px] font-semibold">
-        <span>Cost</span>
+      <button data-tab="workflows" class="tab-btn-mobile p-2 text-slate-600 flex flex-col items-center text-[10px] font-semibold">
+        <span>⚡</span><span>Workflows</span>
       </button>
-      <button data-tab="logs" class="tab-btn-mobile p-2 text-slate-400 flex flex-col items-center text-[10px] font-semibold">
-        <span>Logs</span>
+      <button data-tab="tools" class="tab-btn-mobile p-2 text-slate-600 flex flex-col items-center text-[10px] font-semibold">
+        <span>🔌</span><span>Tools</span>
+      </button>
+      <button data-tab="executions" class="tab-btn-mobile p-2 text-slate-600 flex flex-col items-center text-[10px] font-semibold">
+        <span>🔍</span><span>Traces</span>
+      </button>
+      <button data-tab="logs" class="tab-btn-mobile p-2 text-slate-600 flex flex-col items-center text-[10px] font-semibold">
+        <span>📜</span><span>Logs</span>
+      </button>
+      <button data-tab="settings" class="tab-btn-mobile p-2 text-slate-600 flex flex-col items-center text-[10px] font-semibold">
+        <span>⚙️</span><span>Config</span>
       </button>
     </div>
 
     <!-- Main Workspace Container -->
-    <main class="flex-1 p-4 sm:p-8 max-w-6xl mx-auto overflow-y-auto pb-24 md:pb-8 flex flex-col gap-10">
+    <main class="flex-1 p-4 sm:p-8 max-w-6xl mx-auto overflow-y-auto pb-24 md:pb-8">
 
       <!-- ========================================================================= -->
       <!-- TAB 1: OVERVIEW                                                           -->
       <!-- ========================================================================= -->
-      <section id="view-health" class="tab-view space-y-8 order-1">
+      <section id="view-overview" class="tab-view space-y-8">
+        <!-- Overview Subheader -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
           <div>
-            <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Software health and recovery</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Continuity, failed executions, recovery, and the live trace of what was restored</p>
+            <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Overview — Live Work Continuity</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Real-time system telemetry, work continuity, and cost reduction analytics</p>
           </div>
           <div class="flex items-center gap-2">
             <button id="period-history" class="period-btn text-xs font-medium text-slate-700 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 shadow-xs cursor-pointer">
@@ -259,10 +215,65 @@
               <div class="text-xl font-extrabold text-emerald-600">94.1%</div>
               <span class="text-[10px] text-slate-500 font-medium">Verified outcomes</span>
             </div>
-            <div class="p-4 rounded-2xl bg-white border border-sky-200/90 shadow-sm">
-              <span class="text-[10px] font-mono font-semibold text-sky-700 uppercase block mb-1">Work preserved</span>
-              <div class="text-xl font-extrabold text-sky-600">94%</div>
-              <span class="text-[10px] text-slate-500 font-medium">Interrupted work resumed</span>
+          </div>
+        </div>
+
+        <!-- 2. COST & WORK RECOVERY -->
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-xs font-mono font-bold tracking-widest text-slate-400 uppercase flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span>COST &amp; WORK RECOVERY</span>
+            </h2>
+            <span class="text-[10px] font-mono text-slate-400">Financial Intelligence</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Wasted API & Compute Costs -->
+            <div class="p-5 rounded-2xl bg-white border border-rose-200/90 shadow-sm relative">
+              <div class="flex items-center justify-between mb-2">
+                <span id="kpi-tag-cost" class="text-[10px] font-mono font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 tracking-wider uppercase">
+                  MEASURED · WASTED API COST
+                </span>
+                <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+              </div>
+              <div id="kpi-lost-val" class="text-3xl font-black text-rose-600 tracking-tight mb-1">$7.13</div>
+              <p class="text-[11px] text-slate-500">Direct failed API calls across workflows</p>
+            </div>
+
+            <!-- Costs Avoided Through Recovery -->
+            <div class="p-5 rounded-2xl bg-white border border-emerald-200/90 shadow-sm relative">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 tracking-wider uppercase">
+                  MEASURED · SAVINGS
+                </span>
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              </div>
+              <div class="text-3xl font-black text-emerald-600 tracking-tight mb-1">$18,450.00</div>
+              <p class="text-[11px] text-slate-500">Costs avoided through work recovery</p>
+            </div>
+
+            <!-- Interrupted Work Recovered -->
+            <div class="p-5 rounded-2xl bg-white border border-sky-200/90 shadow-sm relative">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-mono font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200 tracking-wider uppercase">
+                  MEASURED · FIDELITY
+                </span>
+                <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+              </div>
+              <div class="text-3xl font-black text-sky-600 tracking-tight mb-1">94%</div>
+              <p class="text-[11px] text-slate-500">Interrupted work preserved &amp; resumed</p>
+            </div>
+
+            <!-- Estimated Business Loss at Risk -->
+            <div class="p-5 rounded-2xl bg-white border border-amber-200/90 shadow-sm relative">
+              <div class="flex items-center justify-between mb-2">
+                <span id="kpi-tag-risk" class="text-[10px] font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 tracking-wider uppercase">
+                  ESTIMATE · AT RISK
+                </span>
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              </div>
+              <div id="kpi-risk-val" class="text-3xl font-black text-amber-600 tracking-tight mb-1">$5,185.00</div>
+              <p class="text-[11px] text-slate-500">Estimated business loss at risk (~61 users)</p>
             </div>
           </div>
         </div>
@@ -321,7 +332,7 @@
                 <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
                 <span>Failure Insights &amp; Verified Outcomes</span>
               </div>
-              <p class="text-xs text-slate-500 mt-0.5">Failed services, root causes, affected workflows, and recovery status</p>
+              <p class="text-xs text-slate-500 mt-0.5">Failed services, root causes, affected workflows, wasted compute/API costs, &amp; recovery status</p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
               <span class="text-[10px] font-mono font-bold text-slate-600 bg-slate-200/80 px-2.5 py-1 rounded-full border border-slate-300">
@@ -336,7 +347,8 @@
               <div class="col-span-3">Failed Service &amp; Dependency</div>
               <div class="col-span-3">Root Cause Isolation</div>
               <div class="col-span-2">Affected Workflows &amp; Users</div>
-              <div class="col-span-4 text-right">Recovery Status</div>
+              <div class="col-span-2">Wasted Compute / API Cost</div>
+              <div class="col-span-2 text-right">Recovery Status</div>
             </div>
 
             <!-- Row 1 -->
@@ -354,11 +366,11 @@
               <div class="col-span-2 font-mono text-slate-700">
                 <span class="font-bold text-slate-900">67</span> runs · <span class="font-bold text-slate-900">28</span> users
               </div>
-              <div class="hidden">
+              <div class="col-span-2 font-mono">
                 <span class="font-bold text-rose-600 text-sm">$3.98</span>
                 <span class="text-[9px] text-slate-400 block uppercase font-bold">Measured Cost</span>
               </div>
-              <div class="col-span-4 text-right">
+              <div class="col-span-2 text-right">
                 <span class="inline-flex items-center gap-1 text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-full border border-emerald-200">
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Auto-Recovered (12ms)
                 </span>
@@ -380,11 +392,11 @@
               <div class="col-span-2 font-mono text-slate-700">
                 <span class="font-bold text-slate-900">41</span> runs · <span class="font-bold text-slate-900">19</span> users
               </div>
-              <div class="hidden">
+              <div class="col-span-2 font-mono">
                 <span class="font-bold text-amber-600 text-sm">$1.63</span>
                 <span class="text-[9px] text-slate-400 block uppercase font-bold">Measured Cost</span>
               </div>
-              <div class="col-span-4 text-right">
+              <div class="col-span-2 text-right">
                 <span class="inline-flex items-center gap-1 text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-full border border-emerald-200">
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> State Preserved ✓
                 </span>
@@ -406,11 +418,11 @@
               <div class="col-span-2 font-mono text-slate-700">
                 <span class="font-bold text-slate-900">12</span> runs · <span class="font-bold text-slate-900">8</span> users
               </div>
-              <div class="hidden">
+              <div class="col-span-2 font-mono">
                 <span class="font-bold text-rose-600 text-sm">$0.98</span>
                 <span class="text-[9px] text-slate-400 block uppercase font-bold">Measured Cost</span>
               </div>
-              <div class="col-span-4 text-right">
+              <div class="col-span-2 text-right">
                 <span class="inline-flex items-center gap-1 text-[10px] bg-sky-50 text-sky-700 font-bold px-2.5 py-1 rounded-full border border-sky-200">
                   <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Replayed (Verified)
                 </span>
@@ -420,61 +432,10 @@
         </div>
       </section>
 
-      <section id="view-cost" class="tab-view space-y-8 hidden order-1">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
-          <div>
-            <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Cost recovery</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Wasted spend, savings, and the APIs, workflows, and agents that drive them</p>
-          </div>
-          <div class="flex items-center bg-slate-100 p-0.5 rounded-lg text-xs font-medium text-slate-600">
-            <button onclick="setPeriod('24h')" data-period="24h" class="period-tab px-3 py-1 rounded bg-white text-rose-600 font-semibold shadow-xs cursor-pointer">24h</button>
-            <button onclick="setPeriod('7d')" data-period="7d" class="period-tab px-3 py-1 rounded hover:text-slate-900 cursor-pointer">7d</button>
-            <button onclick="setPeriod('30d')" data-period="30d" class="period-tab px-3 py-1 rounded hover:text-slate-900 cursor-pointer">30d</button>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="p-5 rounded-2xl bg-white border border-rose-200/90 shadow-sm">
-            <span id="kpi-tag-cost" class="text-[10px] font-mono font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 tracking-wider uppercase">Measured · Wasted API cost</span>
-            <div id="kpi-lost-val" class="text-3xl font-black text-rose-600 tracking-tight mt-2 mb-1">$7.13</div>
-            <p class="text-[11px] text-slate-500">Direct failed API calls across workflows</p>
-          </div>
-          <div class="p-5 rounded-2xl bg-white border border-emerald-200/90 shadow-sm">
-            <span class="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 tracking-wider uppercase">Measured · Savings</span>
-            <div class="text-3xl font-black text-emerald-600 tracking-tight mt-2 mb-1">$18,450.00</div>
-            <p class="text-[11px] text-slate-500">Costs avoided through work recovery</p>
-          </div>
-          <div class="p-5 rounded-2xl bg-white border border-amber-200/90 shadow-sm">
-            <span id="kpi-tag-risk" class="text-[10px] font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 tracking-wider uppercase">Estimate · At risk</span>
-            <div id="kpi-risk-val" class="text-3xl font-black text-amber-600 tracking-tight mt-2 mb-1">$5,185.00</div>
-            <p class="text-[11px] text-slate-500">Estimated business loss at risk (<span id="kpi-users-count">61</span> users)</p>
-          </div>
-        </div>
-        <div class="rounded-3xl bg-white border border-slate-200 shadow-sm overflow-hidden">
-          <div class="px-6 py-4 bg-slate-50/80 border-b border-slate-200">
-            <div class="text-sm font-bold text-slate-900">Wasted compute and API cost</div>
-            <p class="text-xs text-slate-500 mt-0.5">Measured cost of the same failed services</p>
-          </div>
-          <div class="divide-y divide-slate-100 text-xs">
-            <div class="px-6 py-3 flex items-center justify-between gap-3">
-              <span class="font-mono font-bold text-slate-800">OpenAI /v1/chat/completions</span>
-              <span class="font-bold text-rose-600">$3.98</span>
-            </div>
-            <div class="px-6 py-3 flex items-center justify-between gap-3">
-              <span class="font-mono font-bold text-slate-800">Stripe /v1/payment_intents</span>
-              <span class="font-bold text-amber-600">$1.63</span>
-            </div>
-            <div class="px-6 py-3 flex items-center justify-between gap-3">
-              <span class="font-mono font-bold text-slate-800">PostgreSQL Vector Pool</span>
-              <span class="font-bold text-rose-600">$0.98</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <!-- ========================================================================= -->
       <!-- TAB 2: WORKFLOWS                                                          -->
       <!-- ========================================================================= -->
-      <section id="view-workflows" class="tab-view space-y-6 hidden order-3">
+      <section id="view-workflows" class="tab-view space-y-6 hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
           <div>
             <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Registered Workflows</h1>
@@ -482,7 +443,7 @@
           </div>
           <div class="flex items-center gap-2">
             <span class="text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-full">
-              3 Active Pipelines
+              4 Active Pipelines
             </span>
           </div>
         </div>
@@ -550,6 +511,37 @@
             </button>
           </div>
 
+          <!-- Workflow 3 -->
+          <div class="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm hover:border-rose-300 transition-all">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <h3 class="font-mono text-sm font-bold text-slate-900">customer_support_autonomous_agent</h3>
+              </div>
+              <span class="text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                Circuit Shield
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">Autonomous customer ticket resolution agent with tool execution safeguards.</p>
+            <div class="grid grid-cols-3 gap-2 p-3 bg-slate-50 rounded-2xl text-center mb-3">
+              <div>
+                <p class="text-[10px] text-slate-400 uppercase font-mono">Executions</p>
+                <p class="text-sm font-bold text-slate-800">2,150</p>
+              </div>
+              <div>
+                <p class="text-[10px] text-slate-400 uppercase font-mono">Fail Rate</p>
+                <p class="text-sm font-bold text-rose-600">14.1%</p>
+              </div>
+              <div>
+                <p class="text-[10px] text-slate-400 uppercase font-mono">Revenue Saved</p>
+                <p class="text-sm font-bold text-emerald-600">$1,640.00</p>
+              </div>
+            </div>
+            <button onclick="switchTab('executions')" class="w-full py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer">
+              Inspect Traces →
+            </button>
+          </div>
+
           <!-- Workflow 4 -->
           <div class="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm hover:border-rose-300 transition-all">
             <div class="flex items-center justify-between mb-3">
@@ -583,48 +575,10 @@
         </div>
       </section>
 
-      <section id="view-agents" class="tab-view space-y-6 hidden order-4">
-        <div class="pb-4 border-b border-slate-200">
-          <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Agents</h2>
-          <p class="text-xs text-slate-500 mt-0.5">Runs named as an agent. Other pipelines stay under Workflows.</p>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm hover:border-rose-300 transition-all">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                <h3 class="font-mono text-sm font-bold text-slate-900">customer_support_autonomous_agent</h3>
-              </div>
-              <span class="text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
-                Circuit Shield
-              </span>
-            </div>
-            <p class="text-xs text-slate-500 mb-4">Autonomous customer ticket resolution agent with tool execution safeguards.</p>
-            <div class="grid grid-cols-3 gap-2 p-3 bg-slate-50 rounded-2xl text-center mb-3">
-              <div>
-                <p class="text-[10px] text-slate-400 uppercase font-mono">Executions</p>
-                <p class="text-sm font-bold text-slate-800">2,150</p>
-              </div>
-              <div>
-                <p class="text-[10px] text-slate-400 uppercase font-mono">Fail Rate</p>
-                <p class="text-sm font-bold text-rose-600">14.1%</p>
-              </div>
-              <div>
-                <p class="text-[10px] text-slate-400 uppercase font-mono">Revenue Saved</p>
-                <p class="text-sm font-bold text-emerald-600">$1,640.00</p>
-              </div>
-            </div>
-            <button onclick="switchTab('executions')" class="w-full py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer">
-              Inspect Traces →
-            </button>
-          </div>
-        </div>
-      </section>
-
       <!-- ========================================================================= -->
       <!-- TAB 3: TOOLS & APIS                                                       -->
       <!-- ========================================================================= -->
-      <section id="view-tools" class="tab-view space-y-6 hidden order-2">
+      <section id="view-tools" class="tab-view space-y-6 hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
           <div>
             <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Connected Tools &amp; APIs</h1>
@@ -747,7 +701,7 @@
       <!-- ========================================================================= -->
       <!-- TAB 4: EXECUTIONS & TRACES (WITH SLIDEOUT DRAWER)                         -->
       <!-- ========================================================================= -->
-      <section id="view-executions" class="tab-view space-y-6 hidden order-2">
+      <section id="view-executions" class="tab-view space-y-6 hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
           <div>
             <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Executions &amp; Traces</h1>
@@ -851,7 +805,7 @@
       <!-- ========================================================================= -->
       <!-- TAB 5: TELEMETRY LOGS (WITH FILTER & LIVE STREAM)                         -->
       <!-- ========================================================================= -->
-      <section id="view-logs" class="tab-view space-y-6 hidden order-3">
+      <section id="view-logs" class="tab-view space-y-6 hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
           <div>
             <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Telemetry Logs</h1>
@@ -906,7 +860,7 @@
       <!-- ========================================================================= -->
       <!-- TAB 6: IMPACT SETTINGS                                                    -->
       <!-- ========================================================================= -->
-      <section id="view-settings" class="tab-view space-y-6 hidden order-1">
+      <section id="view-settings" class="tab-view space-y-6 hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
           <div>
             <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Business Impact Settings</h1>
@@ -1074,68 +1028,44 @@
   <!-- Interactive Logic Script -->
   <script>
     // Tab switching logic
-    const TAB_ALIAS = {
-      overview: "health",
-      executions: "health",
-      logs: "logs",
-      workflows: "cost",
-      tools: "cost",
-      health: "health",
-      cost: "cost",
-      settings: "settings"
-    };
-    const TAB_GROUPS = {
-      health: ["health", "executions"],
-      cost: ["cost", "tools", "workflows", "agents"],
-      logs: ["logs"],
-      settings: ["settings"]
-    };
-
     function switchTab(tabId) {
-      const tab = TAB_ALIAS[tabId] || "health";
-      const group = TAB_GROUPS[tab];
       document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
-      group.forEach(id => {
-        const view = document.getElementById('view-' + id);
-        if (view) view.classList.remove('hidden');
-      });
+      const activeView = document.getElementById('view-' + tabId);
+      if (activeView) activeView.classList.remove('hidden');
 
+      // Update sidebar active buttons
       document.querySelectorAll('.tab-btn').forEach(btn => {
-        if (btn.getAttribute('data-tab') === tab) {
-          btn.className = "tab-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-white/10 text-white font-semibold border border-white/20 transition-all cursor-pointer";
+        if (btn.getAttribute('data-tab') === tabId) {
+          btn.className = "tab-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-rose-50 text-rose-700 font-semibold border border-rose-200/80 transition-all cursor-pointer";
         } else {
-          btn.className = "tab-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 border border-transparent transition-all cursor-pointer";
+          btn.className = "tab-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all cursor-pointer";
         }
       });
 
+      // Update mobile active buttons
       document.querySelectorAll('.tab-btn-mobile').forEach(btn => {
-        const on = btn.getAttribute('data-tab') === tab;
-        btn.className = "tab-btn-mobile p-2 flex flex-col items-center text-[10px] font-semibold " + (on ? "text-white" : "text-slate-400");
+        if (btn.getAttribute('data-tab') === tabId) {
+          btn.className = "tab-btn-mobile text-xs font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap bg-rose-50 text-rose-700 border border-rose-200 shadow-xs";
+        } else {
+          btn.className = "tab-btn-mobile text-xs font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap text-slate-600 hover:bg-slate-100 border border-transparent";
+        }
       });
 
-      document.querySelectorAll('.settings-link').forEach(btn => {
-        btn.classList.toggle('bg-white/10', tab === 'settings');
-        btn.classList.toggle('text-white', tab === 'settings');
-        btn.classList.toggle('border-white/20', tab === 'settings');
-      });
-
+      // Update breadcrumb
       const breadcrumb = document.getElementById('breadcrumb-title');
       const names = {
-        health: "Software health and recovery",
-        cost: "Cost recovery",
-        logs: "Telemetry Logs",
+        overview: "Overview Telemetry",
+        workflows: "Workflows Management",
+        tools: "Tool & API Health",
+        executions: "Executions & Traces",
+        logs: "Real-time Telemetry Logs",
         settings: "Impact Settings"
       };
-      if (breadcrumb && names[tab]) breadcrumb.textContent = names[tab];
+      if (breadcrumb && names[tabId]) breadcrumb.textContent = names[tabId];
 
-      if (window.location.hash !== '#' + tab) {
-        history.replaceState(null, '', '#' + tab);
-      }
-      if (tabId === 'executions') {
-        document.getElementById('view-' + tabId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      // Update URL hash
+      window.location.hash = tabId;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // Attach click listeners to all tab buttons
@@ -1161,6 +1091,9 @@
       if (hash) switchTab(hash);
     });
 
+    // Run immediately as well
+    initDashboard();
+
     // Timeframe filter toggle (24h, 7d, 30d)
     const periodData = {
       '24h': { cost: '$7.13', failed: '152', risk: '$5,185.00', users: '61', failRate: '19.0%', latency: '859ms', reqs: '800', runRate: '$213.95', badge: 'LAST 24H' },
@@ -1171,9 +1104,9 @@
     function setPeriod(period) {
       document.querySelectorAll('.period-tab').forEach(b => {
         if (b.getAttribute('data-period') === period) {
-          b.className = "period-tab px-3 py-1 rounded bg-white/10 text-white font-semibold cursor-pointer";
+          b.className = "period-tab px-3 py-1 rounded bg-white text-rose-600 font-semibold shadow-xs cursor-pointer";
         } else {
-          b.className = "period-tab px-3 py-1 rounded hover:text-white cursor-pointer text-slate-400";
+          b.className = "period-tab px-3 py-1 rounded hover:text-slate-900 cursor-pointer text-slate-600";
         }
       });
       
@@ -1228,8 +1161,6 @@
       container.innerHTML = '';
       sampleLogs.forEach(log => appendLogRow(log, container));
     }
-
-    initDashboard();
 
     function appendLogRow(log, container) {
       const row = document.createElement('div');
@@ -1304,9 +1235,9 @@
     document.querySelectorAll('.log-filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.log-filter-btn').forEach(b => {
-          b.className = "log-filter-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white cursor-pointer";
+          b.className = "log-filter-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 cursor-pointer";
         });
-        btn.className = "log-filter-btn px-3 py-1.5 rounded-lg bg-white text-white cursor-pointer";
+        btn.className = "log-filter-btn px-3 py-1.5 rounded-lg bg-white text-rose-600 shadow-xs cursor-pointer";
         
         const filter = btn.getAttribute('data-log-filter');
         filterLogs(filter);
