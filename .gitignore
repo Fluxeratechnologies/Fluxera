@@ -1,14 +1,12 @@
 node_modules/
+frontend/node_modules/
 .env
 frontend/.env
 *.log
 .DS_Store
 dist/
+frontend/dist/
 coverage/
 tests/
-.agents/skills/
-skills-lock.json
-
-# video compositions
-film/
-social/
+palette-*.html
+frontend/palette-*.html
