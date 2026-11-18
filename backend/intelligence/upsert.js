@@ -30,17 +30,19 @@ async function upsertTool(customerId, name, price) {
   return result.rows[0].id
 }
 
-async function upsertExecution(customerId, { id, workflowId, startedAt, endedAt, status, durationMs, recoveryOf, forExecutionId, forStep, hitCount }) {
+async function upsertExecution(customerId, { id, workflowId, startedAt, endedAt, status, durationMs, recoveryOf, recoveryRequestId, forExecutionId, forStep, hitCount }) {
   const hits = Number.isInteger(hitCount) ? hitCount : null
   const result = await query(
     `INSERT INTO workflow_executions
        (id, customer_id, workflow_id, status, started_at, ended_at, duration_ms, recovery_of,
-        for_execution_id, for_step, hit_count)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        recovery_request_id, for_execution_id, for_step, hit_count)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
        ON CONFLICT (id) DO UPDATE SET
+         status = CASE WHEN EXCLUDED.ended_at IS NOT NULL THEN EXCLUDED.status ELSE workflow_executions.status END,
          ended_at    = COALESCE(EXCLUDED.ended_at, workflow_executions.ended_at),
          duration_ms = COALESCE(EXCLUDED.duration_ms, workflow_executions.duration_ms),
          recovery_of = COALESCE(workflow_executions.recovery_of, EXCLUDED.recovery_of),
+         recovery_request_id = COALESCE(workflow_executions.recovery_request_id, EXCLUDED.recovery_request_id),
          for_execution_id = COALESCE(workflow_executions.for_execution_id, EXCLUDED.for_execution_id),
          for_step = COALESCE(workflow_executions.for_step, EXCLUDED.for_step),
          hit_count = COALESCE(EXCLUDED.hit_count, workflow_executions.hit_count)
@@ -54,6 +56,7 @@ async function upsertExecution(customerId, { id, workflowId, startedAt, endedAt,
       endedAt || null,
       durationMs == null ? null : durationMs,
       recoveryOf || null,
+      recoveryRequestId || null,
       forExecutionId || null,
       forStep || null,
       hits,

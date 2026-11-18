@@ -16,7 +16,9 @@ router.post('/', async (req, res) => {
 
   try {
     const sql = fs.readFileSync(path.join(__dirname, '../../db/schema.sql'), 'utf8')
+    const intelligence = fs.readFileSync(path.join(__dirname, '../../db/intelligence.sql'), 'utf8')
     await pool.query(sql)
+    await pool.query(intelligence)
     return res.status(200).json({ ok: true, message: 'Migration applied' })
   } catch (err) {
     console.error('[migrate] Error:', err.message)

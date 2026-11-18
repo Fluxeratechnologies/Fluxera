@@ -10,11 +10,13 @@
     "start":      "node backend/server.js",
     "dev":        "nodemon backend/server.js",
     "processor":  "node backend/processor/run.js",
+    "worker":     "node backend/worker/run.js",
     "report":     "node backend/email/send-report.js",
     "migrate":    "node db/migrate.js",
     "seed":       "node db/seed.js",
     "seed:intel": "node db/seed-intelligence.js",
-    "test":       "node tests/run.js && node tests/intelligence.test.js"
+    "seed:dev": "FLUXERA_ALLOW_DEV_SEED=true NODE_ENV=development node scripts/seed-v2-demo.js",
+    "test":       "node tests/intelligence.test.js"
   },
   "dependencies": {
     "express":        "^4.18.2",
