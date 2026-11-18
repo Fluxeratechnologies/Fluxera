@@ -10,8 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@remixicon/react": "^4.9.0",
+    "cobe": "^2.0.1",
+    "motion": "^12.43.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-aria-components": "^1.22.1",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.5",
+    "simple-icons": "^16.38.0",
+    "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
