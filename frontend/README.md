@@ -1,6 +1,6 @@
-# Fluxera Frontend Dashboard & Landing Suite
+# Fluxera Frontend
 
-The client-side interface for **Fluxera — The Reliability & Recovery Engine**. Built with **React 19**, **Vite**, **Tailwind CSS**, and modern glassmorphism 3D spatial design tokens.
+The React/Vite interface for Fluxera's live continuity control plane.
 
 ---
 
@@ -9,30 +9,20 @@ The client-side interface for **Fluxera — The Reliability & Recovery Engine**.
 ```
 frontend/
 ├── public/
-│   ├── favicon.svg               # Official Fluxera 'fx' vector brand favicon
-│   ├── icons.svg                 # Shared SVG symbol sprite definitions
-│   └── standalone/               # Zero-dependency, pure HTML/CSS/JS deployable pages
-│       ├── index.html            # Standalone Hero & Landing Page
-│       ├── vision.html           # Standalone How Fluxera Works (Vision & 3D Table)
-│       ├── dashboard.html        # Standalone Live Telemetry & Revenue Dashboard
-│       ├── style.css             # Standalone 3D effects & animation tokens
-│       └── script.js             # Standalone interactive terminal & audio simulator
+│   ├── favicon.svg               # Fluxera favicon
+│   └── icons.svg                 # Shared SVG symbols
 ├── src/
 │   ├── components/               # Reusable UI component library
-│   │   ├── Navigation.jsx        # Floating glass pill navigation bar
-│   │   ├── ProductShell.jsx      # Workspace wrapper & telemetry bar
-│   │   ├── RecoveryCard.jsx      # Automated recovery & fallback card
-│   │   ├── Tree.jsx              # Interactive execution call tree visualizer
-│   │   └── ui.jsx                # Metric cards, status badges, and buttons
-│   ├── pages/                    # Main application views
-│   │   ├── Landing.jsx           # Interactive Web Landing & Vision views
-│   │   ├── Workflows.jsx         # Registered workflow pipelines & heal rates
-│   │   ├── Tools.jsx             # Third-party dependency health & fallbacks
-│   │   ├── Executions.jsx        # Execution audit log & trace inspector
-│   │   ├── Logs.jsx              # Live streaming telemetry logs feed
-│   │   └── Settings.jsx          # Revenue risk model & SLA thresholds
-│   ├── index.css                 # Global cybernetic styles, animations, & aurora gradients
-│   ├── App.jsx                   # Root application state, auth, & router
+│   │   ├── base/                 # Source-owned BoardUI primitives
+│   │   ├── application/          # Application-level BoardUI components
+│   │   ├── Globe.jsx             # Synthetic COBE execution globe
+│   │   ├── ProductStages.jsx     # Keyboard-operated product previews
+│   │   └── design-system.jsx     # Shared motion and status helpers
+│   ├── hooks/
+│   │   └── useLiveOperations.js  # Durable SSE reconnect and refresh logic
+│   ├── styles/                   # BoardUI semantic theme and typography
+│   ├── index.css                 # V2 design tokens and responsive styles
+│   ├── App.jsx                   # Public, workspace, and staff route trees
 │   └── main.jsx                  # React DOM entrypoint
 ├── index.html                    # Vite application root HTML
 ├── package.json                  # Frontend dependencies & build scripts
@@ -59,9 +49,12 @@ npm run preview
 
 ---
 
-## 🎨 Design System & Visual Highlights
+## Serving the app
 
-- **Aurora Cosmic Gradients**: High-tech glow rings, horizon arc domes, and glassmorphism cards.
-- **Continuous Marquee Carousels**: Floating infinite auto-scrolling tech stacks with pause-on-hover physics.
-- **Multi-Tab Telemetry Explorer**: Interactive master-detail terminal with step-by-step code payloads and formula breakdowns.
-- **Pure Standalone Distribution**: Contains full zero-dependency standalone HTML files in `public/standalone/` for instant static hosting.
+React modules cannot be opened directly with `file://`. Use Vite during development:
+
+```bash
+npm run dev
+```
+
+Then open the HTTP URL printed by Vite, usually `http://localhost:5173/`.

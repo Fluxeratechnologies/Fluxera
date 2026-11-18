@@ -12,3 +12,10 @@ skills-lock.json
 # video compositions
 film/
 social/
+
+# Local design, browser, and generated deliverables
+.playwright-cli/
+output/
+tmp/
+brag-output/
+Fluxera/
