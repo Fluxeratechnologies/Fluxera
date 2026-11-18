@@ -28,13 +28,14 @@ export function useLiveOperations(session) {
   }, [enabled, refresh]);
   useEffect(() => {
     if (!enabled) return undefined;
-    const controller = new AbortController(); let reconnect; let attempt = 0;
+    const controller = new AbortController(); let reconnect; let attempt = 0; let reader = null; let active = true;
     const connect = async () => {
       try {
         const response = await fetch(`${API_BASE}/api/live?after=${lastEventId.current}`, { headers: { ...dashboardHeaders(session), "Last-Event-ID": String(lastEventId.current) }, signal: controller.signal });
         if (!response.ok || !response.body) throw new Error("Live stream unavailable");
+        if (!active) return;
         setConnected(true); attempt = 0;
-        const reader = response.body.getReader(); const decoder = new TextDecoder(); let buffer = "";
+        reader = response.body.getReader(); const decoder = new TextDecoder(); let buffer = "";
         while (!controller.signal.aborted) {
           const chunk = await reader.read(); if (chunk.done) break;
           buffer += decoder.decode(chunk.value, { stream: true });
@@ -54,20 +55,20 @@ export function useLiveOperations(session) {
           // source of truth once, then acknowledge only the latest confirmed change.
           if (latestEvent) {
             await refresh();
-            setEventPulse(latestEvent);
+            if (active) setEventPulse(latestEvent);
           }
         }
-      } catch { if (!controller.signal.aborted) setError("Live stream paused — retrying."); }
+      } catch { if (active && !controller.signal.aborted) setError("Live stream paused — retrying."); }
       finally {
-        setConnected(false);
-        if (!controller.signal.aborted) {
+        if (active) setConnected(false);
+        if (active && !controller.signal.aborted) {
           attempt += 1;
           reconnect = setTimeout(connect, Math.min(15000, 1000 * (2 ** attempt)));
         }
       }
     };
     connect();
-    return () => { controller.abort(); clearTimeout(reconnect); };
+    return () => { active = false; controller.abort(); reader?.cancel().catch(() => {}); clearTimeout(reconnect); };
   }, [enabled, refresh, session]);
 
   return { operations, error, connected, refresh, enabled, eventPulse };
