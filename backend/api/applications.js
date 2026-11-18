@@ -4,17 +4,31 @@ const { pool, query } = require('../../db/pool')
 const { requireStaff } = require('./auth')
 
 const router = express.Router()
+const DOMAINS = new Set([
+  'Software & API Systems',
+  'AI Agents & Workflows',
+  'Robotics & Factories',
+  'Vehicles, Energy & Infrastructure'
+])
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 router.post('/', async (req, res) => {
-  const email = String(req.body?.email || '').trim().toLowerCase()
-  const company = String(req.body?.company || '').trim().slice(0, 255)
-  const name = String(req.body?.name || '').trim().slice(0, 255) || null
-  if (!email.includes('@') || !company) return res.status(400).json({ error: 'Name, company, and work email are required' })
+  const email = String(req.body?.email || '').trim().toLowerCase().slice(0, 254)
+  const company = String(req.body?.company || '').trim().slice(0, 160)
+  const name = String(req.body?.name || '').trim().slice(0, 120)
+  const domain = String(req.body?.domain || '').trim()
+  const useCase = String(req.body?.use_case || '').trim().slice(0, 1200)
+  if (!EMAIL_PATTERN.test(email) || !company || !name || !DOMAINS.has(domain) || useCase.length < 20) {
+    return res.status(400).json({ error: 'Name, company, work email, domain, and a short use case are required' })
+  }
   try {
     await query(
-      `INSERT INTO workspace_applications (email, company, name)
-       VALUES ($1, $2, $3) ON CONFLICT (lower(email)) WHERE status = 'pending' DO NOTHING`,
-      [email, company, name]
+      `INSERT INTO workspace_applications (email, company, name, domain, use_case)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (lower(email)) WHERE status = 'pending'
+       DO UPDATE SET company = EXCLUDED.company, name = EXCLUDED.name,
+         domain = EXCLUDED.domain, use_case = EXCLUDED.use_case`,
+      [email, company, name, domain, useCase]
     )
     return res.status(202).json({ ok: true })
   } catch (err) {

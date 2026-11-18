@@ -139,8 +139,23 @@ ALTER TABLE workspace_applications ADD COLUMN IF NOT EXISTS reviewed_by UUID REF
 ALTER TABLE workspace_applications ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMPTZ;
 ALTER TABLE workspace_applications ADD COLUMN IF NOT EXISTS customer_id UUID REFERENCES customers(id) ON DELETE SET NULL;
 ALTER TABLE workspace_applications ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE workspace_applications ADD COLUMN IF NOT EXISTS domain TEXT;
+ALTER TABLE workspace_applications ADD COLUMN IF NOT EXISTS use_case TEXT;
 CREATE UNIQUE INDEX IF NOT EXISTS idx_workspace_applications_pending_email
   ON workspace_applications (lower(email)) WHERE status = 'pending';
+
+CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT UNIQUE NOT NULL,
+  status TEXT NOT NULL DEFAULT 'subscribed' CHECK (status IN ('subscribed', 'unsubscribed')),
+  consent_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  consent_version TEXT NOT NULL,
+  source TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_newsletter_subscribers_created_at
+  ON newsletter_subscribers (created_at DESC);
 
 -- Phase 2
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS webhook_url TEXT;
