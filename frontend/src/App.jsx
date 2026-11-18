@@ -1,188 +1,67 @@
-import { useState, useEffect, useCallback } from "react";
-import { CSS } from "./format";
-import { mock } from "./mock";
-import { apiGet } from "./api";
-import { Nav } from "./components/Nav";
-import { ProductShell } from "./components/ProductShell";
-import { WhatPage, HowPage, WhyPage, Login } from "./pages/Landing";
-import { Onboarding } from "./pages/Onboarding";
-import { Overview } from "./pages/Overview";
-import { Logs } from "./pages/Logs";
-import { Settings } from "./pages/Settings";
-import { Workflows } from "./pages/Workflows";
-import { Tools } from "./pages/Tools";
-import { Executions } from "./pages/Executions";
-import { ExecutionDetail } from "./pages/ExecutionDetail";
-import { ToolDetail } from "./pages/ToolDetail";
+import { useCallback, useEffect, useState } from "react";
+import { BrowserRouter, Link, Navigate, NavLink, Route, Routes, useNavigate, useParams } from "react-router-dom";
+import { ThemeToggle } from "@/components/application/theme/theme-toggle";
+import { Globe } from "./components/Globe";
+import { FluxeraMark } from "./components/FluxeraMark";
+import { PlatformLogo } from "./components/PlatformLogo";
+import { ProductStages } from "./components/ProductStages";
+import { ScrollReveal } from "./components/design-system";
+import { API_BASE, apiPost, dashboardGet, dashboardPatch, dashboardPost } from "./api";
+import { useLiveOperations } from "./hooks/useLiveOperations";
 
-function loadSession(){
-  try{
-    const raw=localStorage.getItem("fluxera_session");
-    return raw?JSON.parse(raw):null;
-  }catch{return null;}
+const nav = [["/app", "Command center"], ["/app/approvals", "Approvals"], ["/app/executions", "Executions"], ["/app/recoveries", "Recoveries"], ["/app/integrations", "Integrations"], ["/app/cost", "Cost"], ["/app/audit", "Audit"], ["/app/settings", "Settings"]];
+const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 });
+const dateFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" });
+const date = (value) => value ? dateFormatter.format(new Date(value)) : "—";
+const getSession = () => { try { const value = JSON.parse(localStorage.getItem("fluxera_session") || "null"); return value?.dashboardToken && value?.workspaceId ? value : null; } catch { return null; } };
+
+function Shell() {
+  const [session, setSession] = useState(getSession); const navigate = useNavigate();
+  useEffect(() => { if (session) localStorage.setItem("fluxera_session", JSON.stringify(session)); else localStorage.removeItem("fluxera_session"); }, [session]);
+  useEffect(() => { const token = new URLSearchParams(location.search).get("magic_link_token"); if (!token) return undefined; let active = true; apiPost("/api/dashboard-auth/magic-link/exchange", null, { token }).then(async r => { const p = await r.json(); if (!r.ok || !p.workspaces?.length) throw new Error(); if (!active) return; const workspace = p.workspaces[0]; setSession({ dashboardToken: p.session_token, workspaceId: workspace.id, company: workspace.company, role: workspace.role }); navigate("/app", { replace: true }); }).catch(() => { if (active) navigate("/access?error=expired", { replace: true }); }); history.replaceState({}, "", location.pathname); return () => { active = false; }; }, [navigate]);
+  return <Routes><Route path="/" element={<Public/>}/><Route path="/access" element={<Access/>}/><Route path="/pending" element={<Pending/>}/><Route path="/app/*" element={session ? <Workspace session={session} onSignOut={() => { setSession(null); navigate("/"); }}/> : <Navigate to="/access" replace/>}/><Route path="/staff/*" element={session ? <Staff session={session}/> : <Navigate to="/access" replace/>}/><Route path="*" element={<Navigate to="/" replace/>}/></Routes>;
 }
 
-export default function App(){
-  const[route,setRoute]=useState(()=>loadSession()?"health":"what");
-  const[session,setSession]=useState(loadSession);
-  const[period,setPeriod]=useState("24h");
-  const[data,setData]=useState(null);
-  const[error,setError]=useState(null);
-  const[live,setLive]=useState(false);
-  const[price,setPrice]=useState(.04);
-  const[executionId,setExecutionId]=useState(null);
-  const[toolId,setToolId]=useState(null);
-  const[workflowFilter,setWorkflowFilter]=useState("");
-  const[signupEmail,setSignupEmail]=useState("");
-
-  const productPages=["health","cost","overview","endpoints","logs","settings","workflows","tools","tool","executions","execution","history"];
-  const isProductPage=productPages.includes(route);
-  const needsReport=["health","cost","settings","overview","logs"].includes(route);
-
-  function go(id, extra){
-    const alias={overview:"health",executions:"health",endpoints:"health",workflows:"cost",tools:"cost"};
-    const next=alias[id]||id;
-    if(next==="execution")setExecutionId(extra);
-    if(id==="tool")setToolId(extra);
-    if(id==="history")setWorkflowFilter(typeof extra==="string"?extra:"");
-    if(id==="executions")setWorkflowFilter("");
-    if(id==="signup")setSignupEmail(typeof extra==="string"?extra:"");
-    setRoute(next);
-    window.scrollTo(0,0);
-  }
-
-  const regen=useCallback(async()=>{
-    if(!session)return;
-    setError(null);
-    if(session.isDemo||!session.apiKey){setData(mock(period));return;}
-    try{
-      const r=await apiGet(`/api/report?period=${period}`,session.apiKey);
-      if(!r.ok){
-        if(r.status===401||r.status===403)throw new Error("Your API key is no longer valid. Please sign in again.");
-        throw new Error("Couldn't load your report from the local API.");
-      }
-      const j=await r.json();
-      const eps=(j.endpoints||[]).map(ep=>({name:ep.endpoint,total:ep.total||0,failed:ep.failed||0,rate:parseFloat(ep.failure_rate)||0,lost:parseFloat(ep.revenue_lost)||0,avgLatency:parseInt(ep.avg_fail_latency)||0})).sort((a,b)=>b.lost-a.lost);
-      const tl=parseFloat(j.revenue_lost)||0,sm=j.summary||{},bi=j.business_impact||{};
-      const spark=(j.trend||[]).map(t=>({day:t.date,lost:parseFloat(t.revenue_lost)||0}));
-      const logs=(j.logs||[]).map(l=>({id:l.request_id||l.id,endpoint:l.endpoint,status:l.status,latency:l.latency_ms||0,price:parseFloat(l.price)||0,error:l.error_type,ts:new Date(l.logged_at),workflow:l.workflow_name||l.tool_name||null}));
-      setData({
-        logs,totalLost:tl,
-        totalFailed:parseInt(sm.failed_requests)||0,
-        totalRequests:parseInt(sm.total_requests)||0,
-        failRate:parseFloat(sm.failure_rate)||0,
-        avgLatency:parseInt(sm.avg_latency_ms)||0,
-        endpoints:eps,spark,
-        impact:{
-          configured:!!bi.configured,demo:false,
-          abandonmentRate:parseFloat(bi.abandonment_rate)||0,
-          avgOrderValue:parseFloat(bi.avg_order_value)||0,
-          usersAffected:bi.estimated_users_affected,
-          revenueAtRisk:bi.estimated_revenue_at_risk,
-          formula:bi.formula,
-        },
-        isDemo:false,
-      });
-    }catch(e){
-      setData(null);
-      setError(e.message||"Couldn't reach the local API.");
-    }
-  },[session,period]);
-
-  useEffect(()=>{if(session&&isProductPage)regen();},[session,regen,isProductPage]);
-
-  useEffect(()=>{
-    try{
-      if(session)localStorage.setItem("fluxera_session",JSON.stringify(session));
-      else localStorage.removeItem("fluxera_session");
-    }catch{/* session just won't persist */}
-  },[session]);
-
-  useEffect(()=>{
-    const on=isProductPage&&!!session;
-    document.documentElement.classList.toggle("product-root",on);
-    return()=>document.documentElement.classList.remove("product-root");
-  },[isProductPage,session]);
-
-  useEffect(()=>{
-    if(!live||!session||!session.isDemo)return;
-    const iv=setInterval(()=>{
-      const fail=Math.random()<.17;
-      const entry={id:"req_"+Math.random().toString(36).slice(2,9),endpoint:"/v1/chat/completions",status:fail?"fail":"success",latency:fail?2000:120,price:price,error:fail?"timeout":null,ts:new Date()};
-      setData(prev=>{
-        if(!prev)return prev;
-        const logs=[entry,...prev.logs].slice(0,1000);
-        const failed=logs.filter(l=>l.status==="fail");
-        return{...prev,logs,totalLost:failed.reduce((s,l)=>s+l.price,0),totalFailed:failed.length,totalRequests:logs.length,failRate:logs.length?(failed.length/logs.length)*100:0};
-      });
-    },800);
-    return()=>clearInterval(iv);
-  },[live,session,price]);
-
-  function enterDashboard(id){
-    if(!session){setSession({email:"",company:"Demo",apiKey:"",isDemo:true});}
-    go(id);
-  }
-
-  return(
-    <>
-      <style>{CSS}</style>
-      <div style={{minHeight:"100vh",background:"var(--bg)"}}>
-        {!(isProductPage&&session)&&<Nav
-          route={route}
-          go={go}
-          hasSession={!!session}
-          onViewDemo={()=>enterDashboard("overview")}
-          onSignIn={()=>go("overview")}
-          onSignUp={(email)=>go("signup", email)}
-        />}
-
-        {(route==="what"||route==="features")&&<WhatPage go={go} onDemo={()=>enterDashboard("overview")} onSignUp={(email)=>go("signup", email)} />}
-        {route==="how"&&<HowPage go={go} />}
-        {route==="why"&&<WhyPage go={go} onSignUp={(email)=>go("signup", email)} />}
-        {route==="signup"&&<Onboarding onLogin={setSession} go={go} initialEmail={signupEmail} session={session} />}
-
-        {isProductPage&&!session&&<Login onLogin={setSession} go={go} />}
-        {isProductPage&&session&&needsReport&&!data&&error&&(
-          <div className="product min-h-screen flex items-center justify-center px-6">
-            <div className="product-wash" aria-hidden="true" />
-            <div className="relative z-10 text-center max-w-md">
-              <p className="text-sm font-semibold text-rose-300 mb-2">Unable to load your Fluxera report</p>
-              <p className="text-sm text-slate-400 mb-5">{error}</p>
-              <button onClick={regen} className="shimmer-btn text-white text-sm font-semibold px-5 py-2.5 rounded-full cursor-pointer border-0">Try again</button>
-            </div>
-          </div>
-        )}
-        {isProductPage&&session&&needsReport&&!data&&!error&&(
-          <div className="product min-h-screen flex items-center justify-center px-6">
-            <div className="product-wash" aria-hidden="true" />
-            <p className="relative z-10 text-sm text-slate-400 font-mono">Loading...</p>
-          </div>
-        )}
-        {isProductPage&&session&&(data||["tool","execution","history"].includes(route))&&(
-          <ProductShell page={route} go={go} company={session.company} isDemo={session.isDemo} live={live} setLive={setLive} onLogout={()=>{setSession(null);setData(null);go("what");}}>
-            {route==="health"&&data&&(
-              <div className="flex flex-col gap-10">
-                <Overview data={data} period={period} setPeriod={setPeriod} go={go} part="health" />
-                <Executions apiKey={session.apiKey} isDemo={session.isDemo} go={go} />
-              </div>
-            )}
-            {route==="cost"&&data&&(
-              <div className="flex flex-col gap-10">
-                <Overview data={data} period={period} setPeriod={setPeriod} go={go} part="cost" />
-                <Tools apiKey={session.apiKey} isDemo={session.isDemo} go={go} />
-                <Workflows apiKey={session.apiKey} isDemo={session.isDemo} go={go} actor="workflow" />
-                <Workflows apiKey={session.apiKey} isDemo={session.isDemo} go={go} actor="agent" />
-              </div>
-            )}
-            {route==="logs"&&data&&<Logs data={data} />}
-            {route==="settings"&&data&&<Settings apiKey={session.apiKey} company={session.company} isDemo={session.isDemo} pricePerReq={price} setPricePerReq={setPrice} impact={data.impact} regen={regen} onApplyKey={setSession} go={go} webhookUrl={session.webhookUrl||""} interruptMinutes={session.interruptMinutes??15} onPatchSession={(partial)=>setSession(s=>({...s,...partial}))} />}
-            {route==="tool"&&<ToolDetail apiKey={session.apiKey} toolId={toolId} go={go} />}
-            {route==="history"&&<Executions apiKey={session.apiKey} isDemo={session.isDemo} go={go} workflow={workflowFilter} grouped />}
-            {route==="execution"&&<ExecutionDetail apiKey={session.apiKey} executionId={executionId} go={go} />}
-          </ProductShell>
-        )}
-      </div>
-    </>
-  );
+function Public() {
+  const navigate = useNavigate(); const [menu, setMenu] = useState(false); const [openFaq, setOpenFaq] = useState(null);
+  return <main className="public-site"><header className="public-header"><nav className="capsule-nav" aria-label="Primary navigation"><Link className="wordmark" to="/"><FluxeraMark size={25}/>Fluxera</Link><button className="mobile-menu" onClick={() => setMenu(!menu)} aria-expanded={menu}>Menu</button><div className={menu ? "public-links is-open" : "public-links"}><a href="#product">Product</a><a href="#how">How it works</a><a href="#integrations">Integrations</a><a href="#faq">FAQ</a></div><div className="public-actions"><button className="text-button" onClick={() => navigate("/access")}>Sign in</button><a className="soft-button" href="#access">Request access</a></div></nav></header>
+    <section className="public-hero" id="product"><div className="hero-copy"><p className="eyebrow">Continuity for production AI</p><h1>Observe the break. Approve the next move.</h1><p className="hero-lede">Fluxera connects every agent, API, workflow, tool, and memory operation to one durable recovery record—then waits for a person before it acts.</p><div className="hero-actions"><a className="ink-button" href="#access">Request workspace access</a><a href="#how" className="quiet-link">See the system</a></div><p className="hero-footnote">Metadata-only telemetry · signed dispatch · verified outcomes</p></div><div className="hero-proof"><div className="globe-frame"><Globe/><div className="globe-label"><span className="live-dot"/>Synthetic telemetry network</div></div><div className="hero-event one"><b>Failure observed</b><small>workflow / retry-safe</small></div><div className="hero-event two"><b>Approval required</b><small>human gate engaged</small></div></div></section>
+    <ScrollReveal as="section" className="proof-band"><p>One control plane for the work your software cannot afford to lose.</p><div><span>Agents</span><span>APIs</span><span>Workflows</span><span>Tools</span><span>Memory</span></div></ScrollReveal>
+    <ScrollReveal as="section" className="public-section architecture" id="how"><div className="section-title"><p className="eyebrow">One system, one trail</p><h2>From signal to verified result.</h2></div><div className="sequence">{[["01", "Observe", "Canonical events preserve lineage, status, attempt, latency, checkpoints, and direct cost."],["02", "Decide", "Fluxera turns eligible failures and stalled runs into evidence-rich requests for authorized people."],["03", "Dispatch", "Approved retry or resume actions travel through signed, idempotent webhook delivery."],["04", "Verify", "Linked SDK events—not a webhook status code—determine whether recovery worked."]].map(([n,t,c],index) => <article key={n} style={{"--item-delay":`${index*70}ms`}}><b>{n}</b><h3>{t}</h3><p>{c}</p></article>)}</div></ScrollReveal>
+    <ScrollReveal as="section" className="public-section integration-section" id="integrations"><div className="section-title"><p className="eyebrow">Five integration layers</p><h2>Every operation gets a place in the continuity record.</h2></div><div className="integration-grid">{[["Agents", "Model calls, handoffs, and tool execution.", "Anthropic"], ["APIs", "Requests, responses, retries, errors, and latency.", "Vercel"], ["Workflows", "Steps, checkpoints, dependencies, and stalled runs.", "GitHub"], ["Tools", "Calls, output status, delivery failures, and spend.", "Zapier"], ["Memory", "Read/write/retrieval operations without stored values.", "PostgreSQL"]].map(([title, copy, platform],index) => <article key={title} style={{"--item-delay":`${index*55}ms`}}><div className="integration-icon"><PlatformLogo name={platform}/></div><h3>{title}</h3><p>{copy}</p><span><PlatformLogo name={platform}/> Compatible platform example</span></article>)}</div></ScrollReveal>
+    <ProductStages/>
+    <ScrollReveal as="section" className="public-section faq" id="faq"><div className="section-title"><p className="eyebrow">Questions</p><h2>Built to stay accountable.</h2></div>{[["Does Fluxera dispatch recovery automatically?","No. Every customer-system recovery waits for an authorized admin or approver."],["What does Fluxera store?","Execution metadata, events, recovery records, and costs—not prompts, responses, tool arguments, or memory values."],["How does Fluxera know recovery worked?","A linked SDK execution or event verifies the result. A successful webhook delivery alone is never treated as success."],["Is Fluxera always on?","The pilot is best effort on free-tier infrastructure. Production uptime requires paid, always-on services."]].map(([q,a], index) => <article className="faq-row" key={q}><button aria-expanded={openFaq === index} onClick={() => setOpenFaq(openFaq === index ? null : index)}>{q}<span>{openFaq === index ? "−" : "+"}</span></button>{openFaq === index && <p>{a}</p>}</article>)}</ScrollReveal>
+    <ScrollReveal as="section" className="access-cta" id="access"><div><p className="eyebrow">Pilot access</p><h2>Bring a person into every consequential retry.</h2><p>Request a Fluxera workspace for your production AI systems.</p></div><AccessRequest onSuccess={() => navigate("/pending")}/></ScrollReveal><footer className="public-footer"><Link className="wordmark" to="/"><FluxeraMark size={24}/>Fluxera</Link><p>Work continuity for modern software.</p><button className="text-button" onClick={() => navigate("/access")}>Sign in</button></footer></main>;
 }
+
+function AccessRequest({ onSuccess }) { const [form, setForm] = useState({ name:"", company:"", email:"" }); const [state, setState] = useState("idle"); const submit = async e => { e.preventDefault(); setState("sending"); const r = await apiPost("/api/applications", null, form); setState(r.ok ? "done" : "error"); if (r.ok) onSuccess?.(); }; return <form className="access-form" onSubmit={submit}><label htmlFor="request-name">Name<input id="request-name" required value={form.name} onChange={e => setForm({...form,name:e.target.value})} placeholder="Your name"/></label><label htmlFor="request-company">Company<input id="request-company" required value={form.company} onChange={e => setForm({...form,company:e.target.value})} placeholder="Company"/></label><label htmlFor="request-email">Work email<input id="request-email" required type="email" value={form.email} onChange={e => setForm({...form,email:e.target.value})} placeholder="you@company.com"/></label><button type="submit" className="ink-button" disabled={state === "sending"}>{state === "sending" ? "Requesting…" : "Request access"}</button>{state === "error" && <p className="form-error">We could not save your request. Try again.</p>}</form>; }
+function Access() { const [email,setEmail] = useState(""); const [state,setState] = useState("idle"); const error = new URLSearchParams(location.search).get("error"); const submit = async e => { e.preventDefault(); setState("sending"); const r = await apiPost("/api/dashboard-auth/magic-link",null,{email}); setState(r.ok ? "sent" : "error"); }; return <main className="access-page"><Link className="wordmark" to="/"><FluxeraMark size={25}/>Fluxera</Link><section className="access-card"><p className="eyebrow">Approved workspaces</p><h1>Enter your workspace.</h1><p>Fluxera sends a single-use link to approved members. SDK keys never unlock this console.</p>{error && <p className="form-error">This link is expired or has already been used. Request another one.</p>}{state === "sent" ? <div className="success-copy"><b>Check your inbox.</b><p>If this email belongs to an approved workspace member, a secure sign-in link is on its way.</p></div> : <form onSubmit={submit}><label htmlFor="access-email">Work email<input id="access-email" autoComplete="email" required type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@company.com"/></label><button type="submit" className="ink-button" disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Send secure link"}</button>{state === "error" && <p className="form-error">Could not request a sign-in link.</p>}</form>}<Link to="/">Back to Fluxera</Link></section></main>; }
+function Pending() { return <main className="access-page"><Link className="wordmark" to="/"><FluxeraMark size={25}/>Fluxera</Link><section className="access-card"><p className="eyebrow">Request received</p><h1>Your workspace request is pending.</h1><p>Fluxera staff will review your application. Once activated, use your work email to receive a secure sign-in link.</p><Link className="quiet-link" to="/">Return to the product</Link></section></main>; }
+
+function Workspace({ session,onSignOut }) { const live = useLiveOperations(session); return <div className="app-shell"><header className="app-topbar"><Link className="wordmark" to="/app"><FluxeraMark size={25}/>Fluxera</Link><nav aria-label="Workspace navigation">{nav.map(([to,label]) => <NavLink key={to} end={to === "/app"} to={to}>{label}</NavLink>)}</nav><div className="topbar-actions"><span className={live.connected ? "connection live" : "connection"}>{live.connected ? "Live" : "Reconnecting"}</span><ThemeToggle appearance="segmented" size="small"/><button className="account-button" onClick={onSignOut}>{session.company?.slice(0,1) || "F"}<span>Sign out</span></button></div></header><div className="app-mobile-nav">{nav.slice(0,5).map(([to,label]) => <NavLink key={to} end={to === "/app"} to={to}>{label}</NavLink>)}</div><main className="app-content"><Routes><Route index element={<Command live={live}/>}/><Route path="approvals" element={<RecoveryPage session={session} title="Approval inbox" pending/>}/><Route path="recoveries" element={<RecoveryPage session={session} title="Recovery history"/>}/><Route path="executions" element={<ExecutionsPage session={session}/>}/><Route path="executions/:id" element={<ExecutionDetail session={session}/>}/><Route path="integrations" element={<IntegrationsPage session={session}/>}/><Route path="cost" element={<CostPage session={session}/>}/><Route path="audit" element={<AuditPage session={session}/>}/><Route path="settings" element={<SettingsPage session={session}/>}/><Route path="*" element={<Navigate to="/app" replace/>}/></Routes></main></div>; }
+function useData(path,session) { const [state,setState]=useState({loading:true,data:null,error:""}); const load=useCallback(async()=>{setState(prev=>({...prev,loading:true}));try{const r=await dashboardGet(path,session);const p=await r.json();if(!r.ok)throw new Error(p.error||"Could not load workspace data");setState({loading:false,data:p,error:""});}catch(err){setState({loading:false,data:null,error:err.message});}},[path,session]);useEffect(()=>{load();},[load]);return {...state,reload:load}; }
+function PageHeading({ eyebrow,title,children }) { return <header className="page-heading"><div><p className="eyebrow">{eyebrow}</p><h1>{title}</h1></div>{children}</header>; } function Card({children,className=""}) { return <section className={`app-card ${className}`}>{children}</section>; } function State({loading,error,children}) { if(loading)return <div className="loading-state" aria-live="polite">Loading live workspace data…</div>;if(error)return <div className="error-state">{error}</div>;return children; }
+function Command({live}) { const data=live.operations; const executions=data?.executions||[];const changedId=live.eventPulse?.type==="execution.updated"?live.eventPulse.data?.execution_id:null;return <><PageHeading eyebrow="Workspace / operational triage" title="Command center"><Link className="primary-button" to="/app/approvals">Review approvals</Link></PageHeading><State loading={!data&&!live.error} error={live.error&&!data?live.error:""}><section className="metric-row"><Metric label="Service health" value={data?.health?.worker === "healthy" ? "Healthy" : "Degraded"} detail={`API and database online · worker ${data?.health?.worker_last_seen_seconds ?? "—"}s ago`} good={data?.health?.worker === "healthy"}/><Metric label="Pending approvals" value={String(data?.recoveries?.pending ?? 0).padStart(2,"0")} detail="Human decision required"/><Metric label="Queue backlog" value={data?.queue?.ready ?? 0} detail={`${data?.queue?.delayed ?? 0} delayed · ${data?.queue?.oldest_lag_seconds ?? 0}s oldest`}/><Metric label="Cost exposure" value={money.format(data?.metrics?.observed_failed_cost ?? 0)} detail="Observed failed cost · 24 hours"/></section><section className="command-grid"><Card className="activity-card"><div className="card-heading"><div><p className="eyebrow">Live execution stream</p><h2>What is moving now</h2></div><Link to="/app/executions">View all</Link></div><div className="activity-list" aria-live="polite">{executions.length?executions.map(item=><Link className={`activity-row ${changedId===item.id?"is-live-update":""}`} to={`/app/executions/${item.id}`} key={item.id}><span className={item.status === "failed" ? "status-dot bad" : "status-dot"}/><b>{item.workflow}</b><small>{item.actor} · {item.status}</small><em>{item.duration_ms || 0}ms</em></Link>):<p>Waiting for your first SDK execution event.</p>}</div></Card><Card className="approval-callout"><p className="eyebrow">Human gate</p><h2>Recovery stays with a person.</h2><p>Fluxera prepares checkpoint-aware retry or resume actions. It cannot dispatch until an authorized approver decides.</p><div><span>Signed webhook</span><span>Idempotency key</span><span>SDK verification</span></div><Link className="primary-button" to="/app/approvals">Open approval inbox</Link></Card></section></State></>; }
+function Metric({label,value,detail,good}) { return <Card className="metric"><p>{label}</p><strong className={good?"good-text":""}>{value}</strong><small>{detail}</small></Card>; } function Status({value}) { return <span className={`status ${value}`}>{String(value).replaceAll("_"," ")}</span>; } function Empty({label,copy}) { return <Card className="empty"><h2>{label}</h2><p>{copy}</p></Card>; }
+function RecoveryPage({session,title,pending=false}) { const {data,loading,error,reload}=useData(`/api/recovery-requests${pending?"?status=pending_approval":""}`,session);const [busy,setBusy]=useState("");const [decision,setDecision]=useState(null);const [notice,setNotice]=useState(null);const decide=async(id,action)=>{setNotice(null);setBusy(id);const reason=action==="reject"?window.prompt("Reason for rejecting this recovery?"):"";if(action==="reject"&&reason===null){setBusy("");return;}const r=await dashboardPost(`/api/recovery-requests/${id}/${action}`,session,{reason});const payload=await r.json();if(r.ok){const status=payload.recovery_request?.status||`${action}d`;setDecision({id,status});setNotice({tone:"success",message:action==="approve"?"Recovery approved. Durable dispatch has been queued.":"Recovery rejected. The decision is now in the audit trail."});setBusy("");await new Promise(resolve=>setTimeout(resolve,260));await reload();setDecision(null);}else{setNotice({tone:"error",message:payload.error||"Could not save decision"});setBusy("");}};return <><PageHeading eyebrow="Continuity / human decision" title={title}/>{notice&&<div className={`decision-notice ${notice.tone}`} role={notice.tone==="error"?"alert":"status"} aria-live="polite">{notice.message}</div>}<State loading={loading} error={error}><div className="record-list">{data?.recovery_requests?.length?data.recovery_requests.map(row=>{const confirmed=decision?.id===row.id?decision.status:null;return <Card key={row.id} className={`recovery-row ${confirmed?`is-${confirmed}`:""}`}><div><div className="record-title"><h2>{row.workflow_name}</h2><Status value={confirmed||row.status}/></div><p>{row.action} from {row.source} · {row.integration_name||"No external integration selected"}</p><small>Created {date(row.created_at)} · expires {date(row.expires_at)}</small></div>{row.status==="pending_approval"&&!confirmed&&<div className="row-actions"><button className="secondary-button" disabled={busy===row.id} onClick={()=>decide(row.id,"reject")}>{busy===row.id?"Saving…":"Reject"}</button><button className="primary-button" disabled={busy===row.id} onClick={()=>decide(row.id,"approve")}>{busy===row.id?"Saving…":"Approve"}</button></div>}{confirmed&&<div className="decision-confirmed" aria-hidden="true">{confirmed==="approved"?"Approved ✓":"Rejected"}</div>}</Card>}):<Empty label="No recovery requests yet" copy="Eligible failures and stalled workflows will appear here for review."/>}</div></State></>; }
+function ExecutionsPage({session}) { const {data,loading,error}=useData("/api/console/executions",session);return <><PageHeading eyebrow="Observability / metadata only" title="Execution stream"/><State loading={loading} error={error}><Card className="table-card"><div className="table-scroll"><table><thead><tr><th>Execution</th><th>Layer</th><th>Status</th><th>Duration</th><th>Cost</th><th>Started</th></tr></thead><tbody>{data?.executions?.map(row=><tr key={row.id}><td><Link to={`/app/executions/${row.id}`}>{row.workflow}</Link></td><td>{row.actor}</td><td><Status value={row.status}/></td><td>{row.duration_ms||0}ms</td><td>{money.format(row.total_cost||0)}</td><td>{date(row.started_at)}</td></tr>)}</tbody></table></div>{!data?.executions?.length&&<Empty label="No executions yet" copy="Instrument the SDK to send the first metadata-only execution event."/>}</Card></State></>; }
+function ExecutionDetail({session}) { const {id}=useParams();const {data,loading,error}=useData(`/api/console/executions/${id}`,session);return <><PageHeading eyebrow="Execution / trace" title={data?.execution?.workflow||"Execution detail"}><Link className="secondary-button" to="/app/executions">Back to stream</Link></PageHeading><State loading={loading} error={error}>{data&&<><section className="metric-row"><Metric label="Status" value={data.execution.status} detail={data.execution.actor}/><Metric label="Duration" value={`${data.execution.duration_ms||0}ms`} detail="Observed duration"/><Metric label="Direct cost" value={money.format(data.execution.total_cost||0)} detail="Recorded by SDK"/><Metric label="Failed cost" value={money.format(data.execution.failed_cost||0)} detail="Cost at risk"/></section><Card className="step-card"><h2>Checkpoint-aware steps</h2>{data.steps.map(step=><div className="step-row" key={step.id}><span className={step.status==="fail"?"status-dot bad":"status-dot"}/><div><b>{step.name}</b><small>{step.cursor?`Cursor: ${step.cursor}`:"No cursor recorded"}</small></div><Status value={step.status}/><em>{step.duration_ms||0}ms</em></div>)}</Card></>}</State></>; }
+function IntegrationsPage({session}) {
+  const {data,loading,error,reload}=useData("/api/integrations",session);
+  const [form,setForm]=useState({name:"",webhook_url:""}); const [adding,setAdding]=useState(false);
+  const add=async e=>{e.preventDefault();const r=await dashboardPost("/api/integrations",session,{...form,supports_idempotency_key:true});if(r.ok){setForm({name:"",webhook_url:""});setAdding(false);reload();}else alert((await r.json()).error||"Could not add integration");};
+  const toggle=async row=>{await fetch(`${API_BASE}/api/integrations/${row.id}`,{method:"PATCH",headers:{Authorization:`Bearer ${session.dashboardToken}`,"X-Fluxera-Workspace":session.workspaceId,"Content-Type":"application/json"},body:JSON.stringify({active:!row.active})});reload();};
+  return <><PageHeading eyebrow="Integrations / durable dispatch" title="Connections"><button className="primary-button" onClick={()=>setAdding(!adding)}>{adding?"Close":"Add integration"}</button></PageHeading>{adding&&<Card className="form-card"><form onSubmit={add}><label>Name<input required value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Production recovery receiver"/></label><label>HTTPS webhook<input required value={form.webhook_url} onChange={e=>setForm({...form,webhook_url:e.target.value})} placeholder="https://example.com/fluxera/recovery"/></label><p>Activation requires declared Idempotency-Key support.</p><button className="primary-button">Create integration</button></form></Card>}<State loading={loading} error={error}><div className="integration-list">{data?.integrations?.length ? data.integrations.map(row => <Card className="integration-row" key={row.id}><div className="connection-orb">↗</div><div><h2>{row.name}</h2><p>{row.webhook_url}</p><small>HTTPS transport · Idempotency-Key {row.supports_idempotency_key?"supported":"missing"}</small></div><div className="integration-actions"><Status value={row.active?"active":"inactive"}/><button className="secondary-button" onClick={()=>toggle(row)}>{row.active?"Deactivate":"Activate"}</button></div></Card>) : <Empty label="No integrations connected" copy="Connect a signed recovery receiver to make approved retry and resume actions deliverable."/>}</div></State></>;
+}
+function CostPage({session}) { const {data,loading,error}=useData("/api/console/cost",session);const cost=data?.cost;return <><PageHeading eyebrow="Cost / recommendations only" title="Cost intelligence"/><State loading={loading} error={error}>{cost&&<><section className="metric-row"><Metric label="Observed cost" value={money.format(cost.observed_cost||0)} detail="Direct SDK-attributed cost · 30 days"/><Metric label="Retry waste" value={money.format(cost.retry_waste||0)} detail="Observed failed execution cost"/><Metric label="Estimated avoidable" value={money.format(cost.estimated_avoidable_cost||0)} detail="Estimate, never automatic suppression"/><Metric label="Affected executions" value={cost.affected_executions||0} detail="Failed or partial runs"/></section><Card className="explain-card"><h2>Recommendations, not interference.</h2><p>Fluxera surfaces duplicate and retry waste separately from observed spend. The pilot never suppresses, reroutes, or changes customer work.</p></Card></>}</State></>; }
+function AuditPage({session}) { const {data,loading,error}=useData("/api/console/audit",session);return <><PageHeading eyebrow="Audit / immutable decisions" title="Recovery audit"/><State loading={loading} error={error}><Card className="audit-card">{data?.events?.length?data.events.map(event=><div className="audit-row" key={event.id}><span className="audit-line"/><div><b>{event.event_type.replaceAll("_"," ")}</b><p>{event.actor_email||"System"} · {event.action} recovery · {date(event.created_at)}</p></div><Status value={event.status}/></div>):<Empty label="No audit events yet" copy="Every recovery request and human decision will leave a durable record here."/>}</Card></State></>; }
+function SettingsPage({session}) { const {data,loading,error,reload}=useData("/api/console/settings",session);const [value,setValue]=useState(15);useEffect(()=>{if(data?.settings?.interrupt_after_minutes)setValue(data.settings.interrupt_after_minutes);},[data]);const save=async()=>{const r=await dashboardPatch("/api/console/settings",session,{interrupt_after_minutes:Number(value)});if(r.ok)reload();else alert((await r.json()).error||"Could not save settings");};return <><PageHeading eyebrow="Workspace / policy" title="Settings"/><State loading={loading} error={error}><Card className="settings-card"><h2>Stalled workflow threshold</h2><p>Workflows inactive past this duration become approval-gated recovery candidates.</p><div><input type="number" min="1" max="1440" value={value} onChange={e=>setValue(e.target.value)}/><span>minutes</span><button className="primary-button" onClick={save}>Save threshold</button></div></Card></State></>; }
+function Staff({session}) {
+  const {data:fleetData,loading:fleetLoading,error:fleetError}=useData("/api/console/staff/fleet",session);
+  const [applications,setApplications]=useState([]); const [error,setError]=useState("");
+  const load=useCallback(async()=>{ const r=await fetch(`${API_BASE}/api/applications`,{headers:{Authorization:`Bearer ${session.dashboardToken}`}}); const p=await r.json(); if(r.ok)setApplications(p.applications||[]); else setError(p.error||"Staff access is required"); },[session]);
+  useEffect(()=>{load();},[load]);
+  const action=async(id,kind)=>{const r=await fetch(`${API_BASE}/api/applications/${id}/${kind}`,{method:"POST",headers:{Authorization:`Bearer ${session.dashboardToken}`,"Content-Type":"application/json"},body:"{}"});if(r.ok)load();else setError((await r.json()).error||"Could not update application");};
+  return <div className="staff-shell"><header className="staff-header"><Link className="wordmark" to="/"><FluxeraMark size={25}/>Fluxera staff</Link><Link className="secondary-button" to="/app">Customer workspace</Link></header><main className="staff-content"><PageHeading eyebrow="Internal / pilot operations" title="Fleet health"/><State loading={fleetLoading} error={fleetError||error}><>{fleetData&&<section className="metric-row"><Metric label="Active workspaces" value={fleetData.fleet.workspaces.active} detail={`${fleetData.fleet.workspaces.total} total`}/><Metric label="Pending applications" value={fleetData.fleet.applications.pending} detail="Needs staff review"/><Metric label="Pending recoveries" value={fleetData.fleet.recoveries.pending} detail="Across the fleet"/><Metric label="Worker heartbeat" value={fleetData.fleet.worker.last_seen_at?"Online":"Unknown"} detail={date(fleetData.fleet.worker.last_seen_at)}/></section>}<Card className="table-card"><div className="card-heading"><div><p className="eyebrow">Pilot access</p><h2>Workspace applications</h2></div></div><div className="table-scroll"><table><thead><tr><th>Applicant</th><th>Company</th><th>Status</th><th>Submitted</th><th/></tr></thead><tbody>{applications.map(app=><tr key={app.id}><td>{app.name||app.email}<small>{app.email}</small></td><td>{app.company}</td><td><Status value={app.status}/></td><td>{date(app.created_at)}</td><td>{app.status==="pending"&&<div className="row-actions"><button className="secondary-button" onClick={()=>action(app.id,"reject")}>Reject</button><button className="primary-button" onClick={()=>action(app.id,"activate")}>Activate</button></div>}</td></tr>)}</tbody></table></div></Card></></State></main></div>;
+}
+export default function App(){return <BrowserRouter><Shell/></BrowserRouter>;}

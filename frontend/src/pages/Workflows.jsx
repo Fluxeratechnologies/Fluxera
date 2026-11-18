@@ -123,7 +123,7 @@ export function Workflows({ apiKey, isDemo, go, actor: lockedActor }) {
                 className="px-6 py-4 grid grid-cols-1 sm:grid-cols-12 gap-3 items-center hover:bg-rosebrand-50/30 transition-colors"
               >
                 <div className="sm:col-span-3 flex items-center gap-2 min-w-0">
-                  <Dot active={w.still_failing} color={w.still_failing ? "#e11d48" : "#10b981"} />
+                  <Dot active={w.still_failing} color={w.still_failing ? "#D9541E" : "#147342"} />
                   <span className="font-mono text-xs font-bold text-slate-800 truncate">{w.name}</span>
                   {w.actor && w.actor !== "workflow" && (
                     <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 border border-slate-200 rounded px-1.5 py-0.5 shrink-0">

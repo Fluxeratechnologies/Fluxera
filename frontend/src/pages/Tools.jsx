@@ -85,7 +85,7 @@ export function Tools({ apiKey, isDemo, go }) {
             <div className="sm:col-span-3 flex items-center gap-2">
               <Dot
                 active={t.availability === "down" || t.still_failing}
-                color={t.availability === "down" ? "#e11d48" : t.still_failing ? "#f59e0b" : "#10b981"}
+                color={t.availability === "down" ? "#D9541E" : t.still_failing ? "#c06a21" : "#147342"}
               />
               <span className="font-mono text-xs font-bold text-slate-800">{t.name}</span>
             </div>

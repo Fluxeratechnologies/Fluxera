@@ -1,161 +1,27 @@
 import React from "react";
+import { Icon } from "./design-system";
+import { FluxeraMark } from "./FluxeraMark";
 
 const NAV = [
-  { id: "health", label: "Software health and recovery", short: "Health", icon: "grid" },
-  { id: "cost", label: "Cost recovery", short: "Cost", icon: "bolt" },
-  { id: "logs", label: "Telemetry Logs", short: "Logs", icon: "doc" },
+  { id: "health", label: "Command center", icon: "grid" },
+  { id: "approvals", label: "Approval inbox", icon: "shield" },
+  { id: "logs", label: "Execution stream", icon: "stream" },
+  { id: "cost", label: "Cost intelligence", icon: "coins" },
 ];
 
-const CRUMB = {
-  health: "Software health and recovery",
-  cost: "Cost recovery",
-  logs: "Telemetry Logs",
-  settings: "Impact Settings",
-  execution: "Execution",
-  history: "History",
-  tool: "Tool",
-};
+const titles = { health: "Command center", approvals: "Approval inbox", logs: "Execution stream", cost: "Cost intelligence", settings: "Workspace settings", history: "Recovery history", execution: "Execution detail", tool: "Tool detail" };
 
-function Icon({ name }) {
-  const common = { fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", className: "w-4 h-4" };
-  if (name === "grid") return <svg {...common}><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
-  if (name === "flow") return <svg {...common}><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
-  if (name === "bolt") return <svg {...common}><path d="M13 10V3L4 14h7v7l9-11h-7z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
-  if (name === "clock") return <svg {...common}><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
-  if (name === "doc") return <svg {...common}><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
-  return <svg {...common}><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
-}
-
-export function ProductShell({
-  children,
-  page,
-  go,
-  company,
-  isDemo,
-  live,
-  setLive,
-  onLogout,
-}) {
-  const title = NAV.find((n) => n.id === page)?.label || CRUMB[page] || page;
-  const showTitleBar = page !== "health" && page !== "cost";
-  const showHistory = showTitleBar && page !== "settings";
-
-  function active(id) {
-    if (id === "health") return page === "health" || page === "execution" || page === "history";
-    if (id === "cost") return page === "cost" || page === "tool";
-    return page === id;
-  }
-
-  return (
-    <div className="product min-h-screen flex flex-col">
-      <div className="product-wash" aria-hidden="true" />
-      <header className="chrome border-b sticky top-0 z-40 px-4 sm:px-8 py-3">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <button onClick={() => go("what")} className="flex items-center gap-2 bg-transparent border-0 cursor-pointer p-0 shrink-0">
-              <span className="w-8 h-8 rounded-xl bg-gradient-to-tr from-rose-600 via-rose-500 to-rose-400 flex items-center justify-center text-white shadow-md shadow-rose-500/25 font-mono font-bold text-xs">fx</span>
-              <span className="font-bold text-base">Fluxera</span>
-            </button>
-            <span className="text-slate-400">/</span>
-            <span className="crumb text-xs font-semibold px-2.5 py-1 rounded-lg truncate">{CRUMB[page] || title}</span>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <div className="status-ok hidden sm:flex items-center gap-2 text-xs px-3 py-1.5 rounded-full font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              Engine Active
-            </div>
-            {isDemo && (
-              <button
-                onClick={() => setLive(!live)}
-                className="btn-quiet flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full cursor-pointer"
-              >
-                <span className={`w-2 h-2 rounded-full ${live ? "bg-emerald-400 animate-ping" : "bg-slate-500"}`}></span>
-                {live ? "Streaming Live" : "Live Stream Off"}
-              </button>
-            )}
-            <button onClick={() => go("settings")} className="md:hidden btn-quiet p-2 rounded-full cursor-pointer" aria-label="Impact Settings">
-              <Icon name="gear" />
-            </button>
-            <button onClick={() => go("what")} className="btn-quiet text-xs font-semibold px-3.5 py-1.5 rounded-full cursor-pointer">
-              ← Back to Website
-            </button>
-            <button onClick={onLogout} className="md:hidden text-xs font-semibold text-slate-400 px-2 py-1.5 cursor-pointer bg-transparent border-0">
-              Sign out
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <div className="flex flex-1 min-h-0 relative z-10">
-        <aside className="rail w-64 border-r p-4 flex-col justify-between shrink-0 hidden md:flex">
-          <div>
-            <div className="pb-3 mb-3 border-b border-slate-200">
-              <p className="text-[10px] font-semibold text-slate-400 tracking-wider uppercase mb-0.5">Workspace</p>
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-bold capitalize truncate">{company || "Workspace"}</p>
-                {isDemo && <span className="status-bad text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0">Demo</span>}
-              </div>
-            </div>
-            <nav className="space-y-1 text-xs font-medium">
-              {NAV.map((n) => {
-                const on = active(n.id);
-                return (
-                  <button
-                    key={n.id}
-                    onClick={() => go(n.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer border ${on ? "nav-on" : "nav-off"}`}
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <Icon name={n.icon} />
-                      {n.label}
-                    </span>
-                  </button>
-                );
-              })}
-            </nav>
-            <button onClick={() => go("settings")} className={`mt-2 w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border text-xs font-medium ${page === "settings" ? "nav-on" : "nav-off"}`}>
-              <Icon name="gear" />
-              Impact Settings
-            </button>
-          </div>
-          <div className="pt-3 border-t border-slate-200">
-            <button onClick={onLogout} className="btn-quiet w-full text-xs font-medium px-3 py-2 rounded-xl cursor-pointer">
-              Sign out
-            </button>
-          </div>
-        </aside>
-
-        <main className="flex-1 min-w-0 flex flex-col pb-20 md:pb-0">
-          {showTitleBar && (
-            <div className="chrome px-4 sm:px-8 py-4 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <h1 className="text-lg font-bold">{title}</h1>
-              <div className="flex items-center gap-2 flex-wrap">
-                {showHistory && (
-                  <button
-                    onClick={() => go("history")}
-                    className={`text-xs font-medium px-3 py-1.5 rounded-lg cursor-pointer ${page === "history" ? "btn-rose" : "btn-quiet"}`}
-                  >
-                    History
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-          <div className="flex-1 p-4 sm:p-8">{children}</div>
-        </main>
-      </div>
-
-      <nav className="chrome md:hidden fixed bottom-0 left-0 right-0 border-t z-40 px-1 py-1.5 flex justify-around">
-        {NAV.map((n) => {
-          const on = active(n.id);
-          return (
-            <button key={n.id} onClick={() => go(n.id)} className={`p-2 flex flex-col items-center text-[10px] font-semibold border-0 bg-transparent cursor-pointer ${on ? "text-rose-300" : "text-slate-400"}`}>
-              <Icon name={n.icon} />
-              <span className="mt-0.5">{n.short}</span>
-            </button>
-          );
-        })}
-      </nav>
-    </div>
-  );
+export function ProductShell({ children, page, go, company, isDemo, live, setLive, onLogout }) {
+  const title = titles[page] || page;
+  const active = (id) => id === "health" ? ["health", "execution", "history"].includes(page) : id === "cost" ? ["cost", "tool"].includes(page) : page === id;
+  return <div className="v2-app-shell">
+    <aside className="v2-rail">
+      <button className="brand v2-rail__brand" onClick={()=>go("what")}><FluxeraMark inverse />Fluxera</button>
+      <div className="workspace-stamp"><small>WORKSPACE</small><strong>{company || "Fluxera pilot"}</strong><em>{isDemo ? "DEMO MODE" : "APPROVED ACCESS"}</em></div>
+      <nav aria-label="Workspace navigation">{NAV.map(item=><button key={item.id} className={active(item.id) ? "is-active" : ""} onClick={()=>go(item.id)}><Icon name={item.icon} size={16}/>{item.label}</button>)}<button className={page === "settings" ? "is-active" : ""} onClick={()=>go("settings")}><Icon name="settings" size={16}/>Workspace settings</button></nav>
+      <div className="v2-rail__bottom"><div className="engine-state"><i/> Durable engine<br/><span>queue healthy</span></div><button onClick={onLogout}>Sign out</button></div>
+    </aside>
+    <div className="v2-app-content"><header className="v2-app-header"><div><small>FLUXERA / WORKSPACE</small><h2>{title}</h2></div><div className="v2-app-header__actions">{isDemo && <button className="header-live" onClick={()=>setLive(!live)}><i className={live ? "is-on" : ""}/>{live ? "Streaming" : "Paused"}</button>}<button onClick={()=>go("what")}>Public site ↗</button></div></header><main>{children}</main></div>
+    <nav className="v2-mobile-nav" aria-label="Workspace navigation">{NAV.map(item=><button key={item.id} className={active(item.id) ? "is-active" : ""} onClick={()=>go(item.id)}><Icon name={item.icon} size={16}/><span>{item.label.replace("Command center", "Home").replace("Approval inbox", "Approvals").replace("Execution stream", "Stream").replace("Cost intelligence", "Costs")}</span></button>)}<button className={page === "settings" ? "is-active" : ""} onClick={()=>go("settings")}><Icon name="settings" size={16}/><span>Settings</span></button></nav>
+  </div>;
 }
