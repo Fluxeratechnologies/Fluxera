@@ -7,11 +7,12 @@
   inset: 0;
   justify-items: center;
   position: fixed;
-  transition: opacity 380ms var(--loader-ease), transform 540ms var(--loader-ease);
+  transition: opacity 550ms ease;
   z-index: 1000;
 }
-.site-loader.is-leaving { opacity: 0; pointer-events: none; transform: translateY(-3%); }
-.site-loader-mark { height: 74px; position: relative; width: 74px; }
+.site-loader.is-leaving { opacity: 0; pointer-events: none; }
+.site-loader-mark { height: 74px; position: relative; width: 74px; transition: opacity 450ms ease, transform 450ms ease; }
+.site-loader.is-leaving .site-loader-mark { opacity: 0; transform: scale(.96); }
 .site-loader-mark svg { height: 100%; inset: 0; position: absolute; width: 100%; }
 .site-loader-ghost rect:first-child { fill: #ded5c6; }
 .site-loader-ghost path { fill: #b8ad9d; }
@@ -27,5 +28,6 @@
 @media (prefers-reduced-motion: reduce) {
   .site-loader { transition: opacity 150ms ease; }
   .site-loader.is-leaving { transform: none; }
+  .site-loader.is-leaving .site-loader-mark { transform: none; }
   .site-loader-fill { transition: clip-path 150ms ease; }
 }

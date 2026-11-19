@@ -44,10 +44,10 @@ export function SiteLoader() {
   }, [progress]);
 
   useEffect(() => {
-    if (progress < 1 || phase !== "loading") return undefined;
+    if (progress < 1 || visibleProgress < 1 || phase !== "loading") return undefined;
     const hold = window.setTimeout(() => setPhase("leaving"), reduced ? 60 : 260);
     return () => window.clearTimeout(hold);
-  }, [phase, progress, reduced]);
+  }, [phase, progress, reduced, visibleProgress]);
 
   useEffect(() => {
     if (phase !== "leaving") return undefined;
