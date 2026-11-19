@@ -1,13 +1,13 @@
 WEBVTT
 
 1
-00:00:00.000 --> 00:00:05.000
-Start with service health, queue backlog, and pending approvals.
+00:00:00,000 --> 00:00:02,755
+Start with service health and queue pressure.
 
 2
-00:00:05.482 --> 00:00:10.482
-Inspect the execution stream across connected work.
+00:00:02,755 --> 00:00:06,690
+Open a failed execution to inspect its steps and checkpoint.
 
 3
-00:00:11.486 --> 00:00:16.486
-Open a failed execution to inspect its completed steps and checkpoint.
+00:00:06,690 --> 00:00:12,200
+Fluxera keeps the operating context together, so the team can decide what happens next.

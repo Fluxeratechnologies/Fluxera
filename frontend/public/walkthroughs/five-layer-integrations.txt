@@ -1,8 +1,3 @@
-Five-layer integrations
-Illustrative synthetic data. Recorded from the Fluxera React interface.
+Agents, APIs, workflows, tools, and memory share one execution trail. Inspect the receiver's idempotency support, then follow a failed workflow through its steps. All activity shown here is synthetic.
 
-Connect recovery receivers with explicit idempotency-key support.
-
-Agents, APIs, workflows, tools, and memory feed the same execution system.
-
-Use execution lineage and checkpoints to understand what failed.
+Illustrative synthetic data.

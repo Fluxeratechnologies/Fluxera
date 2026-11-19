@@ -1,13 +1,13 @@
 WEBVTT
 
 1
-00:00:00.000 --> 00:00:05.000
-Start with the cost exposure associated with failed work.
+00:00:00,000 --> 00:00:05,235
+Observed spend is recorded separately from retry waste and estimated avoidable cost.
 
 2
-00:00:05.446 --> 00:00:10.446
-Separate observed cost from retry waste and estimated avoidable cost.
+00:00:05,235 --> 00:00:08,726
+Open an execution to see the attributed cost.
 
 3
-00:00:10.876 --> 00:00:15.876
-Inspect individual execution costs. Estimates are not realized savings.
+00:00:08,726 --> 00:00:13,525
+These figures are illustrative, and Fluxera does not suppress customer work.

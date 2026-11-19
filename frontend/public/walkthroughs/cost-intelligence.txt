@@ -1,8 +1,3 @@
-Cost intelligence
-Illustrative synthetic data. Recorded from the Fluxera React interface.
+Observed spend is recorded separately from retry waste and estimated avoidable cost. Open an execution to see the attributed cost. These figures are illustrative, and Fluxera does not suppress customer work.
 
-Start with the cost exposure associated with failed work.
-
-Separate observed cost from retry waste and estimated avoidable cost.
-
-Inspect individual execution costs. Estimates are not realized savings.
+Illustrative synthetic data.

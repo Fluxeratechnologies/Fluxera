@@ -1,8 +1,3 @@
-Live monitoring
-Illustrative synthetic data. Recorded from the Fluxera React interface.
+Start with service health and queue pressure. Open a failed execution to inspect its steps and checkpoint. Fluxera keeps the operating context together, so the team can decide what happens next.
 
-Start with service health, queue backlog, and pending approvals.
-
-Inspect the execution stream across connected work.
-
-Open a failed execution to inspect its completed steps and checkpoint.
+Illustrative synthetic data.
