@@ -1,5 +1,5 @@
 import createGlobe from "cobe";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useReducedMotion } from "./design-system";
 import "./globe-analytics.css";
 import "./globe-host.css";
@@ -11,13 +11,6 @@ const DEFAULT_MARKERS = [
   { id: "cdg", location: [48.86, 2.35], executions: 385, trend: 5 },
   { id: "syd", location: [-33.87, 151.21], executions: 201, trend: 15 },
   { id: "bom", location: [19.08, 72.88], executions: 278, trend: 6 },
-];
-
-const ARCS = [
-  { from: DEFAULT_MARKERS[0].location, to: DEFAULT_MARKERS[1].location },
-  { from: DEFAULT_MARKERS[1].location, to: DEFAULT_MARKERS[5].location },
-  { from: DEFAULT_MARKERS[5].location, to: DEFAULT_MARKERS[2].location },
-  { from: DEFAULT_MARKERS[2].location, to: DEFAULT_MARKERS[4].location },
 ];
 
 function StaticGlobe() {
@@ -32,15 +25,6 @@ export function Globe({ className = "", markers = DEFAULT_MARKERS, speed = 0.002
   const offset = useRef({ phi: 0, theta: 0 });
   const paused = useRef(false);
   const reduced = useReducedMotion();
-  const [tick, setTick] = useState(0);
-
-  useEffect(() => {
-    if (reduced) return undefined;
-    const interval = window.setInterval(() => setTick((value) => value + 1), 3000);
-    return () => window.clearInterval(interval);
-  }, [reduced]);
-
-  const data = useMemo(() => markers.map((marker, index) => ({ ...marker, executions: marker.executions + tick * (index % 3 + 1), trend: Math.max(-20, Math.min(20, marker.trend + ((tick + index) % 3) - 1)) })), [markers, tick]);
   const cobeMarkers = useMemo(() => markers.map((marker) => ({ id: marker.id, location: marker.location, size: 0.045 })), [markers]);
   const handlePointerDown = useCallback((event) => {
     pointer.current = { x: event.clientX, y: event.clientY };
@@ -87,8 +71,7 @@ export function Globe({ className = "", markers = DEFAULT_MARKERS, speed = 0.002
         phi, theta: 0.2, dark: 0, diffuse: 1.5, mapSamples: 16000,
         mapBrightness: 7, mapBaseBrightness: 0.04, baseColor: [1, 1, 1],
         markerColor: [0.85, 0.33, 0.12], glowColor: [0.94, 0.93, 0.91],
-        markerElevation: 0.015, markers: cobeMarkers, arcs: ARCS,
-        arcColor: [0.85, 0.33, 0.12], arcWidth: 0.45, arcHeight: 0.22,
+        markerElevation: 0.015, markers: cobeMarkers,
       });
       canvas.classList.add("is-ready");
       const animate = () => {
@@ -119,7 +102,6 @@ export function Globe({ className = "", markers = DEFAULT_MARKERS, speed = 0.002
   return <div className={`globe globe-analytics ${className}`} role="img" aria-label="Synthetic global execution analytics">
     <StaticGlobe/>
     <div ref={hostRef} className="globe-canvas-host" aria-hidden="true"/>
-    {!reduced && <div className="globe-analytics-labels" aria-hidden="true">{data.map((marker) => <div className="globe-analytics-pill" key={marker.id} style={{ positionAnchor: `--cobe-${marker.id}`, opacity: `var(--cobe-visible-${marker.id}, 0)` }}><strong>{marker.executions}</strong><span className={marker.trend >= 0 ? "positive" : "negative"}>{marker.trend >= 0 ? "↑" : "↓"} {Math.abs(marker.trend)}%</span></div>)}</div>}
-    <span className="sr-only">A draggable decorative globe showing deterministic synthetic execution counts and trends. It does not show customer data.</span>
+    <span className="sr-only">A decorative globe with synthetic locations. It does not show customer data.</span>
   </div>;
 }
