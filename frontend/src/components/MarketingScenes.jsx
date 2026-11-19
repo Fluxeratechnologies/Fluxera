@@ -5,19 +5,17 @@ import { PlatformLogo } from './PlatformLogo';
 import { useReducedMotion, Icon } from './design-system';
 import './marketing-scenes.css';
 
-function MotionFrame({ children, className = '', label }) {
+function MotionFrame({ children, className = '' }) {
   const ref = useRef(null);
   const reduced = useReducedMotion();
-  const [paused, setPaused] = useState(false);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), { threshold: .1 });
     observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
-  return <div ref={ref} className={`marketing-motion ${className}`} data-running={!paused && !reduced && visible}>
+  return <div ref={ref} className={`marketing-motion ${className}`} data-running={!reduced && visible}>
     {children}
-    {!reduced && <button className="scene-motion-toggle" type="button" aria-label={`${paused ? 'Play' : 'Pause'} ${label} animation`} aria-pressed={paused} onClick={() => setPaused(!paused)}>{paused ? 'Play motion' : 'Pause motion'}</button>}
   </div>;
 }
 
