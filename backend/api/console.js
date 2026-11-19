@@ -1,6 +1,7 @@
 const express = require('express')
 const { query } = require('../../db/pool')
 const { requireWorkspaceRole, requireStaff } = require('./auth')
+const { growthReport } = require('../analytics/ga4')
 
 const router = express.Router()
 const ROLES = ['owner', 'admin', 'approver', 'operator', 'viewer']
@@ -81,6 +82,34 @@ router.get('/staff/fleet', async (req, res) => {
     query("SELECT COUNT(*) FILTER (WHERE status = 'pending_approval')::int AS pending FROM recovery_requests"),
   ])
   res.json({ fleet: { workspaces: workspaces.rows[0], applications: applications.rows[0], worker: worker.rows[0], recoveries: recoveries.rows[0] } })
+})
+
+router.get('/staff/growth', async (req, res) => {
+  const staff = await requireStaff(req, res); if (!staff) return
+  const days = Math.min(365, Math.max(1, Number.parseInt(req.query.days, 10) || 30))
+  try {
+    const [applications, recoveries, ga4] = await Promise.all([
+      query(
+        `SELECT COUNT(*)::int AS submitted,
+                COUNT(*) FILTER (WHERE status = 'pending')::int AS pending,
+                COUNT(*) FILTER (WHERE status = 'activated')::int AS activated,
+                COUNT(*) FILTER (WHERE status = 'rejected')::int AS rejected
+         FROM workspace_applications
+         WHERE created_at >= now() - ($1::int * interval '1 day')`, [days]
+      ),
+      query(
+        `SELECT COUNT(*) FILTER (WHERE status = 'verified')::int AS verified_recoveries,
+                COUNT(DISTINCT customer_id) FILTER (WHERE status = 'verified')::int AS verified_workspaces
+         FROM recovery_requests
+         WHERE created_at >= now() - ($1::int * interval '1 day')`, [days]
+      ),
+      growthReport(days).catch((err) => ({ configured: true, unavailable: true, error: err.message, events: [], sources: [], updated_at: null })),
+    ])
+    return res.json({ days, funnel: { ...applications.rows[0], ...recoveries.rows[0] }, ga4 })
+  } catch (err) {
+    console.error('[staff-growth]', err.message)
+    return res.status(500).json({ error: 'Could not load growth analytics' })
+  }
 })
 
 module.exports = router

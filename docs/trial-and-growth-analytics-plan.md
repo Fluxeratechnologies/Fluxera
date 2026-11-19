@@ -1,6 +1,14 @@
 # Fluxera V2 — Shareable Trial and Growth Analytics Plan
 
-Status: proposed implementation plan, 19 November 2026. This document does not claim that the trial or analytics integration is live.
+Status: public guided trial, consent-aware GA4 instrumentation, staff growth summary, and GA4 Data API adapter implemented on 19 November 2026. Production reporting begins after the GA4 measurement ID, property ID, and service-account credentials are configured in hosting.
+
+## Implemented analytics contract
+
+- `/try` provides the synthetic Observe → Analyze → Approve → Dispatch → Verify walkthrough and request-access handoff.
+- Public analytics loads only after an explicit consent choice and excludes `/app` and `/staff` page paths.
+- Accepted applications emit `generate_lead`; the guided experience emits tour and completion milestones; the real command center emits a first-live-event milestone without execution identifiers.
+- `GET /api/console/staff/growth` is staff protected, combines authoritative PostgreSQL application/recovery counts with cached aggregate GA4 reports, and fails safely when GA4 is unconfigured or unavailable.
+- The staff console shows the acquisition funnel, lead-source summary, reporting window, connection state, and last-updated time.
 
 ## Product decision
 

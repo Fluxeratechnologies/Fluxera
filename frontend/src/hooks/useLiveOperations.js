@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { API_BASE, dashboardGet, dashboardHeaders } from "../api";
+import { trackOnce } from "../analytics";
 
 export function useLiveOperations(session) {
   const [operations, setOperations] = useState(null);
@@ -15,6 +16,7 @@ export function useLiveOperations(session) {
       const response = await dashboardGet("/api/operations", session);
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Live operations are unavailable");
+      if (payload.executions?.length) trackOnce("first_live_event", { method: "workspace" });
       setOperations(payload); setError("");
       return payload;
     } catch (err) { setError(err.message || "Live operations are unavailable"); }
