@@ -1,0 +1,13 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:05.000
+Review the recovery request and its configured destination.
+
+2
+00:00:05.423 --> 00:00:10.423
+An authorized person approves. Dispatch is queued; success is not yet verified.
+
+3
+00:00:10.860 --> 00:00:15.860
+The audit trail records the decision. Linked SDK evidence is required for verification.

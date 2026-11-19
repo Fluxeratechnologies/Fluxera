@@ -1,0 +1,13 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:05.000
+Connect recovery receivers with explicit idempotency-key support.
+
+2
+00:00:05.494 --> 00:00:10.494
+Agents, APIs, workflows, tools, and memory feed the same execution system.
+
+3
+00:00:10.892 --> 00:00:15.892
+Use execution lineage and checkpoints to understand what failed.

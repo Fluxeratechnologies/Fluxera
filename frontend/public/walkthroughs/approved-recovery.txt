@@ -1,0 +1,8 @@
+Human-approved recovery
+Illustrative synthetic data. Recorded from the Fluxera React interface.
+
+Review the recovery request and its configured destination.
+
+An authorized person approves. Dispatch is queued; success is not yet verified.
+
+The audit trail records the decision. Linked SDK evidence is required for verification.

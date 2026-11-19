@@ -1,0 +1,8 @@
+Live monitoring
+Illustrative synthetic data. Recorded from the Fluxera React interface.
+
+Start with service health, queue backlog, and pending approvals.
+
+Inspect the execution stream across connected work.
+
+Open a failed execution to inspect its completed steps and checkpoint.

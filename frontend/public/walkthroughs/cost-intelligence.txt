@@ -1,0 +1,8 @@
+Cost intelligence
+Illustrative synthetic data. Recorded from the Fluxera React interface.
+
+Start with the cost exposure associated with failed work.
+
+Separate observed cost from retry waste and estimated avoidable cost.
+
+Inspect individual execution costs. Estimates are not realized savings.

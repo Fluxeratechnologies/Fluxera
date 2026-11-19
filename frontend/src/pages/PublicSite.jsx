@@ -5,6 +5,7 @@ import { FluxeraMark } from "../components/FluxeraMark";
 import { PlatformLogo } from "../components/PlatformLogo";
 import { ScrollReveal } from "../components/design-system";
 import { CloudShader } from "../components/ui/cloud-shader";
+import { TourVideo } from "../components/TourVideo";
 import { apiPost } from "../api";
 import {
   continuitySteps,
@@ -94,16 +95,7 @@ function IntegrationStrip() {
 
 function TourPreview({ tour, featured = false }) {
   return <article className={`tour-preview ${featured ? "is-featured" : ""}`}>
-    <div className="tour-window" aria-label={`${tour.title} synthetic product preview`}>
-      <div className="tour-window-bar"><span/><span/><span/><small>Illustrative synthetic data</small></div>
-      <div className="tour-window-body">
-        <div className="tour-side"><i/><i/><i/><i/></div>
-        <div className="tour-data">
-          <div className="tour-data-heading"><span>{tour.eyebrow}</span><b>Live</b></div>
-          {tour.metrics.map((metric, index) => <div className="tour-data-row" key={metric}><i className={index === 1 ? "is-alert" : ""}/><span>{metric}</span><em>{index === 0 ? "Now" : `${index + 2}m`}</em></div>)}
-        </div>
-      </div>
-    </div>
+    <TourVideo tour={tour}/>
     <div className="tour-copy"><span>{tour.number}</span><h3>{tour.title}</h3><p>{tour.copy}</p><Link to={`/tours#${tour.slug}`}>Explore walkthrough <span aria-hidden="true">↗</span></Link></div>
   </article>;
 }
@@ -151,7 +143,7 @@ export function ProductPage() {
 
 export function ToursPage() {
   return <PublicLayout page="tours">
-    <PageHero kicker="Product walkthroughs" title="Follow the recovery loop from the first signal to proof." copy="These interactive previews use illustrative synthetic data. Redesigned, captioned product recordings will replace the staged media shells as they are completed."/>
+    <PageHero kicker="Product walkthroughs" title="Follow the recovery loop from the first signal to proof." copy="Explore four captioned recordings of the Fluxera console. All examples use illustrative synthetic data; they explain the interface rather than demonstrate production uptime or verified customer outcomes."/>
     <ScrollReveal as="section" className="tour-page-list">{tours.map((tour) => <article id={tour.slug} key={tour.slug}><div className="tour-page-copy"><span>{tour.number}</span><p>{tour.eyebrow}</p><h2>{tour.title}</h2><p>{tour.copy}</p><div>{tour.metrics.map((metric) => <small key={metric}>{metric}</small>)}</div></div><div><TourPreview tour={tour} featured/><details><summary>Read walkthrough transcript</summary><p>{tour.transcript}</p></details></div></article>)}</ScrollReveal>
     <PartnerPanel compact/>
   </PublicLayout>;

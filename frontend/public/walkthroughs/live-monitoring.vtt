@@ -1,0 +1,13 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:05.000
+Start with service health, queue backlog, and pending approvals.
+
+2
+00:00:05.482 --> 00:00:10.482
+Inspect the execution stream across connected work.
+
+3
+00:00:11.486 --> 00:00:16.486
+Open a failed execution to inspect its completed steps and checkpoint.

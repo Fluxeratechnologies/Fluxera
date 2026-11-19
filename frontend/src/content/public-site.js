@@ -23,8 +23,8 @@ export const tours = [
     title: "Live monitoring",
     eyebrow: "The operating picture",
     copy: "See executions, failures, queue pressure, worker health, and stalled work without opening five different systems.",
-    transcript: "A synthetic workflow fails, appears in the live execution stream, and becomes an approval candidate.",
-    metrics: ["1 active failure", "3 queued jobs", "Worker healthy"],
+    transcript: "Start with service health, queue backlog, and pending approvals. Inspect the execution stream, then open a failed execution to review its steps and checkpoint. All data in this recording is illustrative and synthetic.",
+    metrics: ["Failure visibility", "Queue backlog", "Worker health"],
   },
   {
     slug: "approved-recovery",
@@ -32,7 +32,7 @@ export const tours = [
     title: "Human-approved recovery",
     eyebrow: "The consequential decision",
     copy: "Review checkpoint evidence, approve or reject the proposed action, and keep the decision in an immutable audit trail.",
-    transcript: "An approver reviews a checkpoint-aware resume action before a signed webhook is dispatched.",
+    transcript: "Review a pending resume request and its configured destination. An authorized person approves, and the interface confirms that dispatch is queued. Inspect the audit record. This synthetic recording does not perform a webhook dispatch or demonstrate verified recovery.",
     metrics: ["Approval required", "Resume from checkpoint", "Signed dispatch"],
   },
   {
@@ -41,7 +41,7 @@ export const tours = [
     title: "Cost intelligence",
     eyebrow: "The cost of interrupted work",
     copy: "Separate observed spend, retry waste, and estimated avoidable cost without suppressing or rerouting customer work.",
-    transcript: "The cost view distinguishes actual recorded cost from a clearly labeled estimate.",
+    transcript: "Start with failed-work cost exposure. Compare observed cost, retry waste, and estimated avoidable cost, then inspect individual execution costs. These illustrative values are not customer savings.",
     metrics: ["Observed cost", "Retry waste", "Estimated avoidable"],
   },
   {
@@ -50,7 +50,7 @@ export const tours = [
     title: "Five-layer integrations",
     eyebrow: "One continuity record",
     copy: "Connect agent, API, workflow, tool, and memory operations through the same event and recovery model.",
-    transcript: "Five instrumented software layers converge on one durable execution record.",
+    transcript: "Inspect configured recovery receivers and idempotency support. Browse the execution stream across the five integration layers, then inspect a failed workflow's steps. This recording uses synthetic connection and execution data.",
     metrics: ["Agents", "APIs + workflows", "Tools + memory"],
   },
 ];

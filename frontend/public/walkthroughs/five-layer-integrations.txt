@@ -1,0 +1,8 @@
+Five-layer integrations
+Illustrative synthetic data. Recorded from the Fluxera React interface.
+
+Connect recovery receivers with explicit idempotency-key support.
+
+Agents, APIs, workflows, tools, and memory feed the same execution system.
+
+Use execution lineage and checkpoints to understand what failed.
