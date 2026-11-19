@@ -5,7 +5,6 @@ frontend/.env
 .DS_Store
 dist/
 coverage/
-tests/
 .agents/skills/
 skills-lock.json
 
