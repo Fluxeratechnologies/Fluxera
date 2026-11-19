@@ -18,3 +18,8 @@ output/
 tmp/
 brag-output/
 Fluxera/
+
+# Legacy local palette showcases
+palette-*.html
+frontend/palette-*.html
+Futuristic Fluxera Neon Emblem.png
