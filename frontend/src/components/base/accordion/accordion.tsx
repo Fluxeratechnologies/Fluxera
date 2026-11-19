@@ -10,7 +10,7 @@ import {
   Heading as AriaHeading,
 } from "react-aria-components";
 import type { DisclosureGroupProps as AriaDisclosureGroupProps, DisclosureProps as AriaDisclosureProps } from "react-aria-components";
-import { RiAddLine, RiArrowDownSLine } from "@remixicon/react";
+import { Plus as RiAddLine, ChevronDown as RiArrowDownSLine } from "lucide-react";
 import { cx, sortCx } from "@/utils/cx";
 
 /**

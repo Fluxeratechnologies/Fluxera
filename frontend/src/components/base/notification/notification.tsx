@@ -17,11 +17,11 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import {
-  RiCheckboxCircleFill,
-  RiErrorWarningFill,
-  RiInformationFill,
-  RiNotification3Fill,
-} from "@remixicon/react";
+  CircleCheck as RiCheckboxCircleFill,
+  CircleAlert as RiErrorWarningFill,
+  Info as RiInformationFill,
+  Bell as RiNotification3Fill,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Avatar, type AvatarProps } from "@/components/base/avatar/avatar";
 import { Button, type ButtonProps } from "@/components/base/buttons/button";

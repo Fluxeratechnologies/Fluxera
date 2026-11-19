@@ -1,20 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
+import { LayoutGrid, ShieldCheck, List, Coins, Settings, ArrowRight, X, Check, TriangleAlert, PlugZap } from "lucide-react";
 
-const ICONS = {
-  grid: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
-  shield: "M12 3 4.5 6v5.3c0 4.5 3 7.7 7.5 9.7 4.5-2 7.5-5.2 7.5-9.7V6L12 3Z M8.5 12l2.1 2.1 4.9-5",
-  stream: "M4 7h16M4 12h16M4 17h16",
-  coins: "M5 8.5c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5S15.9 6 12 6 5 7.1 5 8.5Z M5 8.5v7c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-7",
-  settings: "M12 15.2A3.2 3.2 0 1 0 12 8.8a3.2 3.2 0 0 0 0 6.4Z M19.4 13.2a7.6 7.6 0 0 0 .1-1.2 7.6 7.6 0 0 0-.1-1.2l2-1.5-2-3.4-2.4 1a8.3 8.3 0 0 0-2-1.2L14.6 3h-5.2L9 5.7a8.3 8.3 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.5A7.6 7.6 0 0 0 4.5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.4-1a8.3 8.3 0 0 0 2 1.2l.4 2.7h5.2l.4-2.7a8.3 8.3 0 0 0 2-1.2l2.4 1 2-3.4-2-1.5Z",
-  arrow: "M5 12h13M13 7l5 5-5 5",
-  close: "m7 7 10 10M17 7 7 17",
-  check: "m5 12 4.2 4.2L19 6.5",
-  alert: "M12 4 3.8 19h16.4L12 4Zm0 5v4m0 3h.01",
-  plug: "M8 7v4m4-4v4m4-4v4M6 11h12v2a6 6 0 0 1-12 0v-2Zm6 8v-3",
-};
+const ICONS = { grid: LayoutGrid, shield: ShieldCheck, stream: List, coins: Coins, settings: Settings, arrow: ArrowRight, close: X, check: Check, alert: TriangleAlert, plug: PlugZap };
 
 export function Icon({ name, size = 18, label }) {
-  return <svg className="fx-icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden={label ? undefined : true} role={label ? "img" : undefined}><path d={ICONS[name] || ICONS.grid} />{label && <title>{label}</title>}</svg>;
+  const Symbol = ICONS[name] || LayoutGrid;
+  return <Symbol className="fx-icon" size={size} strokeWidth={2.3} aria-hidden={label ? undefined : true} aria-label={label} role={label ? "img" : undefined}/>;
 }
 
 export function useReducedMotion() {

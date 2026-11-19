@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { FluxeraMark } from './FluxeraMark';
 import { PlatformLogo } from './PlatformLogo';
 import { useReducedMotion, Icon } from './design-system';
@@ -39,14 +40,14 @@ export function ContinuityMap() {
   return <MotionFrame className="continuity-map" label="continuity map">
     <div className="map-nodes">
       <div className="map-node map-input"><small>Your software</small><div className="map-logo-grid">{['Anthropic', 'GitHub', 'PostgreSQL', 'Stripe', 'Vercel', 'Zapier'].map(name => <span key={name}><PlatformLogo name={name}/></span>)}</div><p>Agents · APIs · Workflows<br/>Tools · Memory</p></div>
-      <span className="map-connector" aria-hidden="true"><span/>metadata →</span>
+      <span className="map-connector" aria-hidden="true"><span/>metadata <ArrowRight size={13}/></span>
       <div className="map-node map-core"><FluxeraMark size={28}/><b>Fluxera</b><small>Observe · analyze · queue</small></div>
-      <span className="map-connector" aria-hidden="true"><span/>review →</span>
+      <span className="map-connector" aria-hidden="true"><span/>review <ArrowRight size={13}/></span>
       <div className="map-node map-gate"><small>Human approval</small><b>Your decision.<br/>Your control.</b><span><Icon name="shield"/> Approved action</span><p>Signed dispatch<br/>Idempotent receiver</p></div>
-      <span className="map-connector" aria-hidden="true"><span/>evidence →</span>
+      <span className="map-connector" aria-hidden="true"><span/>evidence <ArrowRight size={13}/></span>
       <div className="map-node map-output"><Icon name="check" size={28}/><b>Verify the outcome</b><p>Linked SDK events<br/>Durable audit trail</p></div>
     </div>
-    <div className="map-return"><span>←</span> Live status, execution history, and cost evidence</div>
+    <div className="map-return"><ArrowLeft size={15}/> Live status, execution history, and cost evidence</div>
     <p className="map-note">Conceptual system flow · platform examples are not endorsements</p>
   </MotionFrame>;
 }
