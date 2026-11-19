@@ -1,0 +1,15 @@
+/* The document follows the browser; only inner content has a reading-width cap. */
+html, body, #root { min-width: 0; width: 100%; min-height: 100%; }
+.marketing-site, .app-shell, .staff-shell { width: 100%; min-width: 0; }
+.marketing-site main, .app-content, .staff-content { min-width: 0; }
+.command-grid > *, .metric-row > *, .integration-row > *, .recovery-row > * { min-width: 0; }
+.integration-row p, .record-title h2, .activity-row b { overflow-wrap: anywhere; }
+.table-scroll { max-width: 100%; overflow-x: auto; }
+.tour-video { display: block; width: 100%; aspect-ratio: 8 / 5; height: auto; object-fit: contain; background: var(--m-ink); border-radius: 12px; }
+.tour-video-label { color: var(--m-copy); font-size: 12px; margin-block: 10px; }
+@media (max-width: 720px) {
+  .page-heading, .record-title, .recovery-row, .integration-row { flex-wrap: wrap; gap: 16px; }
+  .page-heading h1 { overflow-wrap: anywhere; }
+  .row-actions, .integration-actions { flex-wrap: wrap; }
+  .app-mobile-nav { max-width: 100%; overflow-x: auto; }
+}

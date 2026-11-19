@@ -60,26 +60,54 @@ export function Globe({ className = "", markers = DEFAULT_MARKERS, speed = 0.002
     let globe = null;
     let frame = 0;
     let phi = 0.55;
+    let visible = true;
+    let unavailable = false;
+    let lastFrame = 0;
+    const animate = (time) => {
+      frame = 0;
+      if (!globe || !visible || document.hidden || unavailable) return;
+      const elapsed = lastFrame ? Math.min(time - lastFrame, 50) : 16;
+      if (!lastFrame || time - lastFrame >= 1000 / 30 || pointer.current) {
+        if (!paused.current) phi += speed * elapsed / (1000 / 60);
+        globe.update({ phi: phi + offset.current.phi + drag.current.phi, theta: 0.2 + offset.current.theta + drag.current.theta });
+        lastFrame = time;
+      }
+      frame = requestAnimationFrame(animate);
+    };
+    const resume = () => {
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
+      lastFrame = 0;
+      if (globe && visible && !document.hidden && !unavailable) frame = requestAnimationFrame(animate);
+    };
+    const loseContext = () => {
+      unavailable = true;
+      cancelAnimationFrame(frame);
+      canvas.classList.remove('is-ready');
+    };
+    canvas.addEventListener('webglcontextlost', loseContext);
+    document.addEventListener('visibilitychange', resume);
+    const visibility = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; resume(); });
+    visibility.observe(host);
     const dimensions = () => {
       const size = Math.max(1, Math.round(host.offsetWidth));
       return { width: size, height: size };
     };
     const init = () => {
-      if (globe || !host.offsetWidth) return;
-      globe = createGlobe(canvas, {
+      if (globe || unavailable || !host.offsetWidth) return;
+      try { globe = createGlobe(canvas, {
         ...dimensions(), devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
         phi, theta: 0.2, dark: 0, diffuse: 1.5, mapSamples: 16000,
         mapBrightness: 7, mapBaseBrightness: 0.04, baseColor: [1, 1, 1],
         markerColor: [0.85, 0.33, 0.12], glowColor: [0.94, 0.93, 0.91],
         markerElevation: 0.015, markers: cobeMarkers,
-      });
+      }); } catch {
+        unavailable = true;
+        canvas.remove();
+        return; // Keep the SVG fallback usable when WebGL is unavailable.
+      }
       canvas.classList.add("is-ready");
-      const animate = () => {
-        if (!paused.current) phi += speed;
-        globe?.update({ phi: phi + offset.current.phi + drag.current.phi, theta: 0.2 + offset.current.theta + drag.current.theta });
-        frame = requestAnimationFrame(animate);
-      };
-      frame = requestAnimationFrame(animate);
+      resume();
     };
     const resize = new ResizeObserver(() => {
       if (!globe) init();
@@ -90,6 +118,9 @@ export function Globe({ className = "", markers = DEFAULT_MARKERS, speed = 0.002
     return () => {
       cancelAnimationFrame(frame);
       resize.disconnect();
+      visibility.disconnect();
+      document.removeEventListener('visibilitychange', resume);
+      canvas.removeEventListener('webglcontextlost', loseContext);
       globe?.destroy();
       canvas.removeEventListener("pointerdown", handlePointerDown);
       canvas.removeEventListener("pointermove", handlePointerMove);
