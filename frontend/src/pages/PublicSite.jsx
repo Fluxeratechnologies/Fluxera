@@ -6,6 +6,7 @@ import { PlatformLogo } from "../components/PlatformLogo";
 import { ScrollReveal } from "../components/design-system";
 import { CloudShader } from "../components/ui/cloud-shader";
 import { TourVideo } from "../components/TourVideo";
+import { HeroTiles, ContinuityMap, ProductStory } from "../components/MarketingScenes";
 import { apiPost } from "../api";
 import {
   continuitySteps,
@@ -56,8 +57,13 @@ function PublicLayout({ page, children }) {
   const location = useLocation();
   usePageMeta(page);
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
-  }, [location.pathname]);
+    const frame = requestAnimationFrame(() => {
+      const target = location.hash ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null;
+      if (target) target.scrollIntoView({ block: 'start', behavior: 'instant' });
+      else window.scrollTo({ top: 0, behavior: 'instant' });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [location.pathname, location.hash]);
   return <div className="marketing-site">
     <header className="marketing-header">
       <nav className="marketing-nav" aria-label="Primary navigation">
@@ -117,13 +123,14 @@ export function HomePage() {
   const [openFaq, setOpenFaq] = useState(null);
   return <PublicLayout page="home">
     <section className="marketing-hero">
+      <HeroTiles/>
       <div className="hero-message"><p className="marketing-kicker"><span/>Continuity for production AI</p><h1>Keep work moving<br/>when software fails.</h1><p>Fluxera observes the break, builds the evidence, and waits for an authorized person before dispatching a recovery action.</p><div className="hero-buttons"><Link className="button-dark" to="/app">Open workspace</Link><Link className="button-light" to="/request-access">Request access</Link></div><small>Live monitoring · recovery approvals · verified outcomes</small></div>
       <div className="hero-system"><div className="globe-shell"><Globe/></div></div>
     </section>
     <IntegrationStrip/>
-    <ScrollReveal as="section" className="marketing-section flow-section"><SectionHeading kicker="One durable trail" title="From signal to verified result." copy="Every step remains visible. Every consequential action stays with a person."/><div className="continuity-flow">{continuitySteps.map((step) => <article key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.copy}</p></article>)}</div></ScrollReveal>
+    <ScrollReveal as="section" className="marketing-section flow-section"><SectionHeading kicker="One durable trail" title="From signal to verified result." copy="Every step remains visible. Every consequential action stays with a person."/><ContinuityMap/></ScrollReveal>
     <ScrollReveal as="section" className="marketing-section layers-section"><SectionHeading kicker="Five integration layers" title="One continuity record for the systems that do the work."/><div className="layer-grid">{integrationLayers.map((layer) => <article key={layer.title}><div><PlatformLogo name={layer.platform}/><span>{layer.title}</span></div><p>{layer.copy}</p><small>{layer.platform} example</small></article>)}</div></ScrollReveal>
-    <ScrollReveal as="section" className="marketing-section tour-section"><SectionHeading kicker="See the operating model" title="Four product views. One accountable recovery loop." copy="All previews use deterministic synthetic data."/><div className="tour-grid">{tours.map((tour, index) => <TourPreview key={tour.slug} tour={tour} featured={index < 2}/>)}</div></ScrollReveal>
+    <section className="marketing-section tour-section"><SectionHeading kicker="See the operating model" title="Four product views. One accountable recovery loop." copy="Animated product scenes. Illustrative synthetic data."/>{tours.map(tour => <ScrollReveal key={tour.slug}><ProductStory tour={tour}/></ScrollReveal>)}</section>
     <ScrollReveal as="section" className="marketing-section resource-section"><SectionHeading kicker="Recover more than uptime" title="Protect engineering time, compute, capital, and customer work."/><div className="resource-ledger">{[["Engineering", "Spend less time reconstructing failure context."], ["Time", "Resume supported work from durable checkpoints."], ["Compute", "See repeated attempts and retry waste clearly."], ["Capital", "Separate observed cost from estimated avoidable cost."]].map(([title, copy]) => <article key={title}><h3>{title}</h3><p>{copy}</p></article>)}</div></ScrollReveal>
     <PartnerPanel compact/>
     <ScrollReveal as="section" className="marketing-section faq-section"><SectionHeading kicker="Questions" title="Built to stay accountable."/><div className="faq-list">{faqs.map(([question, answer], index) => <article key={question}><button type="button" aria-expanded={openFaq === index} onClick={() => setOpenFaq(openFaq === index ? null : index)}><span>{question}</span><b>{openFaq === index ? "−" : "+"}</b></button>{openFaq === index && <p>{answer}</p>}</article>)}</div></ScrollReveal>
