@@ -21,6 +21,9 @@
   overflow: clip;
 }
 
+.marketing-site .marketing-pointer-arrow { color: var(--m-orange); stroke: var(--m-paper); }
+.marketing-site :is(input, textarea, select, video, canvas, [contenteditable]) { cursor: auto; }
+
 .marketing-site a { text-decoration: none; }
 .marketing-site h1,
 .marketing-site h2,
