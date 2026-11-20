@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Globe } from "../components/Globe";
 import { FluxeraMark } from "../components/FluxeraMark";
+import { MarketingPointer } from "../components/MarketingPointer";
 import { PlatformLogo } from "../components/PlatformLogo";
 import { ScrollReveal } from "../components/design-system";
 import { CloudShader } from "../components/ui/cloud-shader";
@@ -67,6 +68,7 @@ function PublicLayout({ page, children }) {
     return () => cancelAnimationFrame(frame);
   }, [location.pathname, location.hash]);
   return <div className="marketing-site">
+    <MarketingPointer/>
     <header className="marketing-header">
       <nav className="marketing-nav" aria-label="Primary navigation">
         <Link className="wordmark" to="/"><FluxeraMark size={24}/>Fluxera</Link>
@@ -77,7 +79,7 @@ function PublicLayout({ page, children }) {
           <NavLink to="/vision">Vision</NavLink>
           <NavLink to="/company">Company</NavLink>
         </div>
-        <div className="marketing-actions"><Link className="nav-signin" to="/access">Sign in</Link><Link className="nav-try" to="/try">Try Fluxera</Link><Link className="nav-cta" to="/request-access">Request access</Link></div>
+        <div className="marketing-actions"><Link className="nav-signin" to="/access">Sign in</Link><Link className="nav-try" to="/try">Try playground</Link><Link className="nav-cta" to="/request-access">Request access</Link></div>
       </nav>
     </header>
     <main>{children}</main>
@@ -118,7 +120,7 @@ export function HomePage() {
   return <PublicLayout page="home">
     <section className="marketing-hero">
       <HeroTiles/>
-      <div className="hero-message"><p className="marketing-kicker"><span/>Continuity for production AI</p><h1>Keep work moving<br/>when software fails.</h1><p>Fluxera observes the break, builds the evidence, and waits for an authorized person before dispatching a recovery action.</p><div className="hero-buttons"><Link className="button-dark" to="/try">Try the full workflow</Link><Link className="button-light" to="/request-access">Request access</Link></div><small>Live monitoring · recovery approvals · verified outcomes</small></div>
+      <div className="hero-message"><p className="marketing-kicker"><span/>Continuity for production AI</p><h1>Keep work moving<br/>when software fails.</h1><p>Fluxera observes the break, builds the evidence, and waits for an authorized person before dispatching a recovery action.</p><div className="hero-buttons"><Link className="button-dark" to="/try">Try playground</Link><Link className="button-light" to="/request-access">Request access</Link></div><small>Live monitoring · recovery approvals · verified outcomes</small></div>
       <div className="hero-system"><div className="globe-shell"><Globe/></div></div>
     </section>
     <IntegrationStrip/>
@@ -156,39 +158,6 @@ export function ToursPage() {
   </PublicLayout>;
 }
 
-const trySteps = [
-  { key: "observe", title: "Observe", state: "Failure detected", copy: "A workflow stops after its indexing tool times out. Fluxera records metadata, lineage, cost, and the latest checkpoint.", artifact: ["workflow · document-index", "checkpoint · batch:067", "observed cost · $0.42"] },
-  { key: "analyze", title: "Analyze", state: "Resume recommended", copy: "The evidence shows completed work and an eligible cursor. Fluxera prepares a resume request without executing it.", artifact: ["failure · tool timeout", "completed · 67 / 100 batches", "action · resume from checkpoint"] },
-  { key: "approve", title: "Approve", state: "Human decision required", copy: "An admin or approver reviews the evidence and explicitly authorizes the external action.", artifact: ["role · approver", "decision · approved", "audit · immutable record"] },
-  { key: "dispatch", title: "Dispatch", state: "Signed delivery queued", copy: "The worker sends one signed, idempotent request to the configured recovery receiver.", artifact: ["signature · HMAC-SHA256", "idempotency · recovery_01", "delivery · accepted"] },
-  { key: "verify", title: "Verify", state: "Linked event received", copy: "Fluxera waits for a linked SDK event before calling the recovery successful. HTTP delivery alone is never enough.", artifact: ["execution · recovery child", "outcome · success", "status · verified"] },
-];
-
-export function TryPage() {
-  const [step, setStep] = useState(0);
-  const current = trySteps[step];
-  const completed = step === trySteps.length - 1;
-  useEffect(() => { trackEvent("try_opened", { content_type: "guided_tour" }); trackEvent("tutorial_begin", { method: "public_try" }); }, []);
-  const select = (index) => { setStep(index); trackEvent("tour_step_viewed", { step_name: trySteps[index].key }); };
-  const next = () => {
-    if (completed) { trackEvent("tutorial_complete", { method: "public_try" }); return; }
-    select(step + 1);
-  };
-  return <PublicLayout page="try">
-    <section className="try-page">
-      <header><p className="marketing-kicker"><span/>Illustrative synthetic data</p><h1>Try the complete recovery loop.</h1><p>Walk through Fluxera as an operator. Nothing here connects to a customer system or sends an external webhook.</p></header>
-      <div className="try-workspace">
-        <nav aria-label="Guided tour steps">{trySteps.map((item, index) => <button key={item.key} type="button" className={index === step ? "is-active" : index < step ? "is-complete" : ""} aria-current={index === step ? "step" : undefined} onClick={() => select(index)}><span>0{index + 1}</span>{item.title}</button>)}</nav>
-        <article className="try-artifact" aria-live="polite">
-          <div className="try-artifact-bar"><span>Fluxera continuity workspace</span><b>{current.state}</b></div>
-          <div className="try-artifact-body"><p>0{step + 1} · {current.title}</p><h2>{current.state}</h2><p>{current.copy}</p><dl>{current.artifact.map((line) => { const [label, value] = line.split(" · "); return <div key={line}><dt>{label}</dt><dd>{value}</dd></div>; })}</dl></div>
-          <footer><span>Simulation only · no external action</span>{completed ? <Link className="button-dark" to="/request-access" onClick={() => trackEvent("tutorial_complete", { method: "public_try" })}>Request workspace access</Link> : <button className="button-dark" type="button" onClick={next}>Continue to {trySteps[step + 1].title}</button>}</footer>
-        </article>
-      </div>
-      <section className="try-next"><div><p>Ready for your own execution data?</p><h2>Approved teams receive a real, isolated trial workspace.</h2></div><Link className="button-light" to="/request-access">Request access <ArrowRight size={16}/></Link></section>
-    </section>
-  </PublicLayout>;
-}
 
 export function VisionPage() {
   return <PublicLayout page="vision">
@@ -237,7 +206,7 @@ export function ApplicationForm({ onSuccess, variant = "full" }) {
     setState({ status: "sending", message: "Saving your application…" });
     const response = await apiPost("/api/applications", null, form);
     const payload = await response.json();
-    if (response.ok) { trackEvent("generate_lead", { lead_source: window.location.pathname === "/try" ? "guided_try" : "public_site" }); setState({ status: "done", message: "Application received." }); onSuccess?.(); }
+    if (response.ok) { trackEvent("generate_lead", { lead_source: new URLSearchParams(window.location.search).get("source") === "playground" ? "playground" : "public_site" }); setState({ status: "done", message: "Application received." }); onSuccess?.(); }
     else setState({ status: "error", message: payload.error || "We couldn’t save your application. Try again." });
   };
   return <form className={`application-form is-${variant}`} onSubmit={submit} aria-busy={state.status === "sending"}>
