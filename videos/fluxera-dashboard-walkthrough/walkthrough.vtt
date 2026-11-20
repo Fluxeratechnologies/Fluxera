@@ -1,0 +1,97 @@
+WEBVTT
+
+1
+00:00:00.150 --> 00:00:04.905
+When production work fails, the important question is what happened next.
+
+2
+00:00:04.905 --> 00:00:08.363
+Fluxera makes that answer visible, accountable, and verifiable.
+
+3
+00:00:08.813 --> 00:00:18.221
+The command center brings service health, pending human decisions, queue pressure, cost exposure, and the live execution stream into one operational view.
+
+4
+00:00:18.671 --> 00:00:25.541
+Agent runs, API calls, workflows, tools, and memory operations share one metadata-only event model.
+
+5
+00:00:25.541 --> 00:00:30.447
+Each row keeps status, duration, and direct cost in context.
+
+6
+00:00:30.897 --> 00:00:33.919
+Open an execution to see its step trail.
+
+7
+00:00:33.919 --> 00:00:36.940
+Here, document indexing failed after a saved checkpoint.
+
+8
+00:00:36.940 --> 00:00:41.095
+The cursor tells an approver where a supported resume can begin.
+
+9
+00:00:41.545 --> 00:00:47.760
+Fluxera creates a recovery request, but it does not act on a customer system by itself.
+
+10
+00:00:47.760 --> 00:00:50.867
+An authorized approver reviews the evidence and decides.
+
+11
+00:00:51.317 --> 00:00:53.940
+Approval is recorded before any external action.
+
+12
+00:00:53.940 --> 00:00:59.936
+The request then enters a durable dispatch queue, so a worker restart does not erase it.
+
+13
+00:01:00.386 --> 00:01:07.749
+The worker sends a signed webhook to the configured recovery receiver, with a recovery identifier and idempotency key.
+
+14
+00:01:07.749 --> 00:01:09.794
+Delivery is only a handoff.
+
+15
+00:01:10.244 --> 00:01:16.426
+Fluxera marks recovery verified only after a linked SDK execution reports the outcome.
+
+16
+00:01:16.426 --> 00:01:21.657
+A successful webhook response alone never proves that the work resumed.
+
+17
+00:01:22.107 --> 00:01:29.568
+The audit view preserves the request, human decision, dispatch state, and final verification as separate events.
+
+18
+00:01:29.568 --> 00:01:31.899
+The story remains inspectable later.
+
+19
+00:01:32.349 --> 00:01:38.365
+Cost intelligence separates observed spend and retry waste from estimated avoidable cost.
+
+20
+00:01:38.365 --> 00:01:44.381
+In this pilot, these are recommendations, never automatic suppression of customer work.
+
+21
+00:01:44.831 --> 00:01:48.927
+Integrations connect approved actions to customer-controlled recovery endpoints.
+
+22
+00:01:48.927 --> 00:01:55.583
+Each receiver must declare support for idempotency keys before it can be activated.
+
+23
+00:01:56.033 --> 00:02:02.444
+That is Fluxera: a live continuity workspace where people stay in control and results are verified.
+
+24
+00:02:02.444 --> 00:02:05.249
+Explore the pilot at getfluxera dot com.
