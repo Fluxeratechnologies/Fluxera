@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1920,height=1080"><title>Fluxera — Dashboard walkthrough</title>
+<script src="assets/gsap.min.js"></script>
+<style>
+*{box-sizing:border-box}html,body{width:1920px;height:1080px;margin:0;background:#111;color:#f3eee3;overflow:hidden;font-family:Inter,Arial,Helvetica,sans-serif}
+#root{position:relative;width:100%;height:100%;overflow:hidden;background:radial-gradient(circle at 50% 35%,#252421 0,#111 69%)}
+.clip{position:absolute}.shot{inset:0;overflow:hidden}.screen-wrap{position:absolute;left:132px;top:74px;width:1656px;height:932px;border:1px solid #494744;border-radius:20px;overflow:hidden;transform-origin:50% 50%;box-shadow:0 36px 90px #0009;background:#f3eee3}.screen-wrap img{display:block;width:100%;height:100%;object-fit:cover}
+#shot-4 .screen-wrap{transform-origin:50% 25%}
+.chapter{position:absolute;left:178px;top:108px;display:flex;align-items:center;gap:18px;padding:15px 22px;border-radius:12px;background:#111;color:#fff;font-size:31px;line-height:1.2;letter-spacing:-.035em;font-weight:650;box-shadow:0 10px 25px #0008}.chapter-number{font:600 28px/1.2 monospace;letter-spacing:.04em;color:#ffad86}.chapter-bar{width:37px;height:2px;background:#d9541e}
+.caption{left:255px;right:255px;bottom:127px;display:flex;justify-content:center;text-align:center;z-index:9;pointer-events:none}.caption span{display:inline-block;max-width:1430px;padding:20px 30px 22px;border-radius:14px;color:#fff;font-size:36px;line-height:1.26;font-weight:560;letter-spacing:-.02em;background:#111e;box-shadow:0 16px 45px #0007;text-shadow:0 2px 5px #0005}
+.synthetic{position:absolute;left:178px;bottom:10px;color:#d8d1c6;font:600 28px/1.2 monospace;letter-spacing:.03em;z-index:10}.brand-rail{position:absolute;right:179px;bottom:15px;color:#d9541e;font-size:28px;font-weight:720;letter-spacing:-.035em;z-index:10}
+.end-card{inset:0;background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.end-mark svg{width:115px;height:115px}.end-name{font-size:122px;line-height:1.05;font-weight:730;letter-spacing:-.07em;margin-top:30px}.end-period{color:#d9541e}.end-line{font-size:27px;color:#d7d1c7;letter-spacing:-.01em;margin-top:17px}.end-url{font:600 32px/1.2 monospace;color:#e36b39;margin-top:80px;letter-spacing:.025em}
+.demo-cursor{left:0;top:0;width:42px;height:48px;z-index:15;pointer-events:none;filter:drop-shadow(0 3px 5px #0008)}.demo-cursor svg{width:36px;height:44px}.demo-cursor i{display:block;position:absolute;left:-13px;top:-13px;width:70px;height:70px;border:3px solid #d9541e;border-radius:50%;opacity:0}
+.power-line{inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}.power-line i{width:1540px;height:3px;background:#f3eee3;box-shadow:0 0 14px 7px #f3eee3a0,0 0 55px 20px #d9541e88;display:block}
+</style></head><body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="128.883" data-width="1920" data-height="1080">
+<section id="shot-0" class="clip shot" data-start="0.000" data-duration="9.043" data-track-index="0" aria-label="A control plane for work continuity">
+    <div class="screen-wrap"><img src="capture/01-command-center.png" alt="Illustrative synthetic Fluxera dashboard: A control plane for work continuity"></div>
+    <div class="chapter"><span class="chapter-number">01 / 12</span><span class="chapter-bar"></span><span>A control plane for work continuity</span></div>
+  </section>
+<div id="caption-0-0" class="clip caption" data-start="0.150" data-duration="4.755" data-track-index="2" data-layout-allow-caption-zone="true"><span>When production work fails, the important question is what happened next.</span></div>
+<div id="caption-0-1" class="clip caption" data-start="4.905" data-duration="3.458" data-track-index="2" data-layout-allow-caption-zone="true"><span>Fluxera makes that answer visible, accountable, and verifiable.</span></div>
+<section id="shot-1" class="clip shot" data-start="8.663" data-duration="10.238" data-track-index="0" aria-label="Command center">
+    <div class="screen-wrap"><img src="capture/01-command-center.png" alt="Illustrative synthetic Fluxera dashboard: Command center"></div>
+    <div class="chapter"><span class="chapter-number">02 / 12</span><span class="chapter-bar"></span><span>Command center</span></div>
+  </section>
+<div id="caption-1-0" class="clip caption" data-start="8.813" data-duration="9.408" data-track-index="2" data-layout-allow-caption-zone="true"><span>The command center brings service health, pending human decisions, queue pressure, cost exposure, and the live execution stream into one operational view.</span></div>
+<section id="shot-2" class="clip shot" data-start="18.521" data-duration="12.606" data-track-index="0" aria-label="Five layers, one execution stream">
+    <div class="screen-wrap"><img src="capture/02-executions.png" alt="Illustrative synthetic Fluxera dashboard: Five layers, one execution stream"></div>
+    <div class="chapter"><span class="chapter-number">03 / 12</span><span class="chapter-bar"></span><span>Five layers, one execution stream</span></div>
+  </section>
+<div id="caption-2-0" class="clip caption" data-start="18.671" data-duration="6.870" data-track-index="2" data-layout-allow-caption-zone="true"><span>Agent runs, API calls, workflows, tools, and memory operations share one metadata-only event model.</span></div>
+<div id="caption-2-1" class="clip caption" data-start="25.541" data-duration="4.906" data-track-index="2" data-layout-allow-caption-zone="true"><span>Each row keeps status, duration, and direct cost in context.</span></div>
+<section id="shot-3" class="clip shot" data-start="30.747" data-duration="11.027" data-track-index="0" aria-label="Find the checkpoint">
+    <div class="screen-wrap"><img src="capture/03-execution-detail.png" alt="Illustrative synthetic Fluxera dashboard: Find the checkpoint"></div>
+    <div class="chapter"><span class="chapter-number">04 / 12</span><span class="chapter-bar"></span><span>Find the checkpoint</span></div>
+  </section>
+<div id="caption-3-0" class="clip caption" data-start="30.897" data-duration="3.022" data-track-index="2" data-layout-allow-caption-zone="true"><span>Open an execution to see its step trail.</span></div>
+<div id="caption-3-1" class="clip caption" data-start="33.919" data-duration="3.021" data-track-index="2" data-layout-allow-caption-zone="true"><span>Here, document indexing failed after a saved checkpoint.</span></div>
+<div id="caption-3-2" class="clip caption" data-start="36.940" data-duration="4.155" data-track-index="2" data-layout-allow-caption-zone="true"><span>The cursor tells an approver where a supported resume can begin.</span></div>
+<section id="shot-4" class="clip shot" data-start="41.395" data-duration="10.153" data-track-index="0" aria-label="A person decides">
+    <div class="screen-wrap" data-layout-allow-overflow="true"><img src="capture/04-approval-inbox.png" alt="Illustrative synthetic Fluxera dashboard: A person decides"></div>
+    <div class="chapter"><span class="chapter-number">05 / 12</span><span class="chapter-bar"></span><span>A person decides</span></div>
+  </section>
+<div id="approval-cursor" class="clip demo-cursor" data-start="43.395" data-duration="5.800" data-track-index="4" aria-hidden="true"><svg viewBox="0 0 36 44"><path d="M4 3v32l9-9 7 15 7-4-7-15h13Z" fill="#D9541E" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/></svg><i></i></div>
+<div id="caption-4-0" class="clip caption" data-start="41.545" data-duration="6.215" data-track-index="2" data-layout-allow-caption-zone="true"><span>Fluxera creates a recovery request, but it does not act on a customer system by itself.</span></div>
+<div id="caption-4-1" class="clip caption" data-start="47.760" data-duration="3.107" data-track-index="2" data-layout-allow-caption-zone="true"><span>An authorized approver reviews the evidence and decides.</span></div>
+<section id="shot-5" class="clip shot" data-start="51.167" data-duration="9.449" data-track-index="0" aria-label="Decision recorded">
+    <div class="screen-wrap"><img src="capture/05-approved.png" alt="Illustrative synthetic Fluxera dashboard: Decision recorded"></div>
+    <div class="chapter"><span class="chapter-number">06 / 12</span><span class="chapter-bar"></span><span>Decision recorded</span></div>
+  </section>
+<div id="caption-5-0" class="clip caption" data-start="51.317" data-duration="2.623" data-track-index="2" data-layout-allow-caption-zone="true"><span>Approval is recorded before any external action.</span></div>
+<div id="caption-5-1" class="clip caption" data-start="53.940" data-duration="5.996" data-track-index="2" data-layout-allow-caption-zone="true"><span>The request then enters a durable dispatch queue, so a worker restart does not erase it.</span></div>
+<section id="shot-6" class="clip shot" data-start="60.236" data-duration="10.238" data-track-index="0" aria-label="Signed, idempotent dispatch">
+    <div class="screen-wrap"><img src="capture/06-recovery-dispatched.png" alt="Illustrative synthetic Fluxera dashboard: Signed, idempotent dispatch"></div>
+    <div class="chapter"><span class="chapter-number">07 / 12</span><span class="chapter-bar"></span><span>Signed, idempotent dispatch</span></div>
+  </section>
+<div id="caption-6-0" class="clip caption" data-start="60.386" data-duration="7.363" data-track-index="2" data-layout-allow-caption-zone="true"><span>The worker sends a signed webhook to the configured recovery receiver, with a recovery identifier and idempotency key.</span></div>
+<div id="caption-6-1" class="clip caption" data-start="67.749" data-duration="2.045" data-track-index="2" data-layout-allow-caption-zone="true"><span>Delivery is only a handoff.</span></div>
+<section id="shot-7" class="clip shot" data-start="70.094" data-duration="12.243" data-track-index="0" aria-label="Verification needs evidence">
+    <div class="screen-wrap"><img src="capture/07-verified.png" alt="Illustrative synthetic Fluxera dashboard: Verification needs evidence"></div>
+    <div class="chapter"><span class="chapter-number">08 / 12</span><span class="chapter-bar"></span><span>Verification needs evidence</span></div>
+  </section>
+<div id="caption-7-0" class="clip caption" data-start="70.244" data-duration="6.182" data-track-index="2" data-layout-allow-caption-zone="true"><span>Fluxera marks recovery verified only after a linked SDK execution reports the outcome.</span></div>
+<div id="caption-7-1" class="clip caption" data-start="76.426" data-duration="5.231" data-track-index="2" data-layout-allow-caption-zone="true"><span>A successful webhook response alone never proves that the work resumed.</span></div>
+<section id="shot-8" class="clip shot" data-start="81.957" data-duration="10.622" data-track-index="0" aria-label="An auditable trail">
+    <div class="screen-wrap"><img src="capture/08-audit.png" alt="Illustrative synthetic Fluxera dashboard: An auditable trail"></div>
+    <div class="chapter"><span class="chapter-number">09 / 12</span><span class="chapter-bar"></span><span>An auditable trail</span></div>
+  </section>
+<div id="caption-8-0" class="clip caption" data-start="82.107" data-duration="7.461" data-track-index="2" data-layout-allow-caption-zone="true"><span>The audit view preserves the request, human decision, dispatch state, and final verification as separate events.</span></div>
+<div id="caption-8-1" class="clip caption" data-start="89.568" data-duration="2.331" data-track-index="2" data-layout-allow-caption-zone="true"><span>The story remains inspectable later.</span></div>
+<section id="shot-9" class="clip shot" data-start="92.199" data-duration="12.862" data-track-index="0" aria-label="Cost intelligence">
+    <div class="screen-wrap"><img src="capture/09-cost.png" alt="Illustrative synthetic Fluxera dashboard: Cost intelligence"></div>
+    <div class="chapter"><span class="chapter-number">10 / 12</span><span class="chapter-bar"></span><span>Cost intelligence</span></div>
+  </section>
+<div id="caption-9-0" class="clip caption" data-start="92.349" data-duration="6.016" data-track-index="2" data-layout-allow-caption-zone="true"><span>Cost intelligence separates observed spend and retry waste from estimated avoidable cost.</span></div>
+<div id="caption-9-1" class="clip caption" data-start="98.365" data-duration="6.016" data-track-index="2" data-layout-allow-caption-zone="true"><span>In this pilot, these are recommendations, never automatic suppression of customer work.</span></div>
+<section id="shot-10" class="clip shot" data-start="104.681" data-duration="11.582" data-track-index="0" aria-label="Your recovery receiver">
+    <div class="screen-wrap"><img src="capture/10-integrations.png" alt="Illustrative synthetic Fluxera dashboard: Your recovery receiver"></div>
+    <div class="chapter"><span class="chapter-number">11 / 12</span><span class="chapter-bar"></span><span>Your recovery receiver</span></div>
+  </section>
+<div id="caption-10-0" class="clip caption" data-start="104.831" data-duration="4.096" data-track-index="2" data-layout-allow-caption-zone="true"><span>Integrations connect approved actions to customer-controlled recovery endpoints.</span></div>
+<div id="caption-10-1" class="clip caption" data-start="108.927" data-duration="6.656" data-track-index="2" data-layout-allow-caption-zone="true"><span>Each receiver must declare support for idempotency keys before it can be activated.</span></div>
+<section id="shot-11" class="clip shot" data-start="115.883" data-duration="4.900" data-track-index="0" aria-label="Observe. Approve. Recover. Verify.">
+    <div class="screen-wrap"><img src="capture/11-final-command.png" alt="Illustrative synthetic Fluxera dashboard: Observe. Approve. Recover. Verify."></div>
+    <div class="chapter"><span class="chapter-number">12 / 12</span><span class="chapter-bar"></span><span>Observe. Approve. Recover. Verify.</span></div>
+  </section>
+<div id="caption-11-0" class="clip caption" data-start="116.033" data-duration="6.411" data-track-index="2" data-layout-allow-caption-zone="true"><span>That is Fluxera: a live continuity workspace where people stay in control and results are verified.</span></div>
+<div id="caption-11-1" class="clip caption" data-start="122.444" data-duration="2.805" data-track-index="2" data-layout-allow-caption-zone="true"><span>Explore the pilot at getfluxera dot com.</span></div>
+<section id="end-card" class="clip end-card" data-start="120.783" data-duration="8.100" data-track-index="1">
+      <div class="end-mark"><svg viewBox="0 0 36 36" role="img" aria-label="Fluxera mark"><rect x="1" y="1" width="34" height="34" rx="7" fill="#E7DFD1"/><path d="M8 7h19v6H14v5h9v6h-9v5H8Z" fill="#111111"/><rect x="23" y="18" width="6" height="6" fill="#D9541E"/></svg></div>
+      <div class="end-name">Fluxera<span class="end-period">.</span></div>
+      <div class="end-line">Observe. Approve. Recover. Verify.</div>
+      <div class="end-url">getfluxera.com</div>
+    </section>
+<div id="power-line" class="clip power-line" data-start="120.133" data-duration="1.1" data-track-index="4" aria-hidden="true"><i></i></div>
+<div class="synthetic">ILLUSTRATIVE SYNTHETIC DATA · NO CUSTOMER SYSTEMS</div><div class="brand-rail">F<span style="color:#f3eee3">LUXERA</span></div>
+<audio id="voice-0" src="audio/opening.wav" data-start="0.000" data-duration="8.213" data-track-index="3" data-volume="1"></audio>
+<audio id="voice-1" src="audio/command.wav" data-start="8.663" data-duration="9.408" data-track-index="3" data-volume="1"></audio>
+<audio id="voice-2" src="audio/executions.wav" data-start="18.521" data-duration="11.776" data-track-index="3" data-volume="1"></audio>
+<audio id="voice-3" src="audio/trace.wav" data-start="30.747" data-duration="10.197" data-track-index="3" data-volume="1"></audio>
+<audio id="voice-4" src="audio/approval.wav" data-start="41.395" data-duration="9.323" data-track-index="3" data-volume="1"></audio>
+<audio id="voice-5" src="audio/approved.wav" data-start="51.167" data-duration="8.619" data-track-index="3" data-volume="1"></audio>
+<audio id="voice-6" src="audio/dispatch.wav" data-start="60.236" data-duration="9.408" data-track-index="3" data-volume="1"></audio>
+<audio id="voice-7" src="audio/verification.wav" data-start="70.094" data-duration="11.413" data-track-index="3" data-volume="1"></audio>
+<audio id="voice-8" src="audio/audit.wav" data-start="81.957" data-duration="9.792" data-track-index="3" data-volume="1"></audio>
+<audio id="voice-9" src="audio/cost.wav" data-start="92.199" data-duration="12.032" data-track-index="3" data-volume="1"></audio>
+<audio id="voice-10" src="audio/integrations.wav" data-start="104.681" data-duration="10.752" data-track-index="3" data-volume="1"></audio>
+<audio id="voice-11" src="audio/closing.wav" data-start="115.883" data-duration="9.216" data-track-index="3" data-volume="1"></audio>
+</div><script>
+const tl=gsap.timeline({paused:true});
+tl.fromTo('#caption-0-0', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 0.150);
+tl.fromTo('#caption-0-1', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 4.905);
+tl.fromTo('#shot-0', {opacity:0}, {opacity:1, duration:.34, ease:'power2.out'}, 0.000);
+tl.fromTo('#shot-0 .screen-wrap', {scale:1.015}, {scale:1, duration:9.043, ease:'none'}, 0.000);
+tl.fromTo('#caption-1-0', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 8.813);
+tl.fromTo('#shot-1', {opacity:0}, {opacity:1, duration:.34, ease:'power2.out'}, 8.663);
+tl.fromTo('#shot-1 .screen-wrap', {scale:1.015}, {scale:1, duration:10.238, ease:'none'}, 8.663);
+tl.fromTo('#caption-2-0', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 18.671);
+tl.fromTo('#caption-2-1', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 25.541);
+tl.fromTo('#shot-2', {opacity:0}, {opacity:1, duration:.34, ease:'power2.out'}, 18.521);
+tl.fromTo('#shot-2 .screen-wrap', {scale:1.015}, {scale:1, duration:12.606, ease:'none'}, 18.521);
+tl.fromTo('#caption-3-0', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 30.897);
+tl.fromTo('#caption-3-1', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 33.919);
+tl.fromTo('#caption-3-2', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 36.940);
+tl.fromTo('#shot-3', {opacity:0}, {opacity:1, duration:.34, ease:'power2.out'}, 30.747);
+tl.fromTo('#shot-3 .screen-wrap', {scale:1.015}, {scale:1, duration:11.027, ease:'none'}, 30.747);
+tl.fromTo('#approval-cursor', {x:1260,y:570,opacity:0}, {x:1260,y:570,opacity:1,duration:.18}, 43.395);
+tl.to('#approval-cursor', {x:1654,y:348,duration:1.18,ease:'power2.inOut'}, 43.695);
+tl.fromTo('#approval-cursor i', {scale:.2,opacity:.7}, {scale:2.2,opacity:0,duration:.55,ease:'power2.out'}, 45.025);
+tl.fromTo('#caption-4-0', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 41.545);
+tl.fromTo('#caption-4-1', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 47.760);
+tl.fromTo('#shot-4', {opacity:0}, {opacity:1, duration:.34, ease:'power2.out'}, 41.395);
+tl.fromTo('#shot-4 .screen-wrap', {scale:1}, {scale:1.12, duration:8.153, ease:'power1.inOut'}, 42.045);
+tl.fromTo('#caption-5-0', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 51.317);
+tl.fromTo('#caption-5-1', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 53.940);
+tl.fromTo('#shot-5', {opacity:0}, {opacity:1, duration:.34, ease:'power2.out'}, 51.167);
+tl.fromTo('#shot-5 .screen-wrap', {scale:1.015}, {scale:1, duration:9.449, ease:'none'}, 51.167);
+tl.fromTo('#caption-6-0', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 60.386);
+tl.fromTo('#caption-6-1', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 67.749);
+tl.fromTo('#shot-6', {opacity:0}, {opacity:1, duration:.34, ease:'power2.out'}, 60.236);
+tl.fromTo('#shot-6 .screen-wrap', {scale:1.015}, {scale:1, duration:10.238, ease:'none'}, 60.236);
+tl.fromTo('#caption-7-0', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 70.244);
+tl.fromTo('#caption-7-1', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 76.426);
+tl.fromTo('#shot-7', {opacity:0}, {opacity:1, duration:.34, ease:'power2.out'}, 70.094);
+tl.fromTo('#shot-7 .screen-wrap', {scale:1.015}, {scale:1, duration:12.243, ease:'none'}, 70.094);
+tl.fromTo('#caption-8-0', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 82.107);
+tl.fromTo('#caption-8-1', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 89.568);
+tl.fromTo('#shot-8', {opacity:0}, {opacity:1, duration:.34, ease:'power2.out'}, 81.957);
+tl.fromTo('#shot-8 .screen-wrap', {scale:1.015}, {scale:1, duration:10.622, ease:'none'}, 81.957);
+tl.fromTo('#caption-9-0', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 92.349);
+tl.fromTo('#caption-9-1', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 98.365);
+tl.fromTo('#shot-9', {opacity:0}, {opacity:1, duration:.34, ease:'power2.out'}, 92.199);
+tl.fromTo('#shot-9 .screen-wrap', {scale:1.015}, {scale:1, duration:12.862, ease:'none'}, 92.199);
+tl.fromTo('#caption-10-0', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 104.831);
+tl.fromTo('#caption-10-1', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 108.927);
+tl.fromTo('#shot-10', {opacity:0}, {opacity:1, duration:.34, ease:'power2.out'}, 104.681);
+tl.fromTo('#shot-10 .screen-wrap', {scale:1.015}, {scale:1, duration:11.582, ease:'none'}, 104.681);
+tl.fromTo('#caption-11-0', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 116.033);
+tl.fromTo('#caption-11-1', {opacity:0, y:18}, {opacity:1, y:0, duration:.28, ease:'power2.out'}, 122.444);
+tl.fromTo('#shot-11', {opacity:0}, {opacity:1, duration:.34, ease:'power2.out'}, 115.883);
+tl.fromTo('#shot-11 .screen-wrap', {scale:1.015}, {scale:1, duration:4.900, ease:'none'}, 115.883);
+tl.to('#shot-11 .screen-wrap', {scaleY:.008, filter:'brightness(4)', duration:.26, ease:'power3.in'}, 120.133);
+tl.to('#shot-11 .screen-wrap', {scaleX:0, opacity:0, duration:.2, ease:'power3.in'}, 120.403);
+tl.fromTo('#power-line i', {scaleX:1, opacity:1}, {scaleX:0, opacity:0, duration:.42, ease:'power3.in'}, 120.353);
+tl.fromTo('#end-card', {opacity:0}, {opacity:1, duration:.38, ease:'power2.out'}, 120.783);
+tl.fromTo('#end-card .end-mark', {scale:.88, opacity:0}, {scale:1, opacity:1, duration:.48, ease:'power3.out'}, 120.903);
+tl.fromTo('#end-card .end-name', {y:25, opacity:0}, {y:0, opacity:1, duration:.46, ease:'power3.out'}, 121.103);
+tl.fromTo('#end-card .end-url', {opacity:0}, {opacity:1, duration:.5, ease:'power2.out'}, 121.933);
+window.__timelines['main']=tl;
+tl.seek(0);
+</script></body></html>

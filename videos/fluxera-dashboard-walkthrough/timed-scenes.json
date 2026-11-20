@@ -1,0 +1,110 @@
+[
+  {
+    "id": "opening",
+    "image": "capture/01-command-center.png",
+    "title": "A control plane for work continuity",
+    "narration": "When production work fails, the important question is what happened next. Fluxera makes that answer visible, accountable, and verifiable.",
+    "audio": "audio/opening.wav",
+    "audioDuration": 8.213333,
+    "duration": 8.663333
+  },
+  {
+    "id": "command",
+    "image": "capture/01-command-center.png",
+    "title": "Command center",
+    "narration": "The command center brings service health, pending human decisions, queue pressure, cost exposure, and the live execution stream into one operational view.",
+    "audio": "audio/command.wav",
+    "audioDuration": 9.408,
+    "duration": 9.857999999999999
+  },
+  {
+    "id": "executions",
+    "image": "capture/02-executions.png",
+    "title": "Five layers, one execution stream",
+    "narration": "Agent runs, API calls, workflows, tools, and memory operations share one metadata-only event model. Each row keeps status, duration, and direct cost in context.",
+    "audio": "audio/executions.wav",
+    "audioDuration": 11.776,
+    "duration": 12.225999999999999
+  },
+  {
+    "id": "trace",
+    "image": "capture/03-execution-detail.png",
+    "title": "Find the checkpoint",
+    "narration": "Open an execution to see its step trail. Here, document indexing failed after a saved checkpoint. The cursor tells an approver where a supported resume can begin.",
+    "audio": "audio/trace.wav",
+    "audioDuration": 10.197333,
+    "duration": 10.647333
+  },
+  {
+    "id": "approval",
+    "image": "capture/04-approval-inbox.png",
+    "title": "A person decides",
+    "narration": "Fluxera creates a recovery request, but it does not act on a customer system by itself. An authorized approver reviews the evidence and decides.",
+    "audio": "audio/approval.wav",
+    "audioDuration": 9.322667,
+    "duration": 9.772666999999998
+  },
+  {
+    "id": "approved",
+    "image": "capture/05-approved.png",
+    "title": "Decision recorded",
+    "narration": "Approval is recorded before any external action. The request then enters a durable dispatch queue, so a worker restart does not erase it.",
+    "audio": "audio/approved.wav",
+    "audioDuration": 8.618667,
+    "duration": 9.068667
+  },
+  {
+    "id": "dispatch",
+    "image": "capture/06-recovery-dispatched.png",
+    "title": "Signed, idempotent dispatch",
+    "narration": "The worker sends a signed webhook to the configured recovery receiver, with a recovery identifier and idempotency key. Delivery is only a handoff.",
+    "audio": "audio/dispatch.wav",
+    "audioDuration": 9.408,
+    "duration": 9.857999999999999
+  },
+  {
+    "id": "verification",
+    "image": "capture/07-verified.png",
+    "title": "Verification needs evidence",
+    "narration": "Fluxera marks recovery verified only after a linked SDK execution reports the outcome. A successful webhook response alone never proves that the work resumed.",
+    "audio": "audio/verification.wav",
+    "audioDuration": 11.413333,
+    "duration": 11.863332999999999
+  },
+  {
+    "id": "audit",
+    "image": "capture/08-audit.png",
+    "title": "An auditable trail",
+    "narration": "The audit view preserves the request, human decision, dispatch state, and final verification as separate events. The story remains inspectable later.",
+    "audio": "audio/audit.wav",
+    "audioDuration": 9.792,
+    "duration": 10.241999999999999
+  },
+  {
+    "id": "cost",
+    "image": "capture/09-cost.png",
+    "title": "Cost intelligence",
+    "narration": "Cost intelligence separates observed spend and retry waste from estimated avoidable cost. In this pilot, these are recommendations, never automatic suppression of customer work.",
+    "audio": "audio/cost.wav",
+    "audioDuration": 12.032,
+    "duration": 12.482
+  },
+  {
+    "id": "integrations",
+    "image": "capture/10-integrations.png",
+    "title": "Your recovery receiver",
+    "narration": "Integrations connect approved actions to customer-controlled recovery endpoints. Each receiver must declare support for idempotency keys before it can be activated.",
+    "audio": "audio/integrations.wav",
+    "audioDuration": 10.752,
+    "duration": 11.202
+  },
+  {
+    "id": "closing",
+    "image": "capture/11-final-command.png",
+    "title": "Observe. Approve. Recover. Verify.",
+    "narration": "That is Fluxera: a live continuity workspace where people stay in control and results are verified. Explore the pilot at getfluxera dot com.",
+    "audio": "audio/closing.wav",
+    "audioDuration": 9.216,
+    "duration": 9.665999999999999
+  }
+]

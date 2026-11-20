@@ -1,0 +1,89 @@
+{
+  "totalDuration": 128.883333,
+  "scenes": [
+    {
+      "id": "opening",
+      "start": 0,
+      "duration": 8.663333,
+      "audioDuration": 8.213333,
+      "title": "A control plane for work continuity"
+    },
+    {
+      "id": "command",
+      "start": 8.663333,
+      "duration": 9.857999999999999,
+      "audioDuration": 9.408,
+      "title": "Command center"
+    },
+    {
+      "id": "executions",
+      "start": 18.521333,
+      "duration": 12.225999999999999,
+      "audioDuration": 11.776,
+      "title": "Five layers, one execution stream"
+    },
+    {
+      "id": "trace",
+      "start": 30.747332999999998,
+      "duration": 10.647333,
+      "audioDuration": 10.197333,
+      "title": "Find the checkpoint"
+    },
+    {
+      "id": "approval",
+      "start": 41.394666,
+      "duration": 9.772666999999998,
+      "audioDuration": 9.322667,
+      "title": "A person decides"
+    },
+    {
+      "id": "approved",
+      "start": 51.167333,
+      "duration": 9.068667,
+      "audioDuration": 8.618667,
+      "title": "Decision recorded"
+    },
+    {
+      "id": "dispatch",
+      "start": 60.236,
+      "duration": 9.857999999999999,
+      "audioDuration": 9.408,
+      "title": "Signed, idempotent dispatch"
+    },
+    {
+      "id": "verification",
+      "start": 70.094,
+      "duration": 11.863332999999999,
+      "audioDuration": 11.413333,
+      "title": "Verification needs evidence"
+    },
+    {
+      "id": "audit",
+      "start": 81.95733299999999,
+      "duration": 10.241999999999999,
+      "audioDuration": 9.792,
+      "title": "An auditable trail"
+    },
+    {
+      "id": "cost",
+      "start": 92.199333,
+      "duration": 12.482,
+      "audioDuration": 12.032,
+      "title": "Cost intelligence"
+    },
+    {
+      "id": "integrations",
+      "start": 104.681333,
+      "duration": 11.202,
+      "audioDuration": 10.752,
+      "title": "Your recovery receiver"
+    },
+    {
+      "id": "closing",
+      "start": 115.883333,
+      "duration": 13,
+      "audioDuration": 9.216,
+      "title": "Observe. Approve. Recover. Verify."
+    }
+  ]
+}
