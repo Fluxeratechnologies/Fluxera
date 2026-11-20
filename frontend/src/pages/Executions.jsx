@@ -26,9 +26,9 @@ function checkupLine(e) {
 }
 
 function statusColor(status) {
-  if (status === "success") return "#10b981";
-  if (status === "partial" || status === "interrupted" || status === "miss") return "#f59e0b";
-  return "#e11d48";
+  if (status === "success") return "#147342";
+  if (status === "partial" || status === "interrupted" || status === "miss") return "#c06a21";
+  return "#D9541E";
 }
 
 function ActorBadge({ actor }) {

@@ -74,6 +74,7 @@ router.post('/', async (req, res) => {
       started_at: log.started_at ? new Date(log.started_at) : null,
       ended_at: log.ended_at || log.timestamp ? new Date(log.ended_at || log.timestamp) : null,
       recovery_of: log.recovery_of || null,
+      recovery_request_id: log.recovery_request_id || null,
       actor: log.actor || null,
       for_execution_id: log.for_execution_id || null,
       for_step: log.for_step ? String(log.for_step).slice(0, 255) : null,

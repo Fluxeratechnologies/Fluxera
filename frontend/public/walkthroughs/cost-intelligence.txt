@@ -1,0 +1,3 @@
+Observed spend is recorded separately from retry waste and estimated avoidable cost. Open an execution to see the attributed cost. These figures are illustrative, and Fluxera does not suppress customer work.
+
+Illustrative synthetic data.

@@ -19,6 +19,14 @@ const migrateRoute   = require('./api/migrate')
 const workflowRoute  = require('./api/workflows')
 const executionRoute = require('./api/executions')
 const toolRoute      = require('./api/tools')
+const dashboardAuthRoute = require('./api/dashboard-auth')
+const recoveryRequestsRoute = require('./api/recovery-requests')
+const liveRoute = require('./api/live')
+const integrationsRoute = require('./api/integrations')
+const operationsRoute = require('./api/operations')
+const consoleRoute = require('./api/console')
+const applicationsRoute = require('./api/applications')
+const newsletterRoute = require('./api/newsletter')
 
 const { runProcessor } = require('./processor/run')
 const { sendDailyReports } = require('./email/send-report')
@@ -52,6 +60,16 @@ app.use('/api/waitlist', rateLimit({
   max: 20,
   message: { error: 'Too many waitlist attempts' }
 }))
+app.use('/api/applications', rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many access requests. Try again later.' }
+}))
+app.use('/api/newsletter', rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many subscription requests. Try again later.' }
+}))
 
 // ─── ROUTES ───────────────────────────────────────────────────
 app.use('/api/ingest',    ingestRoute)
@@ -64,6 +82,14 @@ app.use('/api/migrate',    migrateRoute)
 app.use('/api/workflows',  workflowRoute)
 app.use('/api/executions', executionRoute)
 app.use('/api/tools',      toolRoute)
+app.use('/api/dashboard-auth', dashboardAuthRoute)
+app.use('/api/recovery-requests', recoveryRequestsRoute)
+app.use('/api/live', liveRoute)
+app.use('/api/integrations', integrationsRoute)
+app.use('/api/operations', operationsRoute)
+app.use('/api/console', consoleRoute)
+app.use('/api/applications', applicationsRoute)
+app.use('/api/newsletter', newsletterRoute)
 
 // 404 catch-all
 app.use((req, res) => res.status(404).json({ error: 'Not found' }))

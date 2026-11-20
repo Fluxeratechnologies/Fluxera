@@ -1919,7 +1919,7 @@ export function Login({ onLogin, go }) {
   }
 
   return (
-    <div className="relative min-h-[calc(100vh-80px)] flex items-center justify-center p-4 sm:p-6">
+    <div className="fx-access-screen relative min-h-[calc(100vh-80px)] flex items-center justify-center p-4 sm:p-6">
       <ShaderBackground />
       <div className="cosmic-arc-top"></div>
       <div className="relative z-10 w-full max-w-md futuristic-card p-8 sm:p-10 shadow-2xl border border-rose-200/80 bg-white/95">

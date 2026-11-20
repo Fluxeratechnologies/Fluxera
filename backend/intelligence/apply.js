@@ -3,12 +3,27 @@ const { query } = require('../../db/pool')
 const { upsertWorkflow, upsertTool, upsertExecution, upsertStep, applyCheckpoint, resolveRecoveryOf, resolveForAgent } = require('./upsert')
 const { rollupExecution } = require('./rollup')
 const { normalizeCostKind } = require('./kinds')
+const { verifyRecoveryExecution } = require('../recovery/verification')
+const { publishWorkspaceEvent } = require('../events/publish')
 
 async function applyBatch(customer, events) {
   const executionIds = new Set()
   const leaves = []
 
   for (const ev of events) {
+    // Store only canonical metadata; the ingestion route never passes prompts,
+    // responses, tool arguments, or memory values into this record.
+    await query(
+      `INSERT INTO execution_events (customer_id, request_id, kind, metadata)
+       VALUES ($1, $2, $3, $4)
+       ON CONFLICT (customer_id, request_id) DO NOTHING`,
+      [customer.id, ev.request_id, ev.kind, JSON.stringify({
+        status: ev.status, workflow: ev.workflow, step: ev.step, tool: ev.tool,
+        execution_id: ev.execution_id, recovery_of: ev.recovery_of,
+        recovery_request_id: ev.recovery_request_id, latency_ms: ev.latency_ms,
+        price: ev.price, attempt: ev.attempt, timestamp: ev.ended_at,
+      })]
+    )
     let toolId = null
     let executionId = ev.execution_id
     let stepId = ev.step_id
@@ -25,6 +40,7 @@ async function applyBatch(customer, events) {
         status: ev.status === 'fail' ? 'failed' : 'success',
         durationMs: ev.kind === 'workflow_end' ? ev.latency_ms : null,
         recoveryOf: await resolveRecoveryOf(customer.id, ev.recovery_of),
+        recoveryRequestId: ev.recovery_request_id || null,
         forExecutionId: await resolveForAgent(customer.id, ev.for_execution_id),
         forStep: ev.for_step,
         hitCount: ev.hits,
@@ -106,6 +122,8 @@ async function applyBatch(customer, events) {
 
   for (const id of executionIds) {
     await rollupExecution(id)
+    await verifyRecoveryExecution(customer.id, id)
+    await publishWorkspaceEvent(customer.id, 'execution.updated', { execution_id: id })
   }
 }
 

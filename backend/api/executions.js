@@ -2,7 +2,6 @@ const express = require('express')
 const { query } = require('../../db/pool')
 const { requireAuth } = require('./auth')
 const { diagnoseExecution } = require('../intelligence/diagnose')
-const { executeRecover } = require('./recover')
 const { interruptedSql } = require('../intelligence/interrupt')
 const { actorFilter } = require('../intelligence/kinds')
 
@@ -107,30 +106,13 @@ router.get('/:id', async (req, res) => {
   }
 })
 
-router.post('/:id/recover', async (req, res) => {
-  const customer = await requireAuth(req, res)
-  if (!customer) return
-
-  try {
-    const packed = await diagnoseExecution(customer, req.params.id)
-    if (!packed) return res.status(404).json({ error: 'Not found' })
-
-    const action = req.body?.action || packed.diagnosis.recover.action
-    if (!action || action === 'none') {
-      return res.status(400).json({ error: 'Nothing to recover' })
-    }
-
-    const row = await executeRecover(customer, packed, action)
-
-    return res.status(200).json({
-      ok: true,
-      executed: true,
-      recovery: row,
-    })
-  } catch (err) {
-    console.error('[recover]', err.message)
-    return res.status(err.status || 500).json({ error: err.status ? err.message : 'Failed to recover' })
-  }
+// V1 exposed a machine-key endpoint here. It is intentionally retired: only
+// authenticated humans can create and approve V2 recovery requests.
+router.post('/:id/recover', (req, res) => {
+  return res.status(410).json({
+    error: 'Direct recovery is retired. Create a dashboard recovery request instead.',
+    recovery_requests: '/api/recovery-requests',
+  })
 })
 
 module.exports = router

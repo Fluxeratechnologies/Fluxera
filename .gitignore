@@ -1,13 +1,25 @@
 node_modules/
-frontend/node_modules/
 .env
 frontend/.env
 *.log
 .DS_Store
 dist/
-frontend/dist/
 coverage/
-tests/
+.agents/skills/
+skills-lock.json
+
+# video compositions
+film/
+social/
+
+# Local design, browser, and generated deliverables
+.playwright-cli/
+output/
+tmp/
+brag-output/
+Fluxera/
+
+# Legacy local palette showcases
 palette-*.html
 frontend/palette-*.html
 Futuristic Fluxera Neon Emblem.png

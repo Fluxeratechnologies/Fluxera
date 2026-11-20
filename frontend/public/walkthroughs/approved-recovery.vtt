@@ -1,0 +1,13 @@
+WEBVTT
+
+1
+00:00:00,000 --> 00:00:03,586
+This resume request waits for an authorized person.
+
+2
+00:00:03,586 --> 00:00:07,620
+Review the checkpoint and destination, then approve or reject.
+
+3
+00:00:07,620 --> 00:00:12,550
+Approval queues delivery; only a linked execution event can verify recovery.

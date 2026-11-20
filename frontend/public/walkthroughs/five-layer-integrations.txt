@@ -1,0 +1,3 @@
+Agents, APIs, workflows, tools, and memory share one execution trail. Inspect the receiver's idempotency support, then follow a failed workflow through its steps. All activity shown here is synthetic.
+
+Illustrative synthetic data.

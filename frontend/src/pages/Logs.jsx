@@ -83,7 +83,7 @@ export function Logs({ data }) {
                 </div>
 
                 <div className="sm:col-span-2 flex items-center sm:justify-center gap-1.5">
-                  <Dot active={log.status === "fail"} color={log.status === "fail" ? "#e11d48" : "#10b981"} />
+                  <Dot active={log.status === "fail"} color={log.status === "fail" ? "#D9541E" : "#147342"} />
                   <span
                     className={`font-mono text-xs font-bold capitalize ${
                       log.status === "fail" ? "text-rosebrand-600" : "text-emerald-600"

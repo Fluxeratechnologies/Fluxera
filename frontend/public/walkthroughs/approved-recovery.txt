@@ -1,0 +1,3 @@
+This resume request waits for an authorized person. Review the checkpoint and destination, then approve or reject. Approval queues delivery; only a linked execution event can verify recovery.
+
+Illustrative synthetic data.

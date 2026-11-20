@@ -68,7 +68,7 @@ export function Onboarding({ onLogin, go, initialEmail = "", session }) {
 
   if (minted) {
     return (
-      <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-8 pt-24">
+      <div className="fx-access-screen relative min-h-screen flex items-center justify-center p-4 sm:p-8 pt-24">
         <div className="relative z-10 max-w-xl w-full glass-card p-8 sm:p-10 rounded-3xl shadow-card-glass border border-rosebrand-100 bg-white text-left">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -118,7 +118,7 @@ export function Onboarding({ onLogin, go, initialEmail = "", session }) {
   }
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-8 pt-24">
+    <div className="fx-access-screen relative min-h-screen flex items-center justify-center p-4 sm:p-8 pt-24">
       <div className="relative z-10 w-full max-w-md glass-card p-8 sm:p-10 rounded-3xl shadow-card-glass border border-rosebrand-100 bg-white text-left">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rosebrand-600 to-rosebrand-400 flex items-center justify-center text-white shadow-md mb-6 font-mono font-bold">
           fx
